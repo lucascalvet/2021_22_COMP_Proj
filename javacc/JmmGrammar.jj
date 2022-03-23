@@ -12,6 +12,35 @@ TOKEN :
 	< OPEN_PAREN : "(" > |
 	< CLOSE_PAREN : ")" > |
 	< INTEGER : (["0" - "9"])+ >
+	< IMPORT : "import" >
+	< DOT : ".">
+	< SEMICOLON : ";" >
+	< CLASS : "class" >
+	< EXTENDS : "extends" >
+	< OPEN_CURLY_BRA : "{" >
+	< CLOSE_CURLY_BRA : "}" >
+	< PUBLIC : "public" >
+	< RETURN : "return" >
+	< STATIC : "static" >
+	< VOID : "void" >
+	< MAIN : "main" >
+	< STRING : "String" >
+	< OPEN_SQUARE_BRA: "[">
+	< CLOSE_SQUARE_BRA: "]">
+    < INT : "int" >
+    < BOOLEAN: "boolean" >
+    < IF: "if" >
+    < ELSE: "else" >
+    < WHILE: "while" >
+    < ASSIGN: "=" >
+    < AND: "&&" >
+    < MINOR: "<" >
+    < LENGTH: "length">
+    < TRUE: "true" >
+    < FALSE: "false" >
+    < THIS: "this" >
+    < NEW: "new" >
+    < NOT: "!" >
 ;
 
 Start : AdditiveExpression <EOF> ;
