@@ -11,58 +11,81 @@ TOKEN :
 	< DIVIDE : "/" > |
 	< OPEN_PAREN : "(" > |
 	< CLOSE_PAREN : ")" > |
-	< INTEGER : (["0" - "9"])+ >
-	< IMPORT : "import" >
-	< DOT : ".">
-	< SEMICOLON : ";" >
-	< CLASS : "class" >
-	< EXTENDS : "extends" >
-	< OPEN_CURLY_BRA : "{" >
-	< CLOSE_CURLY_BRA : "}" >
-	< PUBLIC : "public" >
-	< RETURN : "return" >
-	< STATIC : "static" >
-	< VOID : "void" >
-	< MAIN : "main" >
-	< STRING : "String" >
-	< OPEN_SQUARE_BRA: "[">
-	< CLOSE_SQUARE_BRA: "]">
-    < INT : "int" >
-    < BOOLEAN: "boolean" >
-    < IF: "if" >
-    < ELSE: "else" >
-    < WHILE: "while" >
-    < ASSIGN: "=" >
-    < AND: "&&" >
-    < MINOR: "<" >
-    < LENGTH: "length">
-    < TRUE: "true" >
-    < FALSE: "false" >
-    < THIS: "this" >
-    < NEW: "new" >
-    < NOT: "!" >
-;
+	< INTEGER : (["0" - "9"])+ > |
+	< IMPORT : "import" > |
+	< DOT : "." > |
+	< SEMICOLON : ";" > |
+	< CLASS : "class" > |
+	< EXTENDS : "extends" > |
+	< OPEN_CURLY_BRA : "{" > |
+	< CLOSE_CURLY_BRA : "}" > |
+	< PUBLIC : "public" > |
+	< COMMA : "," > |
+	< RETURN : "return" > |
+	< STATIC : "static" > |
+	< VOID : "void" > |
+	< MAIN : "main" > |
+	< STRING : "String" > |
+	< OPEN_SQUARE_BRA : "[" > |
+	< CLOSE_SQUARE_BRA : "]" > |
+    < INT : "int" > |
+    < BOOLEAN : "boolean" > |
+    < IF : "if" > |
+    < ELSE : "else" > |
+    < WHILE : "while" > |
+    < ASSIGN : "=" > |
+    < AND : "&&" > |
+    < MINOR : "<" > |
+    < LENGTH : "length" > |
+    < TRUE : "true" > |
+    < FALSE : "false" > |
+    < THIS : "this" > |
+    < NEW : "new" > |
+    < NOT : "!" > |
+    < ID : (["a"-"z"] | ["A"-"Z"]) (["a"-"z"] | ["A"-"Z"] | ["0"-"9"])* >;
 
-Start : AdditiveExpression <EOF> ;
+Start : ImportDeclaration ClassDeclaration <EOF>;
 
-AdditiveExpression :
-	MultiplicativeExpression
-	(
-		(< PLUS > | < MINUS >)
-		MultiplicativeExpression
-	)?
-;
+ImportDeclaration :  (<IMPORT> <ID> (<DOT> <ID>)* <SEMICOLON>)*;
 
-MultiplicativeExpression :
-	Factor
-	(
-		(< TIMES > | < DIVIDE >)
-		Factor
-	)?
-;
+ClassDeclaration : <CLASS> <ID> (<EXTENDS> <ID>)? <OPEN_CURLY_BRA> (VarDeclaration)* (MethodDeclaration)* <CLOSE_CURLY_BRA>;
 
-Factor :
-	< INTEGER > |
-	< MINUS> Factor |
-	< OPEN_PAREN > AdditiveExpression < CLOSE_PAREN >
-;
+VarDeclaration : Type <ID> <SEMICOLON>;
+
+MethodDeclaration : <PUBLIC> Type <ID> <OPEN_PAREN> (Type <ID> ( <COMMA> Type <ID>)* )? <CLOSE_PAREN>
+                    <OPEN_CURLY_BRA>
+                    ( VarDeclaration )*
+                    ( Statement )*
+                    <RETURN> Expression <SEMICOLON>
+                    <CLOSE_CURLY_BRA> |
+                    <PUBLIC> <STATIC> <VOID> <MAIN> <OPEN_PAREN> <STRING> <OPEN_SQUARE_BRA><CLOSE_SQUARE_BRA> <ID> <CLOSE_PAREN>
+                    <OPEN_CURLY_BRA>
+                    ( VarDeclaration )*
+                    ( Statement )*
+                    <CLOSE_CURLY_BRA>;
+
+Type : <INT> <OPEN_SQUARE_BRA> <CLOSE_SQUARE_BRA> |
+      <BOOLEAN> |
+      <INT> |
+      <ID>;
+
+Statement : <OPEN_CURLY_BRA> ( Statement )* <CLOSE_CURLY_BRA> |
+           <IF> <OPEN_PAREN> Expression <CLOSE_PAREN> Statement <ELSE> Statement |
+           <WHILE> <OPEN_PAREN> Expression <CLOSE_PAREN> Statement |
+           Expression <SEMICOLON> |
+           <ID> <ASSIGN> Expression <SEMICOLON> |
+           <ID> <OPEN_SQUARE_BRA> Expression <CLOSE_SQUARE_BRA> <ASSIGN> Expression <SEMICOLON>;
+
+Expression : Expression (<AND> | <MINOR> | <PLUS> | <MINUS> | <TIMES> | <DIVIDE>) Expression |
+            Expression <OPEN_SQUARE_BRA> Expression <CLOSE_SQUARE_BRA> |
+            Expression <DOT> <LENGTH> |
+            Expression <DOT> <ID> <OPEN_PAREN> ( Expression (<COMMA> Expression)* )? <CLOSE_PAREN> |
+            <INTEGER> |
+            <TRUE> |
+            <FALSE> |
+            <ID> |
+            <THIS> |
+            <NEW> <INT> <OPEN_SQUARE_BRA> Expression <CLOSE_SQUARE_BRA> |
+            <NEW> <ID> <OPEN_PAREN> <CLOSE_PAREN> |
+            <NOT> Expression |
+            <OPEN_PAREN> Expression <CLOSE_PAREN>;
