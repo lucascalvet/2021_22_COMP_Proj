@@ -50,7 +50,7 @@ ImportDeclaration :  (<IMPORT> <ID> (<DOT> <ID>)* <SEMICOLON>)*;
 
 ClassDeclaration : <CLASS> <ID> (<EXTENDS> <ID>)? <OPEN_CURLY_BRA> (VarDeclaration)* (MethodDeclaration)* <CLOSE_CURLY_BRA>;
 
-VarDeclaration : Type <ID> <SEMICOLON>;
+VarDeclaration : SCAN 2 (Type <ID> <SEMICOLON>);
 
 MethodDeclaration : SCAN 2 (<PUBLIC> Type <ID> <OPEN_PAREN> (Type <ID> ( <COMMA> Type <ID>)* )? <CLOSE_PAREN>
                     <OPEN_CURLY_BRA>
@@ -67,14 +67,15 @@ MethodDeclaration : SCAN 2 (<PUBLIC> Type <ID> <OPEN_PAREN> (Type <ID> ( <COMMA>
 Type : SCAN 2 (<INT> <OPEN_SQUARE_BRA> <CLOSE_SQUARE_BRA>) |
       <BOOLEAN> |
       <INT> |
-      <ID>;
+      <ID> |
+      <STRING> ;
 
 Statement : <OPEN_CURLY_BRA> ( Statement )* <CLOSE_CURLY_BRA> |
            <IF> <OPEN_PAREN> Expression <CLOSE_PAREN> Statement <ELSE> Statement |
            <WHILE> <OPEN_PAREN> Expression <CLOSE_PAREN> Statement |
-           Expression <SEMICOLON> |
            SCAN 2 (<ID> <ASSIGN> Expression <SEMICOLON>) |
-           SCAN 2 (<ID> <OPEN_SQUARE_BRA> Expression <CLOSE_SQUARE_BRA> <ASSIGN> Expression <SEMICOLON>);
+           SCAN 2 (<ID> <OPEN_SQUARE_BRA> Expression <CLOSE_SQUARE_BRA> <ASSIGN> Expression <SEMICOLON>) |
+           SCAN 2 (Expression <SEMICOLON>);
 
 Expression : <INTEGER> (ExprNLR)? |
             <TRUE> (ExprNLR)? |
