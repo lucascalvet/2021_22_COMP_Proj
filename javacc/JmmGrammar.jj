@@ -2,7 +2,7 @@ PARSER_PACKAGE=pt.up.fe.comp;
 PARSER_CLASS=JmmGrammarParser;
 SMART_NODE_CREATION=false;
 
-SKIP : " " | "\t" | "\r" | "\n";
+SKIP : " " | "\t" | "\r" | "\n" |  <"//" (~["\n"])* "\n"> | <"/*" (~["*"])* "*/">;
 
 TOKEN :
 	< PLUS : "+" > |
@@ -42,7 +42,7 @@ TOKEN :
     < THIS : "this" > |
     < NEW : "new" > |
     < NOT : "!" > |
-    < ID : (["a"-"z"] | ["A"-"Z"]) (["a"-"z"] | ["A"-"Z"] | "_" | ["0"-"9"])* >;
+    < ID : (["a"-"z"] | "_" | ["A"-"Z"]) (["a"-"z"] | ["A"-"Z"] | "_" | ["0"-"9"])* >;
 
 Start : ImportDeclaration ClassDeclaration <EOF>;
 
