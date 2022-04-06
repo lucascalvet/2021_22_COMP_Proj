@@ -9,6 +9,7 @@ import pt.up.fe.comp.jmm.parser.JmmParserResult;
 import pt.up.fe.specs.util.SpecsIo;
 import pt.up.fe.specs.util.SpecsLogs;
 import pt.up.fe.specs.util.SpecsSystem;
+import pt.up.fe.comp.jmm.report.Report; //adictional import for printing reports
 
 public class Launcher {
 
@@ -44,6 +45,15 @@ public class Launcher {
         TestUtils.noErrors(parserResult.getReports());
 
         // ... add remaining stages
+
+        System.out.println("\n-----------------------------------------------------------------------------------------------------------");
+        System.out.println(" Warnings (Reports): ");
+
+        for (Report rep : parserResult.getReports()) {
+            System.out.println("  " + rep);
+        }
+
+        System.out.println("\n");
     }
 
 }
