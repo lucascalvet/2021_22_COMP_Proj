@@ -40,7 +40,8 @@ public class SimpleParser implements JmmParser {
             SpecsSystem.invoke(parser, startingRule);
 
             Node root = parser.rootNode();
-            root.dump("");
+
+            //root.dump("");
 
             if (!(root instanceof JmmNode)) {
                 return JmmParserResult.newError(new Report(ReportType.WARNING, Stage.SYNTATIC, -1,

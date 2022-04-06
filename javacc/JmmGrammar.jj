@@ -45,23 +45,24 @@ TOKEN :
     < NOT : "!" > |
     < ID : (["a"-"z"] | "_" | ["A"-"Z"]) (["a"-"z"] | ["A"-"Z"] | "_" | ["0"-"9"])* >;
 
-Start : ImportDeclaration ClassDeclaration <EOF>;
+Start : (ImportDeclaration)* ClassDeclaration <EOF>;
 
-ImportDeclaration :  (<IMPORT> <ID> (<DOT> <ID>)* <SEMICOLON>)*;
+Identifier : <ID> ({jjtThis.put("name", lastConsumedToken.getImage());});
 
+ImportDeclaration :  <IMPORT> Identifier (<DOT> Identifier)* <SEMICOLON>;
 
-ClassDeclaration : <CLASS> <ID> (<EXTENDS> <ID>)? <OPEN_CURLY_BRA> (VarDeclaration)* (MethodDeclaration)* <CLOSE_CURLY_BRA>;
+ClassDeclaration : <CLASS> Identifier (<EXTENDS> Identifier)? <OPEN_CURLY_BRA> (VarDeclaration)* (MethodDeclaration)* <CLOSE_CURLY_BRA>;
 
-VarDeclaration : SCAN 2 (Type <ID> <SEMICOLON>);
+VarDeclaration : SCAN 2 (Type Identifier <SEMICOLON>);
 
 MethodDeclaration : <PUBLIC> ((
-                    Type <ID> <OPEN_PAREN> (Type <ID> ( <COMMA> Type <ID>)* )? <CLOSE_PAREN>
+                    Type Identifier <OPEN_PAREN> (Type Identifier ( <COMMA> Type Identifier)* )? <CLOSE_PAREN>
                     <OPEN_CURLY_BRA>
                     ( VarDeclaration )*
                     ( Statement )*
                     <RETURN> Expression <SEMICOLON>
                     <CLOSE_CURLY_BRA>) | (
-                    <STATIC> <VOID> <MAIN> <OPEN_PAREN> <STRING> <OPEN_SQUARE_BRA><CLOSE_SQUARE_BRA> <ID> <CLOSE_PAREN>
+                    <STATIC> <VOID> <MAIN> <OPEN_PAREN> <STRING> <OPEN_SQUARE_BRA><CLOSE_SQUARE_BRA> Identifier <CLOSE_PAREN>
                     <OPEN_CURLY_BRA>
                     ( VarDeclaration )*
                     ( Statement )*
@@ -69,13 +70,13 @@ MethodDeclaration : <PUBLIC> ((
 
 Type : <INT> (<OPEN_SQUARE_BRA> <CLOSE_SQUARE_BRA>)? |
       <BOOLEAN> |
-      <ID> |
+      Identifier |
       <STRING> ;
 
 Statement : <OPEN_CURLY_BRA> ( Statement )* <CLOSE_CURLY_BRA> |
            <IF> <OPEN_PAREN> Expression <CLOSE_PAREN> Statement <ELSE> Statement |
            <WHILE> <OPEN_PAREN> Expression <CLOSE_PAREN> Statement |
-           SCAN 2 (<ID> (
+           SCAN 2 (Identifier (
            (<ASSIGN> Expression <SEMICOLON>) |
            (<OPEN_SQUARE_BRA> Expression <CLOSE_SQUARE_BRA> <ASSIGN> Expression <SEMICOLON>)
            )) |
@@ -85,11 +86,11 @@ Statement : <OPEN_CURLY_BRA> ( Statement )* <CLOSE_CURLY_BRA> |
 Expression : <INTEGER> (ExprNLR)? |
             <TRUE> (ExprNLR)? |
             <FALSE> (ExprNLR)? |
-            <ID> (ExprNLR)? |
+            Identifier (ExprNLR)? |
             <THIS> (ExprNLR)? |
             <NEW> (
             (<INT> <OPEN_SQUARE_BRA> Expression <CLOSE_SQUARE_BRA> (ExprNLR)?) |
-            (<ID> <OPEN_PAREN> <CLOSE_PAREN> (ExprNLR)?)
+            (Identifier <OPEN_PAREN> <CLOSE_PAREN> (ExprNLR)?)
             ) |
             <NOT> Expression (ExprNLR)? |
             <OPEN_PAREN> Expression <CLOSE_PAREN> (ExprNLR)?;
@@ -98,5 +99,34 @@ ExprNLR #void : (<AND> | <MINOR> | <PLUS> | <MINUS> | <TIMES> | <DIVIDE>) Expres
           <OPEN_SQUARE_BRA> Expression <CLOSE_SQUARE_BRA> (ExprNLR)? |
           <DOT> (
           (<LENGTH> (ExprNLR)?) |
-          (<ID> <OPEN_PAREN> ( Expression (<COMMA> Expression)* )? <CLOSE_PAREN> (ExprNLR)?)
+          (Identifier <OPEN_PAREN> ( Expression (<COMMA> Expression)* )? <CLOSE_PAREN> (ExprNLR)?)
           );
+
+// Injections for the implementation of JmmNode
+// Since this is injected into BaseNode, it affects only non-terminals
+INJECT BaseNode :
+        import pt.up.fe.comp.jmm.ast.JmmNode;
+        import pt.up.fe.comp.jmm.ast.JmmNodeImpl;
+        import pt.up.fe.comp.jmm.ast.AJmmNode;
+        import pt.up.fe.specs.util.SpecsCollections;
+        extends AJmmNode
+{
+    @Override
+    public List<JmmNode> getChildren() {
+
+        return SpecsCollections.cast(children(), JmmNode.class);
+    }
+
+    @Override
+    public void add(JmmNode child, int index) {
+
+        if (child instanceof Node) {
+
+            addChild(index, (Node) child);
+        } else {
+
+            throw new RuntimeException("Node " + child + " is not a Node.");
+        }
+
+    }
+}

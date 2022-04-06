@@ -34,9 +34,9 @@ public class GrammarTest {
         var result = TestUtils.parse(code, grammarRule);
         TestUtils.noErrors(result.getReports());
 
-        /*System.out.println("Code: " + code + "\n");
+        System.out.println("Code: " + code + "\n");
         System.out.println("AST:\n\n" + result.getRootNode().toTree());
-        System.out.println("\n---------\n");*/
+        System.out.println("\n---------\n");
     }
 
     private static void noErrors(String code) {
@@ -221,7 +221,7 @@ public class GrammarTest {
 
     @Test
     public void testExprAdd() {
-        noErrors("2 + 3", EXPRESSION);
+        noErrors("2 + 3 * 4", EXPRESSION);
     }
 
     @Test
