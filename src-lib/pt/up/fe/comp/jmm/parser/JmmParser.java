@@ -15,4 +15,5 @@ public interface JmmParser {
     default JmmParserResult parse(String jmmCode, String startingRule, Map<String, String> config) {
         return parse(jmmCode, config);
     }
+
 }
