@@ -47,60 +47,64 @@ TOKEN :
 
 Start : (ImportDeclaration)* ClassDeclaration <EOF>;
 
-Identifier : <ID> ({jjtThis.put("name", lastConsumedToken.getImage());});
+Identifier #id_: <ID> ({jjtThis.put("", lastConsumedToken.getImage());});
 
-ImportDeclaration :  <IMPORT> Identifier (<DOT> Identifier)* <SEMICOLON>;
+ImportDeclaration #import_:  <IMPORT> Identifier (<DOT> Identifier)* <SEMICOLON>;
 
-ClassDeclaration : <CLASS> Identifier (<EXTENDS> Identifier)? <OPEN_CURLY_BRA> (VarDeclaration)* (MethodDeclaration)* <CLOSE_CURLY_BRA>;
+ClassDeclaration #class_: <CLASS> Identifier (<EXTENDS> Identifier)? <OPEN_CURLY_BRA> (VarDeclaration)* (MethodDeclaration)* <CLOSE_CURLY_BRA>;
 
-VarDeclaration : SCAN 2 (Type Identifier <SEMICOLON>);
+VarDeclaration #var_: SCAN 2 (Type Identifier <SEMICOLON>);
 
-MethodDeclaration : <PUBLIC> ((
+MethodDeclaration #method_: <PUBLIC> ((
                     Type Identifier <OPEN_PAREN> (Type Identifier ( <COMMA> Type Identifier)* )? <CLOSE_PAREN>
                     <OPEN_CURLY_BRA>
                     ( VarDeclaration )*
                     ( Statement )*
                     <RETURN> Expression <SEMICOLON>
                     <CLOSE_CURLY_BRA>) | (
-                    <STATIC> <VOID> <MAIN> <OPEN_PAREN> <STRING> <OPEN_SQUARE_BRA><CLOSE_SQUARE_BRA> Identifier <CLOSE_PAREN>
+                    <STATIC> <VOID> <MAIN> #main_ <OPEN_PAREN> <STRING> <OPEN_SQUARE_BRA><CLOSE_SQUARE_BRA> Identifier <CLOSE_PAREN>
                     <OPEN_CURLY_BRA>
                     ( VarDeclaration )*
                     ( Statement )*
                     <CLOSE_CURLY_BRA>));
 
-Type : <INT> (<OPEN_SQUARE_BRA> <CLOSE_SQUARE_BRA>)? |
+Type #type_: <INT> (<OPEN_SQUARE_BRA> <CLOSE_SQUARE_BRA>)? |
       <BOOLEAN> |
       Identifier |
-      <STRING> ;
+      <STRING> #string_ ;
 
-Statement : <OPEN_CURLY_BRA> ( Statement )* <CLOSE_CURLY_BRA> |
-           <IF> <OPEN_PAREN> Expression <CLOSE_PAREN> Statement <ELSE> Statement |
-           <WHILE> <OPEN_PAREN> Expression <CLOSE_PAREN> Statement |
-           SCAN 2 (Identifier (
-           (<ASSIGN> Expression <SEMICOLON>) |
-           (<OPEN_SQUARE_BRA> Expression <CLOSE_SQUARE_BRA> <ASSIGN> Expression <SEMICOLON>)
+
+
+Statement #statement_: <OPEN_CURLY_BRA> ( Statement )* <CLOSE_CURLY_BRA> |
+           <IF> #if_ <OPEN_PAREN> Expression <CLOSE_PAREN> Statement <ELSE> #else_ Statement |
+           <WHILE> #while_ <OPEN_PAREN> Expression <CLOSE_PAREN> Statement |
+           SCAN 2 (Identifier  (
+           (<ASSIGN> #assign_ Expression <SEMICOLON>) |
+           (<OPEN_SQUARE_BRA> Expression <CLOSE_SQUARE_BRA> <ASSIGN>  #assign_ Expression <SEMICOLON>)
            )) |
            SCAN 2 (Expression <SEMICOLON>);
 
+Expression #expr_: Expr |
+                <DOT> (<LENGTH> | (Identifier <OPEN_PAREN> ( Expression (<COMMA> Expression)* )? <CLOSE_PAREN>)) |
+                <NEW> ((<INT> <OPEN_SQUARE_BRA> Expression <CLOSE_SQUARE_BRA>) | (Identifier <OPEN_PAREN> <CLOSE_PAREN>));
 
-Expression : <INTEGER> (ExprNLR)? |
-            <TRUE> (ExprNLR)? |
-            <FALSE> (ExprNLR)? |
-            Identifier (ExprNLR)? |
-            <THIS> (ExprNLR)? |
-            <NEW> (
-            (<INT> <OPEN_SQUARE_BRA> Expression <CLOSE_SQUARE_BRA> (ExprNLR)?) |
-            (Identifier <OPEN_PAREN> <CLOSE_PAREN> (ExprNLR)?)
-            ) |
-            <NOT> Expression (ExprNLR)? |
-            <OPEN_PAREN> Expression <CLOSE_PAREN> (ExprNLR)?;
+Expr : LogicalExpr;
 
-ExprNLR #void : (<AND> | <MINOR> | <PLUS> | <MINUS> | <TIMES> | <DIVIDE>) Expression (ExprNLR)? |
-          <OPEN_SQUARE_BRA> Expression <CLOSE_SQUARE_BRA> (ExprNLR)? |
-          <DOT> (
-          (<LENGTH> (ExprNLR)?) |
-          (Identifier <OPEN_PAREN> ( Expression (<COMMA> Expression)* )? <CLOSE_PAREN> (ExprNLR)?)
-          );
+LogicalExpr: CompareExpr (<AND> CompareExpr)*;
+
+CompareExpr: AddExpr (<MINOR> AddExpr)*;
+
+AddExpr:  MultiplyExpr ((<PLUS> | <MINUS>) MultiplyExpr)*;
+
+MultiplyExpr: NotExpr ((<TIMES> | <DIVIDE>) NotExpr)*;
+
+NotExpr: (<NOT>)? ArrayAccess;
+
+ArrayAccess: ExprTerminal (<OPEN_SQUARE_BRA> Expr <CLOSE_SQUARE_BRA>)*;
+
+ExprTerminal: IntLiteral | <OPEN_PAREN> Expression <CLOSE_PAREN> | Identifier | <TRUE> | <FALSE> | <THIS>;
+
+IntLiteral: <INTEGER> ({jjtThis.put("value", lastConsumedToken.getImage());});
 
 // Injections for the implementation of JmmNode
 // Since this is injected into BaseNode, it affects only non-terminals
