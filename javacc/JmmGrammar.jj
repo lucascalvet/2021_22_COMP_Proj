@@ -84,8 +84,8 @@ Statement #statement_: <OPEN_CURLY_BRA> ( Statement )* <CLOSE_CURLY_BRA> |
            )) |
            SCAN 2 (Expression <SEMICOLON>);
 
-Expression #expr_: Expr |
-                <DOT> (<LENGTH> | (Identifier <OPEN_PAREN> ( Expression (<COMMA> Expression)* )? <CLOSE_PAREN>)) |
+Expression #expr_:
+                Expr |
                 <NEW> ((<INT> <OPEN_SQUARE_BRA> Expression <CLOSE_SQUARE_BRA>) | (Identifier <OPEN_PAREN> <CLOSE_PAREN>));
 
 Expr : LogicalExpr;
@@ -100,7 +100,9 @@ MultiplyExpr: NotExpr ((<TIMES> | <DIVIDE>) NotExpr)*;
 
 NotExpr: (<NOT>)? ArrayAccess;
 
-ArrayAccess: ExprTerminal (<OPEN_SQUARE_BRA> Expr <CLOSE_SQUARE_BRA>)*;
+ArrayAccess: AccessExpr (<OPEN_SQUARE_BRA> Expr <CLOSE_SQUARE_BRA>)*;
+
+AccessExpr: ExprTerminal (<DOT> (<LENGTH> | (Identifier <OPEN_PAREN> ( Expression (<COMMA> Expression)* )? <CLOSE_PAREN>)))*;
 
 ExprTerminal: IntLiteral | <OPEN_PAREN> Expression <CLOSE_PAREN> | Identifier | <TRUE> | <FALSE> | <THIS>;
 
