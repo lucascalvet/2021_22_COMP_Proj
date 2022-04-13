@@ -47,7 +47,7 @@ TOKEN :
 
 Start : (ImportDeclaration)* ClassDeclaration <EOF>;
 
-Identifier #id_: <ID> ({jjtThis.put("", lastConsumedToken.getImage());});
+Identifier #id_: <ID> ({jjtThis.put("name", lastConsumedToken.getImage());});
 
 ImportDeclaration #import_:  <IMPORT> Identifier (<DOT> Identifier)* <SEMICOLON>;
 
@@ -68,12 +68,10 @@ MethodDeclaration #method_: <PUBLIC> ((
                     ( Statement )*
                     <CLOSE_CURLY_BRA>));
 
-Type #type_: <INT> (<OPEN_SQUARE_BRA> <CLOSE_SQUARE_BRA>)? |
-      <BOOLEAN> |
+Type #type_: <INT> ({jjtThis.put("type", lastConsumedToken.getImage());}) (<OPEN_SQUARE_BRA> <CLOSE_SQUARE_BRA>)? |
+      <BOOLEAN> #bool_type_ |
       Identifier |
       <STRING> #string_ ;
-
-
 
 Statement #statement_: <OPEN_CURLY_BRA> ( Statement )* <CLOSE_CURLY_BRA> |
            <IF> #if_ <OPEN_PAREN> Expression <CLOSE_PAREN> Statement <ELSE> #else_ Statement |
@@ -84,29 +82,27 @@ Statement #statement_: <OPEN_CURLY_BRA> ( Statement )* <CLOSE_CURLY_BRA> |
            )) |
            SCAN 2 (Expression <SEMICOLON>);
 
-Expression #expr_:
-                Expr |
-                <NEW> ((<INT> <OPEN_SQUARE_BRA> Expression <CLOSE_SQUARE_BRA>) | (Identifier <OPEN_PAREN> <CLOSE_PAREN>));
+Expression #void: LogicalExpr;
 
-Expr : LogicalExpr;
+LogicalExpr #void: CompareExpr (<AND> CompareExpr #and_(2))*;
 
-LogicalExpr: CompareExpr (<AND> CompareExpr)*;
+CompareExpr #void: AddExpr (<MINOR> AddExpr #lower_(2))*;
 
-CompareExpr: AddExpr (<MINOR> AddExpr)*;
+AddExpr #void:  MultiplyExpr (<PLUS> MultiplyExpr #add_(2) | <MINUS> MultiplyExpr #subtract_(2))*;
 
-AddExpr:  MultiplyExpr ((<PLUS> | <MINUS>) MultiplyExpr)*;
+MultiplyExpr #void: NewExpr (<TIMES> NewExpr #multiply_(2) | <DIVIDE> NewExpr #divide_(2))*;
 
-MultiplyExpr: NotExpr ((<TIMES> | <DIVIDE>) NotExpr)*;
+NewExpr #void: NotExpr | (<NEW> ((<INT> #int_type_ <OPEN_SQUARE_BRA> Expression <CLOSE_SQUARE_BRA>) | (Identifier <OPEN_PAREN> <CLOSE_PAREN>))  #new_);
 
-NotExpr: (<NOT>)? ArrayAccess;
+NotExpr #void: ArrayAccess | <NOT> NotExpr #not_;
 
-ArrayAccess: AccessExpr (<OPEN_SQUARE_BRA> Expr <CLOSE_SQUARE_BRA>)*;
+ArrayAccess #void: AccessExpr (<OPEN_SQUARE_BRA> Expression  <CLOSE_SQUARE_BRA> #array_access_)*;
 
-AccessExpr: ExprTerminal (<DOT> (<LENGTH> | (Identifier <OPEN_PAREN> ( Expression (<COMMA> Expression)* )? <CLOSE_PAREN>)))*;
+AccessExpr #void: ExprTerminal (<DOT>  (<LENGTH> #length_ | (Identifier <OPEN_PAREN> ( Expression (<COMMA> Expression)* )? <CLOSE_PAREN>)) #access_(2))*;
 
-ExprTerminal: IntLiteral | <OPEN_PAREN> Expression <CLOSE_PAREN> | Identifier | <TRUE> | <FALSE> | <THIS>;
+ExprTerminal #void: IntLiteral | <OPEN_PAREN> Expression <CLOSE_PAREN> | Identifier | <TRUE> #true_ | <FALSE> #false_ | <THIS> #this_;
 
-IntLiteral: <INTEGER> ({jjtThis.put("value", lastConsumedToken.getImage());});
+IntLiteral #int_: <INTEGER> ({jjtThis.put("value", lastConsumedToken.getImage());});
 
 // Injections for the implementation of JmmNode
 // Since this is injected into BaseNode, it affects only non-terminals
