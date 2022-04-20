@@ -6,6 +6,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import pt.up.fe.comp.jmm.parser.JmmParserResult;
+import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
+import pt.up.fe.comp.jmm.ollir.OllirResult;
+import pt.up.fe.comp.jmm.jasmin.JasminResult;
 import pt.up.fe.specs.util.SpecsIo;
 import pt.up.fe.specs.util.SpecsLogs;
 import pt.up.fe.specs.util.SpecsSystem;
@@ -44,14 +47,59 @@ public class Launcher {
         // Check if there are parsing errors
         TestUtils.noErrors(parserResult.getReports());
 
+        // Instantiate JmmAnalysis
+        JmmAnalyser analyser = new JmmAnalyser();
+
+        // Analysis stage
+        JmmSemanticsResult analysisResult = analyser.semanticAnalysis(parserResult);
+
+        // Check if there are parsing errors
+        TestUtils.noErrors(analysisResult.getReports());
+
+        // Instantiate JmmOptimizer
+        JmmOptimizer optimizer = new JmmOptimizer();
+
+        // Optimization stage
+        JmmSemanticsResult optimizationResult = optimizer.optimize(analysisResult);
+
+        OllirResult ollirCode = optimizer.toOllir(optimizationResult);
+
+        // Check if there are parsing errors
+        TestUtils.noErrors(optimizationResult.getReports());
+
+//        // Instantiate jasminBackend
+//        JasminBackendClass jasminBackend = new JasminBackendClass();
+//
+//        // Jasmin Backend stage
+//        JasminResult jasminResult = jasminBackend.toJasmin(ollirCode);
+//
+//        // Check if there are parsing errors
+//        TestUtils.noErrors(jasminResult.getReports());
+
         // ... add remaining stages
 
         System.out.println("\n-----------------------------------------------------------------------------------------------------------");
         System.out.println(" Warnings (Reports): ");
 
+        System.out.println("   Parser reports: ");
         for (Report rep : parserResult.getReports()) {
-            System.out.println("  " + rep);
+            System.out.println("    " + rep);
         }
+
+        System.out.println("   Analysis reports: ");
+        for (Report rep : analysisResult.getReports()) {
+            System.out.println("    " + rep);
+        }
+
+        System.out.println("   Optimization reports: ");
+        for (Report rep : optimizationResult.getReports()) {
+            System.out.println("    " + rep);
+        }
+
+//        System.out.println("   Jasmin reports: ");
+//        for (Report rep : jasminResult.getReports()) {
+//            System.out.println("    " + rep);
+//        }
 
         System.out.println("\n");
     }
