@@ -70,7 +70,7 @@ MethodDeclaration #MethodDecl: <PUBLIC_> ((
                     ( Statement )*
                     <CLOSE_CURLY_BRA_>));
 
-Type #Type: <INT_> ({jjtThis.put("type", lastConsumedToken.getImage());}) (<OPEN_SQUARE_BRA_> <CLOSE_SQUARE_BRA_>)? |
+Type #Type: <INT_> ({jjtThis.put("type", lastConsumedToken.getImage());}) (({jjtThis.put("type", "int array");}) <OPEN_SQUARE_BRA_> <CLOSE_SQUARE_BRA_>)? |
       <BOOLEAN_> ({jjtThis.put("type", lastConsumedToken.getImage());}) |
       ({jjtThis.put("type", "custom");}) Identifier |
       <STRING_> ({jjtThis.put("type", lastConsumedToken.getImage());}) ;
