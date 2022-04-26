@@ -49,9 +49,11 @@ Start #Program: (ImportDeclaration)* ClassDeclaration <EOF>;
 
 Identifier #Id: <ID_> ({jjtThis.put("name", lastConsumedToken.getImage());});
 
-ImportDeclaration #Import:  <IMPORT_> Identifier (<DOT_> Identifier)* <SEMICOLON_>;
+ImportDeclaration #Import:  <IMPORT_> Package <SEMICOLON_>;
 
-ClassDeclaration #ClassDecl: <CLASS_> Identifier (<EXTENDS_> Identifier)? <OPEN_CURLY_BRA_> (VarDeclaration)* (MethodDeclaration)* <CLOSE_CURLY_BRA_>;
+Package #Package:  Identifier (<DOT_> Identifier)*;
+
+ClassDeclaration #ClassDecl: <CLASS_> Identifier (<EXTENDS_> Identifier #Extends)? <OPEN_CURLY_BRA_> (VarDeclaration)* (MethodDeclaration)* <CLOSE_CURLY_BRA_>;
 
 VarDeclaration #Var: SCAN 2 (Type Identifier <SEMICOLON_>);
 
@@ -69,9 +71,9 @@ MethodDeclaration #MethodDecl: <PUBLIC_> ((
                     <CLOSE_CURLY_BRA_>));
 
 Type #Type: <INT_> ({jjtThis.put("type", lastConsumedToken.getImage());}) (<OPEN_SQUARE_BRA_> <CLOSE_SQUARE_BRA_>)? |
-      <BOOLEAN_> #bool_type |
-      Identifier |
-      <STRING_> #string ;
+      <BOOLEAN_> ({jjtThis.put("type", lastConsumedToken.getImage());}) |
+      ({jjtThis.put("type", "custom");}) Identifier |
+      <STRING_> ({jjtThis.put("type", lastConsumedToken.getImage());}) ;
 
 Statement #Statement: <OPEN_CURLY_BRA_> ( Statement )* <CLOSE_CURLY_BRA_> |
            <IF_> #If <OPEN_PAREN_> Expression <CLOSE_PAREN_> Statement <ELSE_> #Else Statement |
