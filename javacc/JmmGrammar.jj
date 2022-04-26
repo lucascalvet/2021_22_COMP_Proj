@@ -6,103 +6,103 @@ TOKENS_ARE_NODES=false;
 SKIP : " " | "\t" | "\r" | "\n" |  <"//" (~["\n"])* "\n"> |  < "/*"(~["*"])* "*"(~["/"] (~["*"])* "*")* "/" > ;
 
 TOKEN :
-	< PLUS : "+" > |
-	< MINUS : "-" > |
-	< TIMES : "*" > |
-	< DIVIDE : "/" > |
-	< OPEN_PAREN : "(" > |
-	< CLOSE_PAREN : ")" > |
-	< INTEGER : (["0" - "9"])+ > |
-	< IMPORT : "import" > |
-	< DOT : "." > |
-	< SEMICOLON : ";" > |
-	< CLASS : "class" > |
-	< EXTENDS : "extends" > |
-	< OPEN_CURLY_BRA : "{" > |
-	< CLOSE_CURLY_BRA : "}" > |
-	< PUBLIC : "public" > |
-	< COMMA : "," > |
-	< RETURN : "return" > |
-	< STATIC : "static" > |
-	< VOID : "void" > |
-	< MAIN : "main" > |
-	< STRING : "String" > |
-	< OPEN_SQUARE_BRA : "[" > |
-	< CLOSE_SQUARE_BRA : "]" > |
-    < INT : "int" > |
-    < BOOLEAN : "boolean" > |
-    < IF : "if" > |
-    < ELSE : "else" > |
-    < WHILE : "while" > |
-    < ASSIGN : "=" > |
-    < AND : "&&" > |
-    < MINOR : "<" > |
-    < LENGTH : "length" > |
-    < TRUE : "true" > |
-    < FALSE : "false" > |
-    < THIS : "this" > |
-    < NEW : "new" > |
-    < NOT : "!" > |
-    < ID : (["a"-"z"] | "_" | ["A"-"Z"]) (["a"-"z"] | ["A"-"Z"] | "_" | ["0"-"9"])* >;
+	< PLUS_ : "+" > |
+	< MINUS_ : "-" > |
+	< TIMES_ : "*" > |
+	< DIVIDE_ : "/" > |
+	< OPEN_PAREN_ : "(" > |
+	< CLOSE_PAREN_ : ")" > |
+	< INTEGER_ : (["0" - "9"])+ > |
+	< IMPORT_ : "import" > |
+	< DOT_ : "." > |
+	< SEMICOLON_ : ";" > |
+	< CLASS_ : "class" > |
+	< EXTENDS_ : "extends" > |
+	< OPEN_CURLY_BRA_ : "{" > |
+	< CLOSE_CURLY_BRA_ : "}" > |
+	< PUBLIC_ : "public" > |
+	< COMMA_ : "," > |
+	< RETURN_ : "return" > |
+	< STATIC_ : "static" > |
+	< VOID_ : "void" > |
+	< MAIN_ : "main" > |
+	< STRING_ : "String" > |
+	< OPEN_SQUARE_BRA_ : "[" > |
+	< CLOSE_SQUARE_BRA_ : "]" > |
+    < INT_ : "int" > |
+    < BOOLEAN_ : "boolean" > |
+    < IF_ : "if" > |
+    < ELSE_ : "else" > |
+    < WHILE_ : "while" > |
+    < ASSIGN_ : "=" > |
+    < AND_ : "&&" > |
+    < MINOR_ : "<" > |
+    < LENGTH_ : "length" > |
+    < TRUE_ : "true" > |
+    < FALSE_ : "false" > |
+    < THIS_ : "this" > |
+    < NEW_ : "new" > |
+    < NOT_ : "!" > |
+    < ID_ : (["a"-"z"] | "_" | ["A"-"Z"]) (["a"-"z"] | ["A"-"Z"] | "_" | ["0"-"9"])* >;
 
-Start : (ImportDeclaration)* ClassDeclaration <EOF>;
+Start #Program: (ImportDeclaration)* ClassDeclaration <EOF>;
 
-Identifier #id_: <ID> ({jjtThis.put("name", lastConsumedToken.getImage());});
+Identifier #Id: <ID_> ({jjtThis.put("name", lastConsumedToken.getImage());});
 
-ImportDeclaration #import_:  <IMPORT> Identifier (<DOT> Identifier)* <SEMICOLON>;
+ImportDeclaration #Import:  <IMPORT_> Identifier (<DOT_> Identifier)* <SEMICOLON_>;
 
-ClassDeclaration #class_: <CLASS> Identifier (<EXTENDS> Identifier)? <OPEN_CURLY_BRA> (VarDeclaration)* (MethodDeclaration)* <CLOSE_CURLY_BRA>;
+ClassDeclaration #ClassDecl: <CLASS_> Identifier (<EXTENDS_> Identifier)? <OPEN_CURLY_BRA_> (VarDeclaration)* (MethodDeclaration)* <CLOSE_CURLY_BRA_>;
 
-VarDeclaration #var_: SCAN 2 (Type Identifier <SEMICOLON>);
+VarDeclaration #Var: SCAN 2 (Type Identifier <SEMICOLON_>);
 
-MethodDeclaration #method_: <PUBLIC> ((
-                    Type Identifier <OPEN_PAREN> (Type Identifier ( <COMMA> Type Identifier)* )? <CLOSE_PAREN>
-                    <OPEN_CURLY_BRA>
+MethodDeclaration #MethodDecl: <PUBLIC_> ((
+                    Type Identifier <OPEN_PAREN_> (Type Identifier ( <COMMA_> Type Identifier)* )? <CLOSE_PAREN_>
+                    <OPEN_CURLY_BRA_>
                     ( VarDeclaration )*
                     ( Statement )*
-                    <RETURN> Expression <SEMICOLON>
-                    <CLOSE_CURLY_BRA>) | (
-                    <STATIC> <VOID> <MAIN> #main_ <OPEN_PAREN> <STRING> <OPEN_SQUARE_BRA><CLOSE_SQUARE_BRA> Identifier <CLOSE_PAREN>
-                    <OPEN_CURLY_BRA>
+                    <RETURN_> Expression <SEMICOLON_>
+                    <CLOSE_CURLY_BRA_>) | (
+                    <STATIC_> <VOID_> <MAIN_> #main <OPEN_PAREN_> <STRING_> <OPEN_SQUARE_BRA_><CLOSE_SQUARE_BRA_> Identifier <CLOSE_PAREN_>
+                    <OPEN_CURLY_BRA_>
                     ( VarDeclaration )*
                     ( Statement )*
-                    <CLOSE_CURLY_BRA>));
+                    <CLOSE_CURLY_BRA_>));
 
-Type #type_: <INT> ({jjtThis.put("type", lastConsumedToken.getImage());}) (<OPEN_SQUARE_BRA> <CLOSE_SQUARE_BRA>)? |
-      <BOOLEAN> #bool_type_ |
+Type #Type: <INT_> ({jjtThis.put("type", lastConsumedToken.getImage());}) (<OPEN_SQUARE_BRA_> <CLOSE_SQUARE_BRA_>)? |
+      <BOOLEAN_> #bool_type |
       Identifier |
-      <STRING> #string_ ;
+      <STRING_> #string ;
 
-Statement #statement_: <OPEN_CURLY_BRA> ( Statement )* <CLOSE_CURLY_BRA> |
-           <IF> #if_ <OPEN_PAREN> Expression <CLOSE_PAREN> Statement <ELSE> #else_ Statement |
-           <WHILE> #while_ <OPEN_PAREN> Expression <CLOSE_PAREN> Statement |
+Statement #Statement: <OPEN_CURLY_BRA_> ( Statement )* <CLOSE_CURLY_BRA_> |
+           <IF_> #If <OPEN_PAREN_> Expression <CLOSE_PAREN_> Statement <ELSE_> #Else Statement |
+           <WHILE_> #While <OPEN_PAREN_> Expression <CLOSE_PAREN_> Statement |
            SCAN 2 (Identifier  (
-           (<ASSIGN> #assign_ Expression <SEMICOLON>) |
-           (<OPEN_SQUARE_BRA> Expression <CLOSE_SQUARE_BRA> <ASSIGN>  #assign_ Expression <SEMICOLON>)
+           (<ASSIGN_> #Assign Expression <SEMICOLON_>) |
+           (<OPEN_SQUARE_BRA_> Expression <CLOSE_SQUARE_BRA_> <ASSIGN_>  #Assign Expression <SEMICOLON_>)
            )) |
-           SCAN 2 (Expression <SEMICOLON>);
+           SCAN 2 (Expression <SEMICOLON_>);
 
 Expression #void: LogicalExpr;
 
-LogicalExpr #void: CompareExpr (<AND> CompareExpr #and_(2))*;
+LogicalExpr #void: CompareExpr (<AND_> CompareExpr #And(2))*;
 
-CompareExpr #void: AddExpr (<MINOR> AddExpr #lower_(2))*;
+CompareExpr #void: AddExpr (<MINOR_> AddExpr #Lower(2))*;
 
-AddExpr #void:  MultiplyExpr (<PLUS> MultiplyExpr #add_(2) | <MINUS> MultiplyExpr #subtract_(2))*;
+AddExpr #void:  MultiplyExpr (<PLUS_> MultiplyExpr #Add(2) | <MINUS_> MultiplyExpr #Subtract(2))*;
 
-MultiplyExpr #void: NewExpr (<TIMES> NewExpr #multiply_(2) | <DIVIDE> NewExpr #divide_(2))*;
+MultiplyExpr #void: NewExpr (<TIMES_> NewExpr #Multiply(2) | <DIVIDE_> NewExpr #Divide(2))*;
 
-NewExpr #void: NotExpr | (<NEW> ((<INT> #int_type_ <OPEN_SQUARE_BRA> Expression <CLOSE_SQUARE_BRA>) | (Identifier <OPEN_PAREN> <CLOSE_PAREN>))  #new_);
+NewExpr #void: NotExpr | (<NEW_> ((<INT_> #Int_type <OPEN_SQUARE_BRA_> Expression <CLOSE_SQUARE_BRA_>) | (Identifier <OPEN_PAREN_> <CLOSE_PAREN_>))  #New);
 
-NotExpr #void: ArrayAccess | <NOT> NotExpr #not_;
+NotExpr #void: ArrayAccess | <NOT_> NotExpr #Not;
 
-ArrayAccess #void: AccessExpr (<OPEN_SQUARE_BRA> Expression  <CLOSE_SQUARE_BRA> #array_access_)*;
+ArrayAccess #void: AccessExpr (<OPEN_SQUARE_BRA_> Expression  <CLOSE_SQUARE_BRA_> #Array_access)*;
 
-AccessExpr #void: ExprTerminal (<DOT>  (<LENGTH> #length_ | (Identifier <OPEN_PAREN> ( Expression (<COMMA> Expression)* )? <CLOSE_PAREN>)) #access_(2))*;
+AccessExpr #void: ExprTerminal (<DOT_>  (<LENGTH_> #Length | (Identifier <OPEN_PAREN_> ( Expression (<COMMA_> Expression)* )? <CLOSE_PAREN_>)) #Access(2))*;
 
-ExprTerminal #void: IntLiteral | <OPEN_PAREN> Expression <CLOSE_PAREN> | Identifier | <TRUE> #true_ | <FALSE> #false_ | <THIS> #this_;
+ExprTerminal #void: IntLiteral | <OPEN_PAREN_> Expression <CLOSE_PAREN_> | Identifier | <TRUE_> #True | <FALSE_> #False | <THIS_> #This;
 
-IntLiteral #int_: <INTEGER> ({jjtThis.put("value", lastConsumedToken.getImage());});
+IntLiteral #Int: <INTEGER_> ({jjtThis.put("value", lastConsumedToken.getImage());});
 
 // Injections for the implementation of JmmNode
 // Since this is injected into BaseNode, it affects only non-terminals
