@@ -79,14 +79,20 @@ Type #Type: <INT_> ({jjtThis.put("type", lastConsumedToken.getImage());}) (({jjt
       ({jjtThis.put("type", "custom");}) Identifier |
       <STRING_> ({jjtThis.put("type", lastConsumedToken.getImage());}) ;
 
-Statement #Statement: <OPEN_CURLY_BRA_> ( Statement )* <CLOSE_CURLY_BRA_> |
-           <IF_> #If <OPEN_PAREN_> Expression <CLOSE_PAREN_> Statement <ELSE_> #Else Statement |
-           <WHILE_> #While <OPEN_PAREN_> Expression <CLOSE_PAREN_> Statement |
+Statement #void: Block |
+           If |
+           While |
            SCAN 2 (Identifier  (
            (<ASSIGN_> #Assign Expression <SEMICOLON_>) |
            (<OPEN_SQUARE_BRA_> Expression <CLOSE_SQUARE_BRA_> <ASSIGN_>  #Assign Expression <SEMICOLON_>)
            )) |
            SCAN 2 (Expression <SEMICOLON_>);
+
+Block #Block: <OPEN_CURLY_BRA_> ( Statement )* <CLOSE_CURLY_BRA_>;
+
+If #If: <IF_> <OPEN_PAREN_> Expression #Condition <CLOSE_PAREN_> Statement <ELSE_> Statement  #Else;
+
+While #While: <WHILE_> <OPEN_PAREN_> Expression #Condition <CLOSE_PAREN_> Statement;
 
 Expression #void: LogicalExpr;
 
