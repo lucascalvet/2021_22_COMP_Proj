@@ -58,17 +58,21 @@ ClassDeclaration #ClassDecl: <CLASS_> Identifier (<EXTENDS_> Identifier #Extends
 VarDeclaration #Var: SCAN 2 (Type Identifier <SEMICOLON_>);
 
 MethodDeclaration #MethodDecl: <PUBLIC_> ((
-                    Type Identifier <OPEN_PAREN_> (Type Identifier ( <COMMA_> Type Identifier)* )? <CLOSE_PAREN_>
+                    Type #FuncReturn Identifier #FuncName <OPEN_PAREN_> FunctionArgs <CLOSE_PAREN_>
                     <OPEN_CURLY_BRA_>
-                    ( VarDeclaration )*
-                    ( Statement )*
-                    <RETURN_> Expression <SEMICOLON_>
-                    <CLOSE_CURLY_BRA_>) | (
-                    <STATIC_> <VOID_> <MAIN_> #main <OPEN_PAREN_> <STRING_> <OPEN_SQUARE_BRA_><CLOSE_SQUARE_BRA_> Identifier <CLOSE_PAREN_>
+                    FunctionBody
+                    <CLOSE_CURLY_BRA_>) #Function | (
+                    <STATIC_> <VOID_> <MAIN_> #Main <OPEN_PAREN_> <STRING_> <OPEN_SQUARE_BRA_><CLOSE_SQUARE_BRA_> Identifier <CLOSE_PAREN_>
                     <OPEN_CURLY_BRA_>
                     ( VarDeclaration )*
                     ( Statement )*
                     <CLOSE_CURLY_BRA_>));
+
+FunctionArgs #FuncArgs: (Type Identifier ( <COMMA_> Type Identifier)* )?;
+
+FunctionBody #Body: ( VarDeclaration )* ( Statement )* ReturnStatement;
+
+ReturnStatement #ReturnStatement: <RETURN_> Expression <SEMICOLON_>;
 
 Type #Type: <INT_> ({jjtThis.put("type", lastConsumedToken.getImage());}) (({jjtThis.put("type", "int array");}) <OPEN_SQUARE_BRA_> <CLOSE_SQUARE_BRA_>)? |
       <BOOLEAN_> ({jjtThis.put("type", lastConsumedToken.getImage());}) |
