@@ -83,8 +83,8 @@ Statement #void: Block |
            If |
            While |
            SCAN 2 (Identifier  (
-           (<ASSIGN_> #Assign Expression <SEMICOLON_>) |
-           (<OPEN_SQUARE_BRA_> Expression <CLOSE_SQUARE_BRA_> <ASSIGN_>  #Assign Expression <SEMICOLON_>)
+           ( Assign ) |
+           (<OPEN_SQUARE_BRA_> Expression <CLOSE_SQUARE_BRA_> Assign)
            )) |
            SCAN 2 (Expression <SEMICOLON_>);
 
@@ -93,6 +93,8 @@ Block #Block: <OPEN_CURLY_BRA_> ( Statement )* <CLOSE_CURLY_BRA_>;
 If #If: <IF_> <OPEN_PAREN_> Expression #Condition <CLOSE_PAREN_> Statement <ELSE_> Statement  #Else;
 
 While #While: <WHILE_> <OPEN_PAREN_> Expression #Condition <CLOSE_PAREN_> Statement;
+
+Assign #Assign: <ASSIGN_> Expression <SEMICOLON_>;
 
 Expression #void: LogicalExpr;
 
@@ -108,9 +110,15 @@ NewExpr #void: NotExpr | (<NEW_> ((<INT_> #Int_type <OPEN_SQUARE_BRA_> Expressio
 
 NotExpr #void: ArrayAccess | <NOT_> NotExpr #Not;
 
-ArrayAccess #void: AccessExpr (<OPEN_SQUARE_BRA_> Expression  <CLOSE_SQUARE_BRA_> #Array_access)*;
+ArrayAccess #void: AccessExpr (ArrayExpr)*;
 
-AccessExpr #void: ExprTerminal (<DOT_>  (<LENGTH_> #Length | (Identifier <OPEN_PAREN_> ( Expression (<COMMA_> Expression)* )? <CLOSE_PAREN_>)) #Access(2))*;
+ArrayExpr #Array_access: <OPEN_SQUARE_BRA_> Expression <CLOSE_SQUARE_BRA_>;
+
+AccessExpr #void: ExprTerminal (<DOT_> (AfterDot) #Access(2))*;
+
+AfterDot #Chained: (<LENGTH_> #Length) | (Identifier <OPEN_PAREN_> MethodCallArgs <CLOSE_PAREN_>);
+
+MethodCallArgs #Args: ( Expression (<COMMA_> Expression)* )?;
 
 ExprTerminal #void: IntLiteral | <OPEN_PAREN_> Expression <CLOSE_PAREN_> | Identifier | <TRUE_> #True | <FALSE_> #False | <THIS_> #This;
 
