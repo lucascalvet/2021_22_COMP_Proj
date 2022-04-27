@@ -110,9 +110,11 @@ NewExpr #void: NotExpr | (<NEW_> ((<INT_> #Int_type <OPEN_SQUARE_BRA_> Expressio
 
 NotExpr #void: ArrayAccess | <NOT_> NotExpr #Not;
 
-ArrayAccess #void: AccessExpr (ArrayExpr)*;
+ArrayAccess #void: AccessExpr ((ArrayExpr) #ArrayAccess(2))*;
 
-ArrayExpr #Array_access: <OPEN_SQUARE_BRA_> Expression <CLOSE_SQUARE_BRA_>;
+ArrayExpr #void: <OPEN_SQUARE_BRA_> ArrayIndex <CLOSE_SQUARE_BRA_>;
+
+ArrayIndex #ArrayIndex : Expression;
 
 AccessExpr #void: ExprTerminal (<DOT_> (AfterDot) #Access(2))*;
 
