@@ -84,7 +84,7 @@ Statement #void: Block |
            While |
            SCAN 2 (Identifier  (
            ( Assign ) |
-           (<OPEN_SQUARE_BRA_> Expression <CLOSE_SQUARE_BRA_> Assign)
+           (ArrayExpr Assign)
            )) |
            SCAN 2 (Expression <SEMICOLON_>);
 
@@ -94,7 +94,7 @@ If #If: <IF_> <OPEN_PAREN_> Expression #Condition <CLOSE_PAREN_> Statement <ELSE
 
 While #While: <WHILE_> <OPEN_PAREN_> Expression #Condition <CLOSE_PAREN_> Statement;
 
-Assign #Assign: <ASSIGN_> Expression <SEMICOLON_>;
+Assign #Assign(2): <ASSIGN_> Expression <SEMICOLON_>;
 
 Expression #void: LogicalExpr;
 
@@ -110,9 +110,9 @@ NewExpr #void: NotExpr | (<NEW_> ((<INT_> #Int_type <OPEN_SQUARE_BRA_> Expressio
 
 NotExpr #void: ArrayAccess | <NOT_> NotExpr #Not;
 
-ArrayAccess #void: AccessExpr ((ArrayExpr) #ArrayAccess(2))*;
+ArrayAccess #void: AccessExpr (ArrayExpr)*;
 
-ArrayExpr #void: <OPEN_SQUARE_BRA_> ArrayIndex <CLOSE_SQUARE_BRA_>;
+ArrayExpr #ArrayAccess(2): <OPEN_SQUARE_BRA_> ArrayIndex <CLOSE_SQUARE_BRA_>;
 
 ArrayIndex #ArrayIndex : Expression;
 
