@@ -14,6 +14,7 @@
 package pt.up.fe.comp;
 
 import org.junit.Test;
+import pt.up.fe.comp.jmm.analysis.table.JmmSymbolTable;
 
 public class GrammarTest {
 
@@ -34,8 +35,12 @@ public class GrammarTest {
         var result = TestUtils.parse(code, grammarRule);
         TestUtils.noErrors(result.getReports());
 
+        JmmSymbolTable symbolTable = new JmmSymbolTable(result.getRootNode());
+
+        System.out.println("SymbolTable:\n\n" + symbolTable.print());
         System.out.println("Code: " + code + "\n");
         System.out.println("AST:\n\n" + result.getRootNode().toTree());
+
         System.out.println("\n---------\n");
     }
 
