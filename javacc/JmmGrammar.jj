@@ -53,7 +53,9 @@ ImportDeclaration #Import:  <IMPORT_> Package <SEMICOLON_>;
 
 Package #Package:  Identifier (<DOT_> Identifier)*;
 
-ClassDeclaration #ClassDecl: <CLASS_> Identifier (<EXTENDS_> Identifier #Extends)? <OPEN_CURLY_BRA_> (VarDeclaration)* (MethodDeclaration)* <CLOSE_CURLY_BRA_>;
+ClassDeclaration #ClassDecl: <CLASS_> Identifier (<EXTENDS_> Identifier #Extends)? <OPEN_CURLY_BRA_> ClassBody <CLOSE_CURLY_BRA_>;
+
+ClassBody #ClassBody: (VarDeclaration)* (MethodDeclaration)*;
 
 VarDeclaration #Var: SCAN 2 (Type Identifier <SEMICOLON_>);
 
