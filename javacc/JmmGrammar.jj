@@ -61,12 +61,13 @@ MethodDeclaration #MethodDecl: <PUBLIC_> ((
                     Type #FuncReturn Identifier #FuncName <OPEN_PAREN_> FunctionArgs <CLOSE_PAREN_>
                     <OPEN_CURLY_BRA_>
                     FunctionBody
-                    <CLOSE_CURLY_BRA_>) #Function | (
-                    <STATIC_> <VOID_> <MAIN_> #Main <OPEN_PAREN_> <STRING_> <OPEN_SQUARE_BRA_><CLOSE_SQUARE_BRA_> Identifier <CLOSE_PAREN_>
-                    <OPEN_CURLY_BRA_>
-                    ( VarDeclaration )*
-                    ( Statement )*
-                    <CLOSE_CURLY_BRA_>));
+                    <CLOSE_CURLY_BRA_>) #Function | Main);
+
+Main #Main: MainHeader <OPEN_CURLY_BRA_> MainBody <CLOSE_CURLY_BRA_>;
+
+MainHeader: <STATIC_> <VOID_> <MAIN_> <OPEN_PAREN_> <STRING_> <OPEN_SQUARE_BRA_><CLOSE_SQUARE_BRA_> Identifier <CLOSE_PAREN_>;
+
+MainBody #MainBody: ( VarDeclaration )* ( Statement )*;
 
 FunctionArgs #FuncArgs: (Type Identifier ( <COMMA_> Type Identifier)* )?;
 
@@ -111,9 +112,7 @@ NewExpr #void: NotExpr | (<NEW_> ((<INT_> #Int_type <OPEN_SQUARE_BRA_> Expressio
 
 NotExpr #void: Access | <NOT_> NotExpr #Not;
 
-Access #void : ExprTerminal (ArrayAccess | AccessExpr)*;
-
-ArrayAccess #void: ArrayExpr;
+Access #void : ExprTerminal (ArrayExpr | AccessExpr)*;
 
 ArrayExpr #ArrayAccess(2): <OPEN_SQUARE_BRA_> Expression #ArrayIndex <CLOSE_SQUARE_BRA_>;
 
