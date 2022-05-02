@@ -96,6 +96,7 @@ While #While: <WHILE_> <OPEN_PAREN_> Expression #Condition <CLOSE_PAREN_> Statem
 
 Assign #Assign(2): <ASSIGN_> Expression <SEMICOLON_>;
 
+
 Expression #void: LogicalExpr;
 
 LogicalExpr #void: CompareExpr (<AND_> CompareExpr #And(2))*;
@@ -108,15 +109,15 @@ MultiplyExpr #void: NewExpr (<TIMES_> NewExpr #Multiply(2) | <DIVIDE_> NewExpr #
 
 NewExpr #void: NotExpr | (<NEW_> ((<INT_> #Int_type <OPEN_SQUARE_BRA_> Expression <CLOSE_SQUARE_BRA_>) | (Identifier <OPEN_PAREN_> <CLOSE_PAREN_>))  #New);
 
-NotExpr #void: ArrayAccess | <NOT_> NotExpr #Not;
+NotExpr #void: Access | <NOT_> NotExpr #Not;
 
-ArrayAccess #void: AccessExpr (ArrayExpr)*;
+Access #void : ExprTerminal (ArrayAccess | AccessExpr)*;
 
-ArrayExpr #ArrayAccess(2): <OPEN_SQUARE_BRA_> ArrayIndex <CLOSE_SQUARE_BRA_>;
+ArrayAccess #void: ArrayExpr;
 
-ArrayIndex #ArrayIndex : Expression;
+ArrayExpr #ArrayAccess(2): <OPEN_SQUARE_BRA_> Expression #ArrayIndex <CLOSE_SQUARE_BRA_>;
 
-AccessExpr #void: ExprTerminal (<DOT_> (AfterDot) #Access(2))*;
+AccessExpr #void:  (<DOT_> (AfterDot) #Access(2));
 
 AfterDot #Chained: (<LENGTH_> #Length) | (Identifier <OPEN_PAREN_> MethodCallArgs <CLOSE_PAREN_>);
 
