@@ -65,7 +65,9 @@ MethodDeclaration #MethodDecl: <PUBLIC_> ((
 
 Main #Main: MainHeader <OPEN_CURLY_BRA_> MainBody <CLOSE_CURLY_BRA_>;
 
-MainHeader: <STATIC_> <VOID_> <MAIN_> <OPEN_PAREN_> <STRING_> <OPEN_SQUARE_BRA_><CLOSE_SQUARE_BRA_> Identifier <CLOSE_PAREN_>;
+MainHeader #MainHeader: <STATIC_> <VOID_> <MAIN_> <OPEN_PAREN_> MainArgs <CLOSE_PAREN_>;
+
+MainArgs #MainArgs: <STRING_> ({jjtThis.put("type", "String array");}) <OPEN_SQUARE_BRA_> <CLOSE_SQUARE_BRA_> Identifier;
 
 MainBody #MainBody: ( VarDeclaration )* ( Statement )*;
 
