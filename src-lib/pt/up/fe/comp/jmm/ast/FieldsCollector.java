@@ -7,8 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class FieldsCollector extends AJmmVisitor<Boolean, Integer> {
-    private int visits;
+public class FieldsCollector extends Collector {
     private final List<Symbol> fields;
 
     public FieldsCollector() {
@@ -16,19 +15,13 @@ public class FieldsCollector extends AJmmVisitor<Boolean, Integer> {
         this.fields = new ArrayList<>();
         addVisit("Program", this::visitDefault);
         addVisit("ClassDecl", this::visitDefault);
+        addVisit("ClassBody", this::visitDefault);
         addVisit("Var", this::visitVariable);
         setDefaultVisit((node, imports) -> ++visits);
     }
 
     public List<Symbol> getFields() {
         return this.fields;
-    }
-
-    private Integer visitDefault(JmmNode node, Boolean dummy) {
-        for (var child : node.getChildren()) {
-            visit(child, true);
-        }
-        return ++visits;
     }
 
     private Integer visitVariable(JmmNode variable, Boolean dummy) {

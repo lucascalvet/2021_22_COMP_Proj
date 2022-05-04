@@ -89,13 +89,18 @@ public interface SymbolTable {
             builder.append(" - signature: ").append(method);
             builder.append("; returnType: ").append(getReturnType(method));
 
-            // var returnType = getReturnType(method);
+            var returnType = getReturnType(method);
             var params = getParameters(method);
-            // builder.append(" - " + returnType.print() + " " + method + "(");
+            var localVars = getLocalVariables(method);
+            builder.append(" - " + returnType.print() + " " + method);
             var paramsString = params.stream().map(param -> param != null ? param.print() : "<null param>")
                     .collect(Collectors.joining(", "));
-            // builder.append(paramsString + ")\n");
+            var varsString = localVars.stream().map(lvar -> lvar != null ? lvar.print() : "<null lvar>")
+                    .collect(Collectors.joining(", "));
+
+            builder.append("\n");
             builder.append("; params: ").append(paramsString);
+            builder.append("; localVars: ").append(varsString);
             builder.append("\n");
         }
 

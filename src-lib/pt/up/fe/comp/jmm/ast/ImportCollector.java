@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ImportCollector extends AJmmVisitor<Boolean, Integer> {
-    private int visits;
+public class ImportCollector extends Collector {
     private final List<String> imports;
 
     public ImportCollector() {
@@ -19,13 +18,6 @@ public class ImportCollector extends AJmmVisitor<Boolean, Integer> {
 
     public List<String> getImports() {
         return this.imports;
-    }
-
-    private Integer visitDefault(JmmNode node, Boolean dummy) {
-        for (var child : node.getChildren()) {
-            visit(child, true);
-        }
-        return ++visits;
     }
 
     private Integer visitPackage(JmmNode package_node, Boolean dummy) {

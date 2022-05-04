@@ -15,6 +15,7 @@ package pt.up.fe.comp;
 
 import org.junit.Test;
 
+import pt.up.fe.comp.jmm.analysis.table.JmmSymbolTable;
 import pt.up.fe.specs.util.SpecsIo;
 
 public class ParserTest {
@@ -22,6 +23,11 @@ public class ParserTest {
     private static void noErrors(String code) {
         var result = TestUtils.parse(code);
         TestUtils.noErrors(result);
+        JmmSymbolTable symbolTable = new JmmSymbolTable(result.getRootNode());
+
+        System.out.println("SymbolTable:\n\n" + symbolTable.print());
+        System.out.println("Code: " + code + "\n");
+        System.out.println("AST:\n\n" + result.getRootNode().toTree());
     }
 
     private static void mustFail(String code) {

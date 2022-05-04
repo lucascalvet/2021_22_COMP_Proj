@@ -7,8 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class LocalVariablesCollector extends AJmmVisitor<Boolean, Integer> {
-    private int visits;
+public class LocalVariablesCollector extends Collector {
     private final List<Symbol> local_vars;
     private String signature;
 
@@ -18,6 +17,7 @@ public class LocalVariablesCollector extends AJmmVisitor<Boolean, Integer> {
         this.signature = methodSignature;
         addVisit("Program", this::visitDefault);
         addVisit("ClassDecl", this::visitDefault);
+        addVisit("ClassBody", this::visitClassBody);
         addVisit("MethodDecl", this::visitDefault);
         addVisit("Function", this::visitFunction);
         addVisit("Body", this::visitDefault);
@@ -29,9 +29,11 @@ public class LocalVariablesCollector extends AJmmVisitor<Boolean, Integer> {
         return this.local_vars;
     }
 
-    private Integer visitDefault(JmmNode node, Boolean dummy) {
+    private Integer visitClassBody(JmmNode node, Boolean dummy) {
         for (var child : node.getChildren()) {
-            visit(child, true);
+            if(child.getKind().equals("MethodDecl")){
+                visit(child, true);
+            }
         }
         return ++visits;
     }
@@ -49,9 +51,6 @@ public class LocalVariablesCollector extends AJmmVisitor<Boolean, Integer> {
     }
 
     private Integer visitVariable(JmmNode variable, Boolean dummy) {
-        if (variable.getJmmParent().getKind() != "Body"){
-            return ++visits;
-        }
         Type t = new Type("int", false);
         String n = "var";
         for (var child : variable.getChildren()) {

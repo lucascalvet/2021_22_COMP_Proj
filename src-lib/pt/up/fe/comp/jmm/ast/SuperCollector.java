@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class SuperCollector extends AJmmVisitor<Boolean, Integer> {
-    private int visits;
+public class SuperCollector extends Collector {
     private String super_name;
 
     public SuperCollector() {
@@ -19,13 +18,6 @@ public class SuperCollector extends AJmmVisitor<Boolean, Integer> {
 
     public String getSuperName() {
         return this.super_name;
-    }
-
-    private Integer visitDefault(JmmNode node, Boolean dummy) {
-        for (var child : node.getChildren()) {
-            visit(child, true);
-        }
-        return ++visits;
     }
 
     private Integer visitExtends(JmmNode super_extends, Boolean dummy) {

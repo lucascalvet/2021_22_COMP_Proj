@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ClassNameCollector extends AJmmVisitor<Boolean, Integer> {
-    private int visits;
+public class ClassNameCollector extends Collector {
     private String class_name;
 
     public ClassNameCollector() {
@@ -18,13 +17,6 @@ public class ClassNameCollector extends AJmmVisitor<Boolean, Integer> {
 
     public String getClassName() {
         return this.class_name;
-    }
-
-    private Integer visitDefault(JmmNode node, Boolean dummy) {
-        for (var child : node.getChildren()) {
-            visit(child, true);
-        }
-        return ++visits;
     }
 
     private Integer visitClassDecl(JmmNode class_decl, Boolean dummy) {
