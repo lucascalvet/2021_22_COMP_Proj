@@ -10,6 +10,12 @@ import pt.up.fe.specs.util.SpecsStrings;
 public class OurOllirToJasminTest {
 
     @Test
+    public void test() {
+        var jasminResult = TestUtils.backend(SpecsIo.getResource("fixtures/public/HelloWorld.jmm"));
+        TestUtils.noErrors(jasminResult);
+    }
+
+    @Test
     public void fac(){
         //TODO -> tradução OllirParaJasmin
         String jasminCode = "";
