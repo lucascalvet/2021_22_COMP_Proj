@@ -7,8 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ParametersCollector extends AJmmVisitor<Boolean, Integer> {
-    private int visits;
+public class ParametersCollector extends Collector {
     private List<Symbol> parameters;
     private String signature;
 
@@ -18,6 +17,7 @@ public class ParametersCollector extends AJmmVisitor<Boolean, Integer> {
         this.signature = methodSignature;
         addVisit("Program", this::visitDefault);
         addVisit("ClassDecl", this::visitDefault);
+        addVisit("ClassBody", this::visitDefault);
         addVisit("MethodDecl", this::visitDefault);
         addVisit("Function", this::visitFunction);
         setDefaultVisit((node, imports) -> ++visits);
@@ -25,13 +25,6 @@ public class ParametersCollector extends AJmmVisitor<Boolean, Integer> {
 
     public List<Symbol> getParameters() {
         return this.parameters;
-    }
-
-    private Integer visitDefault(JmmNode node, Boolean dummy) {
-        for (var child : node.getChildren()) {
-            visit(child, true);
-        }
-        return ++visits;
     }
 
     private Integer visitFunction(JmmNode func, Boolean dummy) {
