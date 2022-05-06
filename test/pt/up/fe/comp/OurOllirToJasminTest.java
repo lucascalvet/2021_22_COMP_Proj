@@ -18,6 +18,8 @@ public class OurOllirToJasminTest {
         OllirResult ollirResult = new OllirResult(SpecsIo.getResource("fixtures/public/ollir/HelloWorld.ollir"), Collections.emptyMap());
         var jasminResult = TestUtils.backend(ollirResult);
         TestUtils.noErrors(jasminResult);
+        String result = jasminResult.run();
+        System.out.println("Jasmin result: "+ result);
     }
 
     @Test
