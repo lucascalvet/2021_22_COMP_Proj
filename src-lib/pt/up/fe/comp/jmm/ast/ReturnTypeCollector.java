@@ -15,12 +15,17 @@ public class ReturnTypeCollector extends Collector {
         this.visits = 0;
         this.return_type = new Type("", false);
         this.signature = methodSignature;
-        addVisit("Program", this::visitDefault);
-        addVisit("ClassDecl", this::visitDefault);
-        addVisit("ClassBody", this::visitDefault);
-        addVisit("MethodDecl", this::visitDefault);
-        addVisit("Function", this::visitFunction);
-        setDefaultVisit((node, imports) -> ++visits);
+        if (this.signature.substring(0, this.signature.indexOf('(')).equals("main")){
+            this.return_type = new Type("void", false);
+        }
+        else{
+            addVisit("Program", this::visitDefault);
+            addVisit("ClassDecl", this::visitDefault);
+            addVisit("ClassBody", this::visitDefault);
+            addVisit("MethodDecl", this::visitDefault);
+            addVisit("Function", this::visitFunction);
+            setDefaultVisit((node, imports) -> ++visits);
+        }
     }
 
     public Type getReturnType() {

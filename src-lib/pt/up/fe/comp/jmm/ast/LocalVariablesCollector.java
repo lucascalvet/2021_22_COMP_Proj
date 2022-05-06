@@ -19,8 +19,14 @@ public class LocalVariablesCollector extends Collector {
         addVisit("ClassDecl", this::visitDefault);
         addVisit("ClassBody", this::visitClassBody);
         addVisit("MethodDecl", this::visitDefault);
-        addVisit("Function", this::visitFunction);
-        addVisit("Body", this::visitDefault);
+        if (this.signature.substring(0, this.signature.indexOf('(')).equals("main")){
+            addVisit("Main", this::visitDefault);
+            addVisit("MainBody", this::visitDefault);
+        }
+        else{
+            addVisit("Function", this::visitFunction);
+            addVisit("Body", this::visitDefault);
+        }
         addVisit("Var", this::visitVariable);
         setDefaultVisit((node, imports) -> ++visits);
     }
