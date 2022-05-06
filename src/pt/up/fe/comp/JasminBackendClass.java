@@ -13,7 +13,7 @@ import java.util.List;
 public class JasminBackendClass implements JasminBackend {
     @Override
     public JasminResult toJasmin(OllirResult ollirResult){
-        String jasminCode = new OllirToJasmin().getCode(ollirResult.getOllirClass());
+        String jasminCode = new OllirToJasmin(ollirResult.getOllirClass()).getCode();
 
         return new JasminResult(ollirResult, jasminCode, ollirResult.getReports());
     }
