@@ -18,6 +18,9 @@ public class MethodCollector extends Collector {
         addVisit("ClassBody", this::visitDefault);
         addVisit("MethodDecl", this::visitDefault);
         addVisit("Function", this::visitFunction);
+        addVisit("Main", this::visitDefault);
+        addVisit("MainHeader", this::visitDefault);
+        addVisit("MainArgs", this::visitMainArgs);
         setDefaultVisit((node, imports) -> ++visits);
     }
 
@@ -75,6 +78,15 @@ public class MethodCollector extends Collector {
             }
         }
         return args;
+    }
+
+    private Integer visitMainArgs(JmmNode node, Boolean dummy){
+        for (var child : node.getChildren()) {
+            if (child.getKind().equals("Id")){
+                this.methods.add("main(String[] " + child.get("name") + ")");
+            }
+        }
+        return ++visits;
     }
 }
 

@@ -19,7 +19,14 @@ public class ParametersCollector extends Collector {
         addVisit("ClassDecl", this::visitDefault);
         addVisit("ClassBody", this::visitDefault);
         addVisit("MethodDecl", this::visitDefault);
-        addVisit("Function", this::visitFunction);
+        if (this.signature.substring(0, this.signature.indexOf('(')).equals("main")){
+            addVisit("Main", this::visitDefault);
+            addVisit("MainHeader", this::visitDefault);
+            addVisit("MainArgs", this::visitMainArgs);
+        }
+        else{
+            addVisit("Function", this::visitFunction);
+        }
         setDefaultVisit((node, imports) -> ++visits);
     }
 
@@ -66,6 +73,15 @@ public class ParametersCollector extends Collector {
             }
         }
         return params;
+    }
+
+    private Integer visitMainArgs(JmmNode node, Boolean dummy){
+        for (var child : node.getChildren()) {
+            if (child.getKind().equals("Id")){
+                this.parameters.add(new Symbol(new Type("String", true), child.get("name")));
+            }
+        }
+        return ++visits;
     }
 }
 
