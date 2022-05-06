@@ -13,8 +13,9 @@ import java.util.List;
 public class JasminBackendClass implements JasminBackend {
     @Override
     public JasminResult toJasmin(OllirResult ollirResult){
-        String jasminCode = new OllirToJasmin().getCode(ollirResult.getOllirClass());
-
-        return new JasminResult(ollirResult, jasminCode, ollirResult.getReports());
+        String jasminCode = "";
+                //new OllirToJasmin().getCode(ollirResult.getOllirClass());
+        return new JasminResult(ollirResult, jasminCode, Collections.emptyList());
+        //return new JasminResult(ollirResult, jasminCode, ollirResult.getReports());
     }
 }
