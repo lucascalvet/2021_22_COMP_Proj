@@ -1,6 +1,7 @@
 package pt.up.fe.comp.jmm.jasmin;
 
 import org.specs.comp.ollir.ClassUnit;
+import pt.up.fe.specs.util.SpecsIo;
 
 import java.util.Collections;
 
@@ -42,13 +43,16 @@ public class OllirToJasmin {
 
     public String getCode(){
         var code = new StringBuilder();
+        var qualifiedNameSuper = getFullyQualifiedName(classUnit.getSuperClass());
 
         code.append(".class public ").append(classUnit.getClassName()).append("\n");
-        code.append(".super ").append(getFullyQualifiedName(classUnit.getSuperClass())).append("\n\n");
+        code.append(".super ").append(qualifiedNameSuper).append("\n\n");
 
+
+        code.append(SpecsIo.getResource("../test/templates/constructor.txt").replace("${SUPER_CLASS}", qualifiedNameSuper));
 
         var result = code.toString();
-        System.out.println("Jasmin Code: \n" + result);
+        System.out.println("\nJasmin Code: \n" + result);
         return code.toString();
     }
 }
