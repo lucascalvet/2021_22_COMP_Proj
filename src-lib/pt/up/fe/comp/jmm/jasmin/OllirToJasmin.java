@@ -152,25 +152,25 @@ public class OllirToJasmin {
         }
     }
 
-    private String getCodeInvokeStatic(CallInstruction method) {
+    private String getCodeInvokeStatic(CallInstruction instruction) {
         var code = new StringBuilder();
         code.append("invokestatic ");
 
         //Operandos, FirstArg(classe), SecondArgs (nomemétodo), ReturnType
 
-        var methodClass = ((Operand) method.getFirstArg()).getName();
+        var methodClass = ((Operand) instruction.getFirstArg()).getName();
 
         code.append(getFullyQualifiedName(methodClass));
         code.append("/");
-        code.append((((LiteralElement) method.getSecondArg()).getLiteral()).replace("\"", ""));
+        code.append((((LiteralElement) instruction.getSecondArg()).getLiteral()).replace("\"", ""));
         code.append("(");
 
-        for(var operand : method.getListOfOperands()){
+        for(var operand : instruction.getListOfOperands()){
             getArgumentCode(operand);
         }
         
         code.append(")");
-        code.append(getJasminType(method.getReturnType()));
+        code.append(getJasminType(instruction.getReturnType()));
         code.append("\n");
 
         return code.toString();
