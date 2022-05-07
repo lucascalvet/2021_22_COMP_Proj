@@ -19,8 +19,8 @@ public class OurOllirToJasminTest {
         var jasminResult = TestUtils.backend(ollirResult);
         TestUtils.noErrors(jasminResult);
         jasminResult.compile();
-        /*String result = jasminResult.run();
-        System.out.println("Jasmin result: "+ result);*/
+        String result = jasminResult.run();
+        System.out.println("Jasmin result: "+ result);
     }
 
     @Test

@@ -1,13 +1,9 @@
 package pt.up.fe.comp.jmm.jasmin;
 
-import org.specs.comp.ollir.ClassUnit;
-import org.specs.comp.ollir.Method;
-import org.specs.comp.ollir.Type;
-import org.specs.comp.ollir.ElementType;
-import org.specs.comp.ollir.ArrayType;
-import org.specs.comp.ollir.Instruction;
+import org.specs.comp.ollir.*;
 
 import pt.up.fe.specs.util.SpecsIo;
+import pt.up.fe.specs.util.classmap.FunctionClassMap;
 import pt.up.fe.specs.util.exceptions.NotImplementedException;
 
 import java.util.Collections;
@@ -16,9 +12,12 @@ import java.util.stream.Collectors;
 public class OllirToJasmin {
 
     private final ClassUnit classUnit;
+    private final FunctionClassMap<Instruction, String> instructionMap;
 
     public OllirToJasmin(ClassUnit classUnit) {
         this.classUnit = classUnit;
+        this.instructionMap = new FunctionClassMap<>();
+        instructionMap.put(CallInstruction.class,this::getCode);
     }
 
     public String getFullyQualifiedName(String className){
@@ -75,6 +74,7 @@ public class OllirToJasmin {
     public String getCode(Method method){
         var code = new StringBuilder();
 
+        //Cabeça do método
         code.append(".method ");
 
         var methodAccessModifier = method.getMethodAccessModifier().name();
@@ -94,10 +94,18 @@ public class OllirToJasmin {
 
         code.append(methodParamTypes).append(")").append(getJasminType(method.getReturnType())).append("\n");
 
+        //Corpo do método
+        code.append(".limit stack 99\n");
+        code.append(".limit locals 99\n");
+
         for(var inst : method.getInstructions()){
             code.append(getCode(inst));
         }
 
+        //TODO: Return Statement
+        code.append("return\n"); //se for return Void
+
+        //Fecho do método
         code.append(".end method\n\n");
 
         var result = code.toString();
@@ -112,6 +120,8 @@ public class OllirToJasmin {
     }
 
     public String getJasminType(ElementType type){
+        //TODO: Adicionar os outros tipos!!
+
         var jasminType = "";
         switch(type) {
             case STRING:
@@ -128,9 +138,47 @@ public class OllirToJasmin {
     }
 
     public String getCode(Instruction instruction){
-        var code = new StringBuilder();
-
-        var result = code.toString();
-        return result;
+        return instructionMap.apply(instruction);
     }
+
+    public String getCode(CallInstruction instruction){
+
+        switch(instruction.getInvocationType()){
+            //TODO : ver as outras invocações
+            case invokestatic:
+                return getCodeInvokeStatic(instruction);
+            default:
+                throw new NotImplementedException(instruction.getInvocationType());
+        }
+    }
+
+    private String getCodeInvokeStatic(CallInstruction method) {
+        var code = new StringBuilder();
+        code.append("invokestatic ");
+
+        //Operandos, FirstArg(classe), SecondArgs (nomemétodo), ReturnType
+
+        var methodClass = ((Operand) method.getFirstArg()).getName();
+
+        code.append(getFullyQualifiedName(methodClass));
+        code.append("/");
+        code.append((((LiteralElement) method.getSecondArg()).getLiteral()).replace("\"", ""));
+        code.append("(");
+
+        for(var operand : method.getListOfOperands()){
+            getArgumentCode(operand);
+        }
+        
+        code.append(")");
+        code.append(getJasminType(method.getReturnType()));
+        code.append("\n");
+
+        return code.toString();
+    }
+
+    private void getArgumentCode(Element operand) {
+        throw new NotImplementedException(this);
+    }
+
+
 }
