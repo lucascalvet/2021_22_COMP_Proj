@@ -55,11 +55,14 @@ public class OllirToJasmin {
         code.append(".class public ").append(classUnit.getClassName()).append("\n");
         code.append(".super ").append(qualifiedNameSuper).append("\n\n");
 
-        code.append(SpecsIo.getResource("../test/templates/constructor.txt").replace("${SUPER_CLASS}", qualifiedNameSuper));
-        code.append("\n\n");
 
         //FIELDS
+        for(var field: classUnit.getFields()){
+            code.append(getCode(field));
+        }
 
+        code.append(SpecsIo.getResource("../test/templates/constructor.txt").replace("${SUPER_CLASS}", qualifiedNameSuper));
+        code.append("\n\n");
 
         //METHODS
         for(var method : classUnit.getMethods()){
@@ -69,6 +72,22 @@ public class OllirToJasmin {
         var result = code.toString();
         System.out.println("\nJasmin Code: \n" + result);
         return result;
+    }
+
+    private String getCode(Field field) {
+        var result = new StringBuilder();
+
+        result.append(".field ");
+        var fieldAccessModifier = field.getFieldAccessModifier().name();
+        if(!fieldAccessModifier.equals("DEFAULT")){
+            result.append(fieldAccessModifier.toLowerCase()).append(" ");
+        }
+
+        result.append(field.getFieldName()).append(" ");
+
+        result.append(getJasminType(field.getFieldType())).append("\n");
+
+        return result.toString();
     }
 
     public String getCode(Method method){
@@ -129,6 +148,9 @@ public class OllirToJasmin {
                 break;
             case VOID:
                 jasminType = "V";
+                break;
+            case INT32:
+                jasminType = "I";
                 break;
             default:
                 throw new NotImplementedException(type);
