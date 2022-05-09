@@ -135,6 +135,7 @@ public class OllirToJasmin {
         if(type instanceof ArrayType){
             return "[" + getJasminType(((ArrayType) type).getTypeOfElements());
         }
+
         return getJasminType(type.getTypeOfElement());
     }
 
@@ -144,9 +145,9 @@ public class OllirToJasmin {
 //        INT32, <-
 //        BOOLEAN, <-
 //        ARRAYREF, <-
-//        OBJECTREF,
-//        CLASS,
-//        THIS,
+//        OBJECTREF,_
+//        CLASS, <-
+//        THIS, <-
 //        STRING, <-
 //        VOID; <-
 
@@ -164,6 +165,18 @@ public class OllirToJasmin {
                 break;
             case BOOLEAN:
                 jasminType = "Z";
+                break;
+            case THIS:
+                //TODO verificar se está correto
+                jasminType = type.getClass().getName();
+                break;
+            case CLASS:
+                //TODO: check if right
+                jasminType = type.getClass().getName();
+                break;
+            case OBJECTREF:
+                //TODO: check if right
+                jasminType = type.getClass().getName();
                 break;
             default:
                 throw new NotImplementedException(type);
