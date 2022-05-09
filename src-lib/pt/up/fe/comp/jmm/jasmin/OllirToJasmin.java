@@ -141,6 +141,16 @@ public class OllirToJasmin {
     public String getJasminType(ElementType type){
         //TODO: Adicionar os outros tipos!!
 
+//        INT32, <-
+//        BOOLEAN, <-
+//        ARRAYREF, <-
+//        OBJECTREF,
+//        CLASS,
+//        THIS,
+//        STRING, <-
+//        VOID; <-
+
+
         var jasminType = "";
         switch(type) {
             case STRING:
@@ -151,6 +161,9 @@ public class OllirToJasmin {
                 break;
             case INT32:
                 jasminType = "I";
+                break;
+            case BOOLEAN:
+                jasminType = "Z";
                 break;
             default:
                 throw new NotImplementedException(type);
