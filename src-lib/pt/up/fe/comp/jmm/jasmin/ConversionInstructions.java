@@ -4,6 +4,8 @@ import org.specs.comp.ollir.*;
 import pt.up.fe.specs.util.classmap.FunctionClassMap;
 import pt.up.fe.specs.util.exceptions.NotImplementedException;
 
+import java.awt.*;
+
 public class ConversionInstructions {
     private final ClassUnit classUnit;
     private final ConversionUtils utils;
@@ -39,10 +41,21 @@ public class ConversionInstructions {
         return "";
     }
 
+    //return
     public String getCode(ReturnInstruction instruction){
         StringBuilder result = new StringBuilder();
         if(!instruction.hasReturnValue()) {
             result.append("return").append("\n");
+        } else{
+            Element operand = instruction.getOperand();
+            if(operand.isLiteral()){
+                result.append("ldc ").append(((LiteralElement)operand).getLiteral()).append("\n");
+                result.append("ireturn").append("\n");
+
+            } else {
+                System.out.println("problems from return");
+            }
+
         }
         return result.toString();
     }
