@@ -13,44 +13,23 @@ public class OllirToJasmin {
 
     private final ClassUnit classUnit;
     private final FunctionClassMap<Instruction, String> instructionMap;
+    private final ConversionUtils utils;
 
     public OllirToJasmin(ClassUnit classUnit) {
         this.classUnit = classUnit;
+        this.utils = new ConversionUtils(this.classUnit);
+
+
         this.instructionMap = new FunctionClassMap<>();
         instructionMap.put(CallInstruction.class,this::getCode);
+        instructionMap.put(AssignInstruction.class,this::getCode);
+        instructionMap.put(ReturnInstruction.class, this::getCode);
     }
 
-    public String getFullyQualifiedName(String className){
-        //secalhar construir um map em que a chave é o last name e o valor é o import já c
-
-        var imports = classUnit.getImports();
-
-        for(var importString : imports) {
-            var splittedImports = importString.split("\\.");
-
-            String lastName;
-            if(splittedImports.length == 0){
-                lastName = importString;
-            } else {
-                lastName = splittedImports[splittedImports.length - 1];
-            }
-
-
-            if(lastName.equals(className)){
-                return importString.replace(".", "/");
-            }
-        }
-
-        if(!imports.equals(Collections.emptyList())){
-            throw new RuntimeException("Could not find import for class " + className);
-        }
-
-        return "java/lang/Object";
-    }
 
     public String getCode(){
         var code = new StringBuilder();
-        var qualifiedNameSuper = getFullyQualifiedName(classUnit.getSuperClass());
+        var qualifiedNameSuper = utils.getFullyQualifiedName(classUnit.getSuperClass());
 
         code.append(".class public ").append(classUnit.getClassName()).append("\n");
         code.append(".super ").append(qualifiedNameSuper).append("\n\n");
@@ -196,8 +175,18 @@ public class OllirToJasmin {
             case invokestatic:
                 return getCodeInvokeStatic(instruction);
             default:
-                throw new NotImplementedException(instruction.getInvocationType());
+                return ""; //throw new NotImplementedException(instruction.getInvocationType());
         }
+    }
+
+    public String getCode(AssignInstruction instruction){
+
+        return "";
+    }
+
+    public String getCode(ReturnInstruction instruction){
+
+        return "";
     }
 
     private String getCodeInvokeStatic(CallInstruction instruction) {
@@ -208,7 +197,7 @@ public class OllirToJasmin {
 
         var methodClass = ((Operand) instruction.getFirstArg()).getName();
 
-        code.append(getFullyQualifiedName(methodClass));
+        code.append(utils.getFullyQualifiedName(methodClass));
         code.append("/");
         code.append((((LiteralElement) instruction.getSecondArg()).getLiteral()).replace("\"", ""));
         code.append("(");
