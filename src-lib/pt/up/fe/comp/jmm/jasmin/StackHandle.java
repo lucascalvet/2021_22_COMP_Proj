@@ -25,4 +25,19 @@ public class StackHandle {
         }
         return result.toString();
     }
+
+    public String store(Element element, HashMap<String, Descriptor> scope, String rightSide){
+        StringBuilder result = new StringBuilder();
+        ElementType type = element.getType().getTypeOfElement();
+
+        if(type == ElementType.INT32 || type == ElementType.STRING || type ==  ElementType.BOOLEAN){
+            int register = scope.get(element).getVirtualReg();
+            if (register > 3 || register < 0)
+                result.append("istore ").append(register).append("\n");
+            else
+                result.append("istore_").append(register).append("\n");
+        }
+        return result.toString();
+    }
+
 }
