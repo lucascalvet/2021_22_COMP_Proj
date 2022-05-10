@@ -87,21 +87,33 @@ public interface SymbolTable {
 
         for (var method : methods) {
             builder.append(" - signature: ").append(method);
-            builder.append("; returnType: ").append(getReturnType(method));
+            builder.append("; returnType: ").append(getReturnType(method).print());
 
             var returnType = getReturnType(method);
             var params = getParameters(method);
             var localVars = getLocalVariables(method);
 
-            var paramsString = params.stream().map(param -> param != null ? param.print() : "<null param>")
-                    .collect(Collectors.joining(", "));
-            var varsString = localVars.stream().map(lvar -> lvar != null ? lvar.print() : "<null lvar>")
-                    .collect(Collectors.joining(", "));
+            builder.append("; params: ");
 
-            builder.append(" - " + returnType.print() + " " + method + "(" + paramsString + ")");
-            builder.append("\n");
-            builder.append("; params: ").append(paramsString);
-            builder.append("; localVars: ").append(varsString);
+            if (params.isEmpty()) {
+                builder.append(" <no params>");
+            } else {
+                var paramsString = params.stream().map(param -> param != null ? param.print() : "<null param>")
+                        .collect(Collectors.joining(", "));
+                builder.append(paramsString);
+            }
+
+            var localVariables = getLocalVariables(method);
+            builder.append("; local vars: ");
+
+            if (localVariables.isEmpty()) {
+                builder.append("<no vars>");
+            } else {
+                var localVarsString = localVariables.stream()
+                        .map(localVar -> localVar != null ? localVar.print() : "<null var>")
+                        .collect(Collectors.joining(", "));
+                builder.append(localVarsString);
+            }
             builder.append("\n");
         }
 
