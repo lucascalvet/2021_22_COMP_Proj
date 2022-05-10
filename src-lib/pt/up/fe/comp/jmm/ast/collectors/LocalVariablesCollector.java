@@ -16,6 +16,7 @@ public class LocalVariablesCollector extends Collector {
         this.visits = 0;
         this.local_vars = new ArrayList<>();
         this.signature = methodSignature;
+<<<<<<< HEAD:src-lib/pt/up/fe/comp/jmm/ast/collectors/LocalVariablesCollector.java
         addVisit(AstNode.PROGRAM, this::visitDefault);
         addVisit(AstNode.CLASS_DECL, this::visitDefault);
         addVisit(AstNode.CLASS_BODY, this::visitClassBody);
@@ -24,6 +25,15 @@ public class LocalVariablesCollector extends Collector {
         if (this.signature.equals("main")){
             addVisit(AstNode.MAIN, this::visitDefault);
             addVisit(AstNode.MAIN_BODY, this::visitDefault);
+=======
+        addVisit("Program", this::visitDefault);
+        addVisit("ClassDecl", this::visitDefault);
+        addVisit("ClassBody", this::visitClassBody);
+        addVisit("MethodDecl", this::visitDefault);
+        if (this.signature.equals("main")){
+            addVisit("Main", this::visitDefault);
+            addVisit("MainBody", this::visitDefault);
+>>>>>>> Fixed collectors:src-lib/pt/up/fe/comp/jmm/ast/LocalVariablesCollector.java
         }
         else{
             addVisit(AstNode.FUNCTION, this::visitFunction);
@@ -48,8 +58,12 @@ public class LocalVariablesCollector extends Collector {
 
     private Integer visitFunction(JmmNode node, Boolean dummy) {
         for (var child : node.getChildren()) {
+<<<<<<< HEAD:src-lib/pt/up/fe/comp/jmm/ast/collectors/LocalVariablesCollector.java
             if (child.getKind().equals(AstNode.FUNC_NAME.toString())) {
                 //if (!child.getChildren().get(0).get("name").equals(this.signature.substring(0, this.signature.indexOf('(')))) {
+=======
+            if (child.getKind().equals("FuncName")) {
+>>>>>>> Fixed collectors:src-lib/pt/up/fe/comp/jmm/ast/LocalVariablesCollector.java
                 if (!child.getChildren().get(0).get("name").equals(this.signature)) {
                     break;
                 }

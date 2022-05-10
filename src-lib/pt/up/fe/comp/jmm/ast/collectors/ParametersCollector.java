@@ -20,7 +20,6 @@ public class ParametersCollector extends Collector {
         addVisit(AstNode.CLASS_DECL, this::visitDefault);
         addVisit(AstNode.CLASS_BODY, this::visitDefault);
         addVisit(AstNode.METHOD_DECL, this::visitDefault);
-        //if (this.signature.substring(0, this.signature.indexOf('(')).equals("main")){
         if (this.signature.equals("main")){
             addVisit(AstNode.MAIN, this::visitDefault);
             addVisit(AstNode.MAIN_HEADER, this::visitDefault);
@@ -40,8 +39,12 @@ public class ParametersCollector extends Collector {
         Boolean check = false;
         List<Symbol> args = new ArrayList<>();
         for (var child : func.getChildren()) {
+<<<<<<< HEAD:src-lib/pt/up/fe/comp/jmm/ast/collectors/ParametersCollector.java
             if (child.getKind().equals(AstNode.FUNC_NAME.toString())){
                 //if(child.getChildren().get(0).get("name").equals(this.signature.substring(0, this.signature.indexOf('(')))){
+=======
+            if (child.getKind().equals("FuncName")){
+>>>>>>> Fixed collectors:src-lib/pt/up/fe/comp/jmm/ast/ParametersCollector.java
                 if(child.getChildren().get(0).get("name").equals(this.signature)){
                     check = true;
                 }
