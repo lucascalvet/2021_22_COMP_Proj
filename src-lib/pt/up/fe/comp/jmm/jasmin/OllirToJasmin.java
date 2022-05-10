@@ -12,18 +12,13 @@ import java.util.stream.Collectors;
 public class OllirToJasmin {
 
     private final ClassUnit classUnit;
-    private final FunctionClassMap<Instruction, String> instructionMap;
     private final ConversionUtils utils;
+    private final ConversionInstructions inst;
 
     public OllirToJasmin(ClassUnit classUnit) {
         this.classUnit = classUnit;
         this.utils = new ConversionUtils(this.classUnit);
-
-
-        this.instructionMap = new FunctionClassMap<>();
-        instructionMap.put(CallInstruction.class,this::getCode);
-        instructionMap.put(AssignInstruction.class,this::getCode);
-        instructionMap.put(ReturnInstruction.class, this::getCode);
+        this.inst = new ConversionInstructions(classUnit);
     }
 
 
@@ -31,15 +26,19 @@ public class OllirToJasmin {
         var code = new StringBuilder();
         var qualifiedNameSuper = utils.getFullyQualifiedName(classUnit.getSuperClass());
 
+        //Main class name
         code.append(".class public ").append(classUnit.getClassName()).append("\n");
+        //Parent class name
         code.append(".super ").append(qualifiedNameSuper).append("\n\n");
 
 
-        //FIELDS
+        //Fields
         for(var field: classUnit.getFields()){
             code.append(getCode(field));
         }
 
+        //Constructor
+        //TODO : solve the problem of file location
         code.append(SpecsIo.getResource("../test/templates/constructor.txt").replace("${SUPER_CLASS}", qualifiedNameSuper));
         code.append("\n\n");
 
@@ -96,8 +95,8 @@ public class OllirToJasmin {
         code.append(".limit stack 99\n");
         code.append(".limit locals 99\n");
 
-        for(var inst : method.getInstructions()){
-            code.append(getCode(inst));
+        for(var instruction : method.getInstructions()){
+            code.append(inst.getCode(instruction));
         }
 
         //TODO: Return Statement
@@ -110,61 +109,6 @@ public class OllirToJasmin {
         return result;
     }
 
-
-
-
-    public String getCode(Instruction instruction){
-        return instructionMap.apply(instruction);
-    }
-
-    public String getCode(CallInstruction instruction){
-
-        switch(instruction.getInvocationType()){
-            //TODO : ver as outras invocações
-            case invokestatic:
-                return getCodeInvokeStatic(instruction);
-            default:
-                return ""; //throw new NotImplementedException(instruction.getInvocationType());
-        }
-    }
-
-    public String getCode(AssignInstruction instruction){
-
-        return "";
-    }
-
-    public String getCode(ReturnInstruction instruction){
-
-        return "";
-    }
-
-    private String getCodeInvokeStatic(CallInstruction instruction) {
-        var code = new StringBuilder();
-        code.append("invokestatic ");
-
-        //Operandos, FirstArg(classe), SecondArgs (nomemétodo), ReturnType
-
-        var methodClass = ((Operand) instruction.getFirstArg()).getName();
-
-        code.append(utils.getFullyQualifiedName(methodClass));
-        code.append("/");
-        code.append((((LiteralElement) instruction.getSecondArg()).getLiteral()).replace("\"", ""));
-        code.append("(");
-
-        for(var operand : instruction.getListOfOperands()){
-            getArgumentCode(operand);
-        }
-        
-        code.append(")");
-        code.append(utils.getJasminType(instruction.getReturnType()));
-        code.append("\n");
-
-        return code.toString();
-    }
-
-    private void getArgumentCode(Element operand) {
-        throw new NotImplementedException(this);
-    }
 
 
 }
