@@ -70,6 +70,7 @@ public class OllirToJasmin {
     }
 
     public String getCode(Method method){
+        this.inst.updateScope(method.getVarTable());
         var code = new StringBuilder();
 
         //Cabeça do método

@@ -5,11 +5,14 @@ import pt.up.fe.specs.util.classmap.FunctionClassMap;
 import pt.up.fe.specs.util.exceptions.NotImplementedException;
 
 import java.awt.*;
+import java.util.HashMap;
 
 public class ConversionInstructions {
     private final ClassUnit classUnit;
     private final ConversionUtils utils;
     private final FunctionClassMap<Instruction, String> instructionMap;
+    private HashMap<String, Descriptor> scope;
+    private StackHandle stackHandle;
 
     public ConversionInstructions(ClassUnit classUnit) {
         this.classUnit = classUnit;
@@ -18,7 +21,12 @@ public class ConversionInstructions {
         instructionMap.put(CallInstruction.class,this::getCode);
         instructionMap.put(AssignInstruction.class,this::getCode);
         instructionMap.put(ReturnInstruction.class, this::getCode);
+        this.scope = new HashMap<>();
+        this.stackHandle = new StackHandle();
+    }
 
+    public void updateScope(HashMap newScope){
+        this.scope = newScope;
     }
 
     public String getCode(Instruction instruction){
@@ -37,6 +45,8 @@ public class ConversionInstructions {
     }
 
     public String getCode(AssignInstruction instruction){
+        Instruction rightSide = instruction.getRhs();
+        Element leftSide = instruction.getDest();
 
         return "";
     }
@@ -49,7 +59,7 @@ public class ConversionInstructions {
         } else{
             Element operand = instruction.getOperand();
             if(operand.isLiteral()){
-                result.append("ldc ").append(((LiteralElement)operand).getLiteral()).append("\n");
+                result.append(stackHandle.load(operand, scope));
                 result.append("ireturn").append("\n");
 
             } else {
