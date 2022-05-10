@@ -1,8 +1,7 @@
-package pt.up.fe.comp.jmm.ast;
+package pt.up.fe.comp.jmm.ast.collectors;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import pt.up.fe.comp.jmm.ast.AstNode;
+import pt.up.fe.comp.jmm.ast.JmmNode;
 
 public class SuperCollector extends Collector {
     private String super_name;
@@ -10,9 +9,9 @@ public class SuperCollector extends Collector {
     public SuperCollector() {
         this.visits = 0;
         this.super_name = null;
-        addVisit("Program", this::visitDefault);
-        addVisit("ClassDecl", this::visitDefault);
-        addVisit("Extends", this::visitExtends);
+        addVisit(AstNode.PROGRAM, this::visitDefault);
+        addVisit(AstNode.CLASS_DECL, this::visitDefault);
+        addVisit(AstNode.EXTENDS, this::visitExtends);
         setDefaultVisit((node, imports) -> ++visits);
     }
 

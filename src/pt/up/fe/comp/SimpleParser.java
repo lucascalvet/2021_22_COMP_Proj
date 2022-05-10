@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.Map;
 
 import pt.up.fe.comp.jmm.ast.JmmNode;
+import pt.up.fe.comp.jmm.ast.annotators.LineColAnnotator;
 import pt.up.fe.comp.jmm.parser.JmmParser;
 import pt.up.fe.comp.jmm.parser.JmmParserResult;
 import pt.up.fe.comp.jmm.report.Report;
@@ -39,7 +40,9 @@ public class SimpleParser implements JmmParser {
             JmmGrammarParser parser = new JmmGrammarParser(SpecsIo.toInputStream(jmmCode));
             SpecsSystem.invoke(parser, startingRule);
 
+            new LineColAnnotator().visit((JmmNode) parser.rootNode());
             var root = ((JmmNode) parser.rootNode()).sanitize();
+
             System.out.println(root.toTree());
 
             if (!(root instanceof JmmNode)) {
@@ -47,7 +50,7 @@ public class SimpleParser implements JmmParser {
                         "JmmNode interface not yet implemented, returning null root node"));
             }
 
-            return new JmmParserResult((JmmNode) root, Collections.emptyList(), config);
+            return new JmmParserResult(root, Collections.emptyList(), config);
 
         } catch (Exception e) {
             return JmmParserResult.newError(Report.newError(Stage.SYNTATIC, -1, -1, "Exception during parsing", e));

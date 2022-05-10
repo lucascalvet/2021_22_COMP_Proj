@@ -2,7 +2,7 @@ package pt.up.fe.comp.jmm.ast.examples;
 
 import java.util.stream.Collectors;
 
-import pt.up.fe.comp.jmm.ast.AJmmVisitor;
+import pt.up.fe.comp.jmm.ast.visitors.AJmmVisitor;
 import pt.up.fe.comp.jmm.ast.JmmNode;
 
 public class ExampleVisitor extends AJmmVisitor<String, String> {

@@ -3,7 +3,7 @@ package pt.up.fe.comp.jmm.ast.examples;
 import java.util.Map;
 
 import pt.up.fe.comp.jmm.ast.JmmNode;
-import pt.up.fe.comp.jmm.ast.PostorderJmmVisitor;
+import pt.up.fe.comp.jmm.ast.visitors.PostorderJmmVisitor;
 
 /**
  * Counts the occurrences of each node kind.
