@@ -1,9 +1,6 @@
 package pt.up.fe.comp.jmm.jasmin;
 
-import org.specs.comp.ollir.Descriptor;
-import org.specs.comp.ollir.Element;
-import org.specs.comp.ollir.ElementType;
-import org.specs.comp.ollir.LiteralElement;
+import org.specs.comp.ollir.*;
 
 import java.util.HashMap;
 
@@ -16,7 +13,7 @@ public class StackHandle {
             result.append("ldc ").append(((LiteralElement)element).getLiteral()).append("\n");
         } else {
             if (type == ElementType.INT32 || type == ElementType.STRING || type == ElementType.BOOLEAN){
-                int register = scope.get(element).getVirtualReg();
+                int register = scope.get(((Operand)element).getName()).getVirtualReg();
                 if (register > 3 || register < 0)
                     result.append("aload ").append(register).append("\n");
                 else
@@ -31,7 +28,9 @@ public class StackHandle {
         ElementType type = element.getType().getTypeOfElement();
 
         if(type == ElementType.INT32 || type == ElementType.STRING || type ==  ElementType.BOOLEAN){
-            int register = scope.get(element).getVirtualReg();
+            String name = ((Operand)element).getName();
+            Descriptor descriptor = scope.get(name);
+            int register = descriptor.getVirtualReg();
             if (register > 3 || register < 0)
                 result.append("istore ").append(register).append("\n");
             else

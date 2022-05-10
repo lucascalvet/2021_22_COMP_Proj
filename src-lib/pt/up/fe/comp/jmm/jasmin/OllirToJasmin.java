@@ -7,6 +7,7 @@ import pt.up.fe.specs.util.classmap.FunctionClassMap;
 import pt.up.fe.specs.util.exceptions.NotImplementedException;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.stream.Collectors;
 
 public class OllirToJasmin {
@@ -70,7 +71,9 @@ public class OllirToJasmin {
     }
 
     public String getCode(Method method){
-        this.inst.updateScope(method.getVarTable());
+        method.buildVarTable();
+        HashMap<String, Descriptor> scope = method.getVarTable();
+        this.inst.updateScope(scope);
         var code = new StringBuilder();
 
         //Cabeça do método

@@ -45,10 +45,24 @@ public class ConversionInstructions {
     }
 
     public String getCode(AssignInstruction instruction){
+        StringBuilder result = new StringBuilder();
         Instruction rightSide = instruction.getRhs();
         Element leftSide = instruction.getDest();
 
-        return "";
+        //handling right side
+        StringBuilder right = new StringBuilder();
+        InstructionType type = rightSide.getInstType();
+        switch (type){
+            case NOPER:
+                Element single = ((SingleOpInstruction) rightSide).getSingleOperand();
+                right.append(stackHandle.load(single, scope));
+                result.append(stackHandle.load(single, scope));
+                break;
+            default:
+                throw new NotImplementedException(this);
+        }
+        result.append(stackHandle.store(leftSide, scope, right.toString()));
+        return result.toString();
     }
 
     //return
