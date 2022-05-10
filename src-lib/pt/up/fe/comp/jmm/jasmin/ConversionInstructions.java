@@ -72,12 +72,12 @@ public class ConversionInstructions {
             result.append("return").append("\n");
         } else{
             Element operand = instruction.getOperand();
-            if(operand.isLiteral()){
-                result.append(stackHandle.load(operand, scope));
+            result.append(stackHandle.load(operand, scope));
+            ElementType type = instruction.getOperand().getType().getTypeOfElement();
+            if (type == ElementType.INT32 || type == ElementType.BOOLEAN){
                 result.append("ireturn").append("\n");
-
             } else {
-                System.out.println("problems from return");
+                result.append("areturn").append("\n");
             }
 
         }

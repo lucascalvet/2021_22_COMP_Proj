@@ -15,9 +15,9 @@ public class StackHandle {
             if (type == ElementType.INT32 || type == ElementType.STRING || type == ElementType.BOOLEAN){
                 int register = scope.get(((Operand)element).getName()).getVirtualReg();
                 if (register > 3 || register < 0)
-                    result.append("aload ").append(register).append("\n");
+                    result.append("iload ").append(register).append("\n");
                 else
-                    result.append("aload_").append(register).append("\n");
+                    result.append("iload_").append(register).append("\n");
             }
         }
         return result.toString();
