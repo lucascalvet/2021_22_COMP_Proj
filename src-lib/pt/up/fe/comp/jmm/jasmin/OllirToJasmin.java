@@ -66,7 +66,7 @@ public class OllirToJasmin {
 
         //METHODS
         for(var method : classUnit.getMethods()){
-            code.append(getCode(method));
+            if(!method.isConstructMethod()) code.append(getCode(method));
         }
 
         var result = code.toString();
