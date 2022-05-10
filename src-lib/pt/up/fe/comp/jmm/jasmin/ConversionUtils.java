@@ -1,6 +1,10 @@
 package pt.up.fe.comp.jmm.jasmin;
 
+import org.specs.comp.ollir.ArrayType;
 import org.specs.comp.ollir.ClassUnit;
+import org.specs.comp.ollir.ElementType;
+import org.specs.comp.ollir.Type;
+import pt.up.fe.specs.util.exceptions.NotImplementedException;
 
 import java.util.Collections;
 
@@ -13,8 +17,7 @@ public class ConversionUtils {
     }
 
     public String getFullyQualifiedName(String className){
-        //secalhar construir um map em que a chave é o last name e o valor é o import já c
-
+        //TODO : can be more efficient with hash mao
         var imports = classUnit.getImports();
 
         for(var importString : imports) {
@@ -27,7 +30,6 @@ public class ConversionUtils {
                 lastName = splittedImports[splittedImports.length - 1];
             }
 
-
             if(lastName.equals(className)){
                 return importString.replace(".", "/");
             }
@@ -38,5 +40,48 @@ public class ConversionUtils {
         }
 
         return "java/lang/Object";
+    }
+
+    public String getJasminType(Type type){
+        if(type instanceof ArrayType){
+            return "[" + getJasminType(((ArrayType) type).getTypeOfElements());
+        }
+
+        return getJasminType(type.getTypeOfElement());
+    }
+
+    public String getJasminType(ElementType type){
+        //TODO: Adicionar os outros tipos!!
+        var jasminType = "";
+        switch(type) {
+            case STRING:
+                jasminType = "Ljava/lang/String;";
+                break;
+            case VOID:
+                jasminType = "V";
+                break;
+            case INT32:
+                jasminType = "I";
+                break;
+            case BOOLEAN:
+                jasminType = "Z";
+                break;
+            case THIS:
+                //TODO verificar se está correto
+                jasminType = type.getClass().getName();
+                break;
+            case CLASS:
+                //TODO: check if right
+                jasminType = type.getClass().getName();
+                break;
+            case OBJECTREF:
+                //TODO: check if right
+                jasminType = type.getClass().getName();
+                break;
+            default:
+                throw new NotImplementedException(type);
+        }
+
+        return jasminType;
     }
 }

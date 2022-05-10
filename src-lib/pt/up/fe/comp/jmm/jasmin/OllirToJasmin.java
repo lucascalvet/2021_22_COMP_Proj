@@ -64,7 +64,7 @@ public class OllirToJasmin {
 
         result.append(field.getFieldName()).append(" ");
 
-        result.append(getJasminType(field.getFieldType())).append("\n");
+        result.append(utils.getJasminType(field.getFieldType())).append("\n");
 
         return result.toString();
     }
@@ -87,10 +87,10 @@ public class OllirToJasmin {
         code.append(method.getMethodName()).append("(");
 
         var methodParamTypes = method.getParams().stream()
-                .map(elem -> getJasminType(elem.getType()))
+                .map(elem -> utils.getJasminType(elem.getType()))
                 .collect(Collectors.joining());
 
-        code.append(methodParamTypes).append(")").append(getJasminType(method.getReturnType())).append("\n");
+        code.append(methodParamTypes).append(")").append(utils.getJasminType(method.getReturnType())).append("\n");
 
         //Corpo do método
         code.append(".limit stack 99\n");
@@ -110,59 +110,8 @@ public class OllirToJasmin {
         return result;
     }
 
-    public String getJasminType(Type type){
-        if(type instanceof ArrayType){
-            return "[" + getJasminType(((ArrayType) type).getTypeOfElements());
-        }
-
-        return getJasminType(type.getTypeOfElement());
-    }
-
-    public String getJasminType(ElementType type){
-        //TODO: Adicionar os outros tipos!!
-
-//        INT32, <-
-//        BOOLEAN, <-
-//        ARRAYREF, <-
-//        OBJECTREF,_
-//        CLASS, <-
-//        THIS, <-
-//        STRING, <-
-//        VOID; <-
 
 
-        var jasminType = "";
-        switch(type) {
-            case STRING:
-                jasminType = "Ljava/lang/String;";
-                break;
-            case VOID:
-                jasminType = "V";
-                break;
-            case INT32:
-                jasminType = "I";
-                break;
-            case BOOLEAN:
-                jasminType = "Z";
-                break;
-            case THIS:
-                //TODO verificar se está correto
-                jasminType = type.getClass().getName();
-                break;
-            case CLASS:
-                //TODO: check if right
-                jasminType = type.getClass().getName();
-                break;
-            case OBJECTREF:
-                //TODO: check if right
-                jasminType = type.getClass().getName();
-                break;
-            default:
-                throw new NotImplementedException(type);
-        }
-
-        return jasminType;
-    }
 
     public String getCode(Instruction instruction){
         return instructionMap.apply(instruction);
@@ -207,7 +156,7 @@ public class OllirToJasmin {
         }
         
         code.append(")");
-        code.append(getJasminType(instruction.getReturnType()));
+        code.append(utils.getJasminType(instruction.getReturnType()));
         code.append("\n");
 
         return code.toString();
