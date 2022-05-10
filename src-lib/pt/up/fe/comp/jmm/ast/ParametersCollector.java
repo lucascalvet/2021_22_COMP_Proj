@@ -19,7 +19,7 @@ public class ParametersCollector extends Collector {
         addVisit("ClassDecl", this::visitDefault);
         addVisit("ClassBody", this::visitDefault);
         addVisit("MethodDecl", this::visitDefault);
-        if (this.signature.substring(0, this.signature.indexOf('(')).equals("main")){
+        if (this.signature.equals("main")){
             addVisit("Main", this::visitDefault);
             addVisit("MainHeader", this::visitDefault);
             addVisit("MainArgs", this::visitMainArgs);
@@ -39,7 +39,7 @@ public class ParametersCollector extends Collector {
         List<Symbol> args = new ArrayList<>();
         for (var child : func.getChildren()) {
             if (child.getKind().equals("FuncName")){
-                if(child.getChildren().get(0).get("name").equals(this.signature.substring(0, this.signature.indexOf('(')))){
+                if(child.getChildren().get(0).get("name").equals(this.signature)){
                     check = true;
                 }
                 else break;

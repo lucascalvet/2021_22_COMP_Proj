@@ -19,7 +19,7 @@ public class LocalVariablesCollector extends Collector {
         addVisit("ClassDecl", this::visitDefault);
         addVisit("ClassBody", this::visitClassBody);
         addVisit("MethodDecl", this::visitDefault);
-        if (this.signature.substring(0, this.signature.indexOf('(')).equals("main")){
+        if (this.signature.equals("main")){
             addVisit("Main", this::visitDefault);
             addVisit("MainBody", this::visitDefault);
         }
@@ -47,7 +47,7 @@ public class LocalVariablesCollector extends Collector {
     private Integer visitFunction(JmmNode node, Boolean dummy) {
         for (var child : node.getChildren()) {
             if (child.getKind().equals("FuncName")) {
-                if (!child.getChildren().get(0).get("name").equals(this.signature.substring(0, this.signature.indexOf('(')))) {
+                if (!child.getChildren().get(0).get("name").equals(this.signature)) {
                     break;
                 }
             }
