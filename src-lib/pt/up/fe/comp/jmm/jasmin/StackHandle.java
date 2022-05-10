@@ -14,6 +14,14 @@ public class StackHandle {
         ElementType type = element.getType().getTypeOfElement();
         if(element.isLiteral()){
             result.append("ldc ").append(((LiteralElement)element).getLiteral()).append("\n");
+        } else {
+            if (type == ElementType.INT32 || type == ElementType.STRING || type == ElementType.BOOLEAN){
+                int register = scope.get(element).getVirtualReg();
+                if (register > 3 || register < 0)
+                    result.append("aload ").append(register).append("\n");
+                else
+                    result.append("aload_").append(register).append("\n");
+            }
         }
         return result.toString();
     }
