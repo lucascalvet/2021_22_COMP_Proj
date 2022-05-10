@@ -2,8 +2,9 @@ package pt.up.fe.comp.jmm.ollir;
 
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.SymbolTable;
-import pt.up.fe.comp.jmm.ast.AJmmVisitor;
+import pt.up.fe.comp.jmm.ast.AstNode;
 import pt.up.fe.comp.jmm.ast.JmmNode;
+import pt.up.fe.comp.jmm.ast.visitors.AJmmVisitor;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,10 +17,9 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
         this.code = new StringBuilder();
         this.symbolTable = symbolTable;
 
-        //TODO: Change kind to constants
-        addVisit("Program", this::programVisit);
-        addVisit("ClassDecl", this::classDeclVisit);
-        addVisit("MethodDecl", this::methodDeclVisit);
+        addVisit(AstNode.PROGRAM, this::programVisit);
+        addVisit(AstNode.CLASS_DECL, this::classDeclVisit);
+        addVisit(AstNode.METHOD_DECL, this::methodDeclVisit);
     }
 
     public String getCode() {
