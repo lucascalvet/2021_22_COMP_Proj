@@ -1,11 +1,8 @@
-package pt.up.fe.comp.jmm.ast;
+package pt.up.fe.comp.jmm.ast.collectors;
 
-import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.Type;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import pt.up.fe.comp.jmm.ast.AstNode;
+import pt.up.fe.comp.jmm.ast.JmmNode;
 
 public class ReturnTypeCollector extends Collector {
     private Type return_type;
@@ -15,15 +12,16 @@ public class ReturnTypeCollector extends Collector {
         this.visits = 0;
         this.return_type = new Type("", false);
         this.signature = methodSignature;
-        if (this.signature.substring(0, this.signature.indexOf('(')).equals("main")){
+        //if (this.signature.substring(0, this.signature.indexOf('(')).equals("main")){
+        if (this.signature.equals("main")){
             this.return_type = new Type("void", false);
         }
         else{
-            addVisit("Program", this::visitDefault);
-            addVisit("ClassDecl", this::visitDefault);
-            addVisit("ClassBody", this::visitDefault);
-            addVisit("MethodDecl", this::visitDefault);
-            addVisit("Function", this::visitFunction);
+            addVisit(AstNode.PROGRAM, this::visitDefault);
+            addVisit(AstNode.CLASS_DECL, this::visitDefault);
+            addVisit(AstNode.CLASS_BODY, this::visitDefault);
+            addVisit(AstNode.METHOD_DECL, this::visitDefault);
+            addVisit(AstNode.FUNCTION, this::visitFunction);
             setDefaultVisit((node, imports) -> ++visits);
         }
     }
@@ -35,11 +33,12 @@ public class ReturnTypeCollector extends Collector {
     private Integer visitFunction(JmmNode func, Boolean dummy) {
         String rtype = "";
         for (var child : func.getChildren()) {
-            if (child.getKind().equals("FuncReturn")) {
+            if (child.getKind().equals(AstNode.FUNC_RETURN.toString())) {
                 rtype = child.getChildren().get(0).get("type");
             }
-            if (child.getKind().equals("FuncName")){
-                if (child.getChildren().get(0).get("name").equals(this.signature.substring(0, this.signature.indexOf('(')))){
+            if (child.getKind().equals(AstNode.FUNC_NAME.toString())){
+                //if (child.getChildren().get(0).get("name").equals(this.signature.substring(0, this.signature.indexOf('(')))){
+                if (child.getChildren().get(0).get("name").equals(this.signature)){
                     if(rtype.equals("int array")){
                         this.return_type = new Type("int", true);
                     }

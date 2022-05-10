@@ -1,8 +1,7 @@
-package pt.up.fe.comp.jmm.ast;
+package pt.up.fe.comp.jmm.ast.collectors;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import pt.up.fe.comp.jmm.ast.AstNode;
+import pt.up.fe.comp.jmm.ast.JmmNode;
 
 public class ClassNameCollector extends Collector {
     private String class_name;
@@ -10,8 +9,8 @@ public class ClassNameCollector extends Collector {
     public ClassNameCollector() {
         this.visits = 0;
         this.class_name = "";
-        addVisit("Program", this::visitDefault);
-        addVisit("ClassDecl", this::visitClassDecl);
+        addVisit(AstNode.PROGRAM, this::visitDefault);
+        addVisit(AstNode.CLASS_DECL, this::visitClassDecl);
         setDefaultVisit((node, imports) -> ++visits);
     }
 

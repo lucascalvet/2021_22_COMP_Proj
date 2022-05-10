@@ -1,7 +1,7 @@
 package pt.up.fe.comp.jmm.ast.examples;
 
 import pt.up.fe.comp.jmm.ast.JmmNode;
-import pt.up.fe.comp.jmm.ast.PreorderJmmVisitor;
+import pt.up.fe.comp.jmm.ast.visitors.PreorderJmmVisitor;
 
 /**
  * Counts the occurrences of each node kind.

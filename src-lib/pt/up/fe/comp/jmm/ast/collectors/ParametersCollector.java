@@ -1,11 +1,12 @@
-package pt.up.fe.comp.jmm.ast;
+package pt.up.fe.comp.jmm.ast.collectors;
 
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.Type;
+import pt.up.fe.comp.jmm.ast.AstNode;
+import pt.up.fe.comp.jmm.ast.JmmNode;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ParametersCollector extends Collector {
     private List<Symbol> parameters;
@@ -15,17 +16,18 @@ public class ParametersCollector extends Collector {
         this.visits = 0;
         this.parameters = new ArrayList<>();
         this.signature = methodSignature;
-        addVisit("Program", this::visitDefault);
-        addVisit("ClassDecl", this::visitDefault);
-        addVisit("ClassBody", this::visitDefault);
-        addVisit("MethodDecl", this::visitDefault);
-        if (this.signature.substring(0, this.signature.indexOf('(')).equals("main")){
-            addVisit("Main", this::visitDefault);
-            addVisit("MainHeader", this::visitDefault);
-            addVisit("MainArgs", this::visitMainArgs);
+        addVisit(AstNode.PROGRAM, this::visitDefault);
+        addVisit(AstNode.CLASS_DECL, this::visitDefault);
+        addVisit(AstNode.CLASS_BODY, this::visitDefault);
+        addVisit(AstNode.METHOD_DECL, this::visitDefault);
+        //if (this.signature.substring(0, this.signature.indexOf('(')).equals("main")){
+        if (this.signature.equals("main")){
+            addVisit(AstNode.MAIN, this::visitDefault);
+            addVisit(AstNode.MAIN_HEADER, this::visitDefault);
+            addVisit(AstNode.MAIN_ARGS, this::visitMainArgs);
         }
         else{
-            addVisit("Function", this::visitFunction);
+            addVisit(AstNode.FUNCTION, this::visitFunction);
         }
         setDefaultVisit((node, imports) -> ++visits);
     }
@@ -38,13 +40,14 @@ public class ParametersCollector extends Collector {
         Boolean check = false;
         List<Symbol> args = new ArrayList<>();
         for (var child : func.getChildren()) {
-            if (child.getKind().equals("FuncName")){
-                if(child.getChildren().get(0).get("name").equals(this.signature.substring(0, this.signature.indexOf('(')))){
+            if (child.getKind().equals(AstNode.FUNC_NAME.toString())){
+                //if(child.getChildren().get(0).get("name").equals(this.signature.substring(0, this.signature.indexOf('(')))){
+                if(child.getChildren().get(0).get("name").equals(this.signature)){
                     check = true;
                 }
                 else break;
             }
-            if (check && child.getKind().equals("FuncArgs")){
+            if (check && child.getKind().equals(AstNode.FUNC_ARGS.toString())){
                 this.parameters = visitFunctionArgs(child);
                 break;
             }
@@ -57,7 +60,7 @@ public class ParametersCollector extends Collector {
         List <Symbol> params = new ArrayList<>();
         Type t = new Type("", false);
         for (var child : node.getChildren()) {
-            if (child.getKind().equals("Type")){
+            if (child.getKind().equals(AstNode.TYPE.toString())){
                 String ts = child.get("type");
                 if (ts.equals("int array")){
                     t = new Type("int", true);
@@ -67,7 +70,7 @@ public class ParametersCollector extends Collector {
                 }
             }
             else{
-                if (child.getKind().equals("Id")){
+                if (child.getKind().equals(AstNode.ID.toString())){
                     params.add(new Symbol(t, child.get("name")));
                 }
             }
@@ -77,7 +80,7 @@ public class ParametersCollector extends Collector {
 
     private Integer visitMainArgs(JmmNode node, Boolean dummy){
         for (var child : node.getChildren()) {
-            if (child.getKind().equals("Id")){
+            if (child.getKind().equals(AstNode.ID.toString())){
                 this.parameters.add(new Symbol(new Type("String", true), child.get("name")));
             }
         }

@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import pt.up.fe.comp.jmm.ast.JmmNode;
-import pt.up.fe.comp.jmm.ast.PreorderJmmVisitor;
+import pt.up.fe.comp.jmm.ast.visitors.PreorderJmmVisitor;
 import pt.up.fe.specs.util.utilities.StringLines;
 
 /**

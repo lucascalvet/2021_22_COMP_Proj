@@ -1,11 +1,12 @@
-package pt.up.fe.comp.jmm.ast;
+package pt.up.fe.comp.jmm.ast.collectors;
 
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.Type;
+import pt.up.fe.comp.jmm.ast.AstNode;
+import pt.up.fe.comp.jmm.ast.JmmNode;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class FieldsCollector extends Collector {
     private final List<Symbol> fields;
@@ -13,10 +14,10 @@ public class FieldsCollector extends Collector {
     public FieldsCollector() {
         this.visits = 0;
         this.fields = new ArrayList<>();
-        addVisit("Program", this::visitDefault);
-        addVisit("ClassDecl", this::visitDefault);
-        addVisit("ClassBody", this::visitDefault);
-        addVisit("Var", this::visitVariable);
+        addVisit(AstNode.PROGRAM, this::visitDefault);
+        addVisit(AstNode.CLASS_DECL, this::visitDefault);
+        addVisit(AstNode.CLASS_BODY, this::visitDefault);
+        addVisit(AstNode.VAR, this::visitVariable);
         setDefaultVisit((node, imports) -> ++visits);
     }
 
@@ -28,7 +29,7 @@ public class FieldsCollector extends Collector {
         Type t = new Type("int", false);
         String n = "var";
         for (var child : variable.getChildren()) {
-            if (child.getKind().equals("Type")){
+            if (child.getKind().equals(AstNode.TYPE.toString())){
                 switch(child.get("type")){
                     case "custom":
                         t = new Type(child.getChildren().get(0).get("name"), false);
@@ -41,7 +42,7 @@ public class FieldsCollector extends Collector {
                         break;
                 }
             }
-            if (child.getKind().equals("Id")){
+            if (child.getKind().equals(AstNode.ID.toString())){
                 n = child.get("name");
             }
         }

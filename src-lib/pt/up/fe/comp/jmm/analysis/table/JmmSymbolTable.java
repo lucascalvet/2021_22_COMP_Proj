@@ -1,15 +1,37 @@
 package pt.up.fe.comp.jmm.analysis.table;
 
 import pt.up.fe.comp.jmm.ast.*;
+import pt.up.fe.comp.jmm.ast.collectors.*;
+import pt.up.fe.comp.jmm.report.Report;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class JmmSymbolTable implements SymbolTable{
 
     private final JmmNode root;
+    private List<Report> reports;
 
     public JmmSymbolTable(JmmNode root) {
         this.root = root;
+        this.reports = new ArrayList<>();
+    }
+
+    public List<Report> getReports() {
+        if(this.reports.isEmpty()){
+            this.reports.addAll(new ImportCollector().getReports());
+            this.reports.addAll(new ClassNameCollector().getReports());
+            this.reports.addAll(new SuperCollector().getReports());
+            this.reports.addAll(new FieldsCollector().getReports());
+            this.reports.addAll(new MethodCollector().getReports());
+            for(var meth: getMethods()){
+                this.reports.addAll(new ReturnTypeCollector(meth).getReports());
+                this.reports.addAll(new ParametersCollector(meth).getReports());
+                this.reports.addAll(new LocalVariablesCollector(meth).getReports());
+            }
+        }
+
+        return this.reports;
     }
 
     @Override

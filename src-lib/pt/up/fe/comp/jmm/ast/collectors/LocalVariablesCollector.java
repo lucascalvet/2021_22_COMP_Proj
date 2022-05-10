@@ -1,11 +1,12 @@
-package pt.up.fe.comp.jmm.ast;
+package pt.up.fe.comp.jmm.ast.collectors;
 
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.Type;
+import pt.up.fe.comp.jmm.ast.AstNode;
+import pt.up.fe.comp.jmm.ast.JmmNode;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class LocalVariablesCollector extends Collector {
     private final List<Symbol> local_vars;
@@ -15,19 +16,20 @@ public class LocalVariablesCollector extends Collector {
         this.visits = 0;
         this.local_vars = new ArrayList<>();
         this.signature = methodSignature;
-        addVisit("Program", this::visitDefault);
-        addVisit("ClassDecl", this::visitDefault);
-        addVisit("ClassBody", this::visitClassBody);
-        addVisit("MethodDecl", this::visitDefault);
-        if (this.signature.substring(0, this.signature.indexOf('(')).equals("main")){
-            addVisit("Main", this::visitDefault);
-            addVisit("MainBody", this::visitDefault);
+        addVisit(AstNode.PROGRAM, this::visitDefault);
+        addVisit(AstNode.CLASS_DECL, this::visitDefault);
+        addVisit(AstNode.CLASS_BODY, this::visitClassBody);
+        addVisit(AstNode.METHOD_DECL, this::visitDefault);
+        //if (this.signature.substring(0, this.signature.indexOf('(')).equals("main")){
+        if (this.signature.equals("main")){
+            addVisit(AstNode.MAIN, this::visitDefault);
+            addVisit(AstNode.MAIN_BODY, this::visitDefault);
         }
         else{
-            addVisit("Function", this::visitFunction);
-            addVisit("Body", this::visitDefault);
+            addVisit(AstNode.FUNCTION, this::visitFunction);
+            addVisit(AstNode.BODY, this::visitDefault);
         }
-        addVisit("Var", this::visitVariable);
+        addVisit(AstNode.VAR, this::visitVariable);
         setDefaultVisit((node, imports) -> ++visits);
     }
 
@@ -37,7 +39,7 @@ public class LocalVariablesCollector extends Collector {
 
     private Integer visitClassBody(JmmNode node, Boolean dummy) {
         for (var child : node.getChildren()) {
-            if(child.getKind().equals("MethodDecl")){
+            if(child.getKind().equals(AstNode.METHOD_DECL.toString())){
                 visit(child, true);
             }
         }
@@ -46,8 +48,9 @@ public class LocalVariablesCollector extends Collector {
 
     private Integer visitFunction(JmmNode node, Boolean dummy) {
         for (var child : node.getChildren()) {
-            if (child.getKind().equals("FuncName")) {
-                if (!child.getChildren().get(0).get("name").equals(this.signature.substring(0, this.signature.indexOf('(')))) {
+            if (child.getKind().equals(AstNode.FUNC_NAME.toString())) {
+                //if (!child.getChildren().get(0).get("name").equals(this.signature.substring(0, this.signature.indexOf('(')))) {
+                if (!child.getChildren().get(0).get("name").equals(this.signature)) {
                     break;
                 }
             }
@@ -60,7 +63,7 @@ public class LocalVariablesCollector extends Collector {
         Type t = new Type("int", false);
         String n = "var";
         for (var child : variable.getChildren()) {
-            if (child.getKind().equals("Type")){
+            if (child.getKind().equals(AstNode.TYPE.toString())){
                 switch(child.get("type")){
                     case "custom":
                         t = new Type(child.getChildren().get(0).get("name"), false);
@@ -73,7 +76,7 @@ public class LocalVariablesCollector extends Collector {
                         break;
                 }
             }
-            if (child.getKind().equals("Id")){
+            if (child.getKind().equals(AstNode.ID.toString())){
                 n = child.get("name");
             }
         }

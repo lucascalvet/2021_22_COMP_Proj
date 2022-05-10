@@ -1,4 +1,7 @@
-package pt.up.fe.comp.jmm.ast;
+package pt.up.fe.comp.jmm.ast.collectors;
+
+import pt.up.fe.comp.jmm.ast.AstNode;
+import pt.up.fe.comp.jmm.ast.JmmNode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,9 +13,9 @@ public class ImportCollector extends Collector {
     public ImportCollector() {
         this.visits = 0;
         this.imports = new ArrayList<>();
-        addVisit("Program", this::visitDefault);
-        addVisit("Import", this::visitDefault);
-        addVisit("Package", this::visitPackage);
+        addVisit(AstNode.PROGRAM, this::visitDefault);
+        addVisit(AstNode.IMPORT, this::visitDefault);
+        addVisit(AstNode.PACKAGE, this::visitPackage);
         setDefaultVisit((node, imports) -> ++visits);
     }
 

@@ -23,6 +23,7 @@ public class ParserTest {
     private static void noErrors(String code) {
         var result = TestUtils.parse(code);
         TestUtils.noErrors(result);
+
         JmmSymbolTable symbolTable = new JmmSymbolTable(result.getRootNode());
 
         System.out.println("SymbolTable:\n\n" + symbolTable.print());

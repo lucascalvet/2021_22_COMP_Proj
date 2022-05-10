@@ -11,11 +11,12 @@
  * specific language governing permissions and limitations under the License. under the License.
  */
 
-package pt.up.fe.comp.jmm.ast;
+package pt.up.fe.comp.jmm.ast.visitors;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import pt.up.fe.comp.jmm.ast.JmmNode;
 import pt.up.fe.specs.util.SpecsCheck;
 
 /**
