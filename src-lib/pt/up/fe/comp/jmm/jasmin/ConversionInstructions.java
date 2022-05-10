@@ -40,8 +40,11 @@ public class ConversionInstructions {
     }
 
     public String getCode(ReturnInstruction instruction){
-
-        return "";
+        StringBuilder result = new StringBuilder();
+        if(!instruction.hasReturnValue()) {
+            result.append("return").append("\n");
+        }
+        return result.toString();
     }
 
     private String getCodeInvokeStatic(CallInstruction instruction) {

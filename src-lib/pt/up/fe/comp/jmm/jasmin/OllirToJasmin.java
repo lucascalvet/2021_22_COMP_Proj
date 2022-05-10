@@ -42,8 +42,9 @@ public class OllirToJasmin {
         code.append(SpecsIo.getResource("../test/templates/constructor.txt").replace("${SUPER_CLASS}", qualifiedNameSuper));
         code.append("\n\n");
 
-        //METHODS
+        //Methods
         for(var method : classUnit.getMethods()){
+            //Constructor is already done in the above lines
             if(!method.isConstructMethod()) code.append(getCode(method));
         }
 
@@ -95,12 +96,16 @@ public class OllirToJasmin {
         code.append(".limit stack 99\n");
         code.append(".limit locals 99\n");
 
+        boolean hasReturn = false;
+
         for(var instruction : method.getInstructions()){
+            if(instruction.getInstType()==InstructionType.RETURN) hasReturn = true;
             code.append(inst.getCode(instruction));
         }
 
         //TODO: Return Statement
-        code.append("return\n"); //se for return Void
+        if(!hasReturn)
+            code.append("return\n"); //se for return Void
 
         //Fecho do método
         code.append(".end method\n\n");
