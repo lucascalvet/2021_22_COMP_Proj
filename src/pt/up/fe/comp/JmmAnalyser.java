@@ -26,11 +26,12 @@ public class JmmAnalyser implements JmmAnalysis {
         List <SemanticAnalyser> analysers = Arrays.asList(new SingleMainMethodCheck(symbolTable), new FunctionVerifier(parserResult.getRootNode(), symbolTable), new TypeVerifier(parserResult.getRootNode(), symbolTable), new SuperImportCheck(symbolTable));
 
         for(var analyser : analysers){
-            //System.out.println(analyser);
+            System.out.println(analyser.toString());
             //System.out.println(analyser.getReports());
 
             reports.addAll(analyser.getReports());
         }
+        System.out.println("OUTLOOP");
 
         return new JmmSemanticsResult(parserResult, symbolTable, reports);
     }

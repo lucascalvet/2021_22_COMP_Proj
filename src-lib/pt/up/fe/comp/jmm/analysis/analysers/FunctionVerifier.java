@@ -14,28 +14,44 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class FunctionVerifier extends PreorderJmmVisitor<Boolean, Boolean> implements SemanticAnalyser{
-
-    private final SymbolTable symbolTable;
-    private final JmmNode root;
-    private List<Report> reports = new ArrayList<Report>();
+public class FunctionVerifier extends Verifier{
 
     public FunctionVerifier(JmmNode root, SymbolTable symbolTable) {
-        this.root = root;
-        this.symbolTable = symbolTable;
-        this.reports = new ArrayList<Report>();
+        super(root, symbolTable);
         addVisit(AstNode.ACCESS, this::visitAccess);
         addVisit(AstNode.CHAINED, this::visitChained);
-
     }
 
     private Boolean visitAccess(JmmNode access, Boolean dummy){
-        for(var child : access.getChildren()){
+        var child = access.getJmmChild(0);
+        if(access.getJmmChild(1).getJmmChild(0).getKind().equals(AstNode.LENGTH.toString())){
+            if(!child.getKind().equals(AstNode.ID.toString()) || !this.getVar(child.get("name")).getType().isArray()){
+                this.addReport(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(child.get("line")), Integer.valueOf(child.get("col")), "Length call should be done to an array"));
+            }
+        }
+        else{
             if(child.getKind().equals(AstNode.ID.toString())){
                 String name = child.get("name");
-                if(!symbolTable.getClassName().equals(name) && !symbolTable.getImports().contains(name) && !symbolTable.getSuper().equals(name)){
-                    this.reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(child.get("line")), Integer.valueOf(child.get("col")), "Couldn't find class named '" + name + "'"));
-                    return false;
+                Boolean current_class = false;
+                if(symbolTable.getClassName().equals(name)){
+                    current_class = true;
+                }
+                else if(!symbolTable.getClassName().equals(name) && !symbolTable.getImports().contains(name) && !symbolTable.getSuper().equals(name)){
+                    String class_name = this.getVar(name).getType().getName();
+                    if(symbolTable.getClassName().equals(class_name)){
+                        current_class = true;
+                    }
+                    else if(!symbolTable.getClassName().equals(class_name) && !symbolTable.getImports().contains(class_name) && !symbolTable.getSuper().equals(class_name)){
+                        this.addReport(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(child.get("line")), Integer.valueOf(child.get("col")), "Couldn't find class named '" + name + "'"));
+                        return false;
+                    }
+                }
+                if(current_class && symbolTable.getSuper().equals("")){
+                    var acess_method = access.getJmmChild(1).getJmmChild(0);
+                    if(!symbolTable.getMethods().contains(acess_method.get("name"))){
+                        this.addReport(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(acess_method.get("line")), Integer.valueOf(acess_method.get("col")), "Couldn't find method named '" + acess_method.get("name") + "'"));
+                        return false;
+                    }
                 }
             }
         }
@@ -57,19 +73,18 @@ public class FunctionVerifier extends PreorderJmmVisitor<Boolean, Boolean> imple
             else if (name != "" && child.getKind().equals(AstNode.ARGS.toString())){
                 var params = symbolTable.getParameters(name);
                 if(params.size() == child.getChildren().size()){
-                    var tv = new TypeVerifier(root, symbolTable);
                     for (int i = 0; i < params.size(); i++){
                         var grandchild = child.getJmmChild(i);
-                        var rparam = tv.getExpressionType(grandchild);
+                        var rparam = this.getExpressionType(grandchild);
                         var tparam = params.get(i).getType();
                         if(!rparam.equals(tparam)){
-                            this.reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(grandchild.get("line")), Integer.valueOf(grandchild.get("col")), "Argument number " + i + " of method " + name + " should be of type " + tparam.toString() + " instead it's " + rparam.toString()));
+                            this.addReport(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(grandchild.get("line")), Integer.valueOf(grandchild.get("col")), "Argument number " + i + " of method " + name + " should be of type " + tparam.toString() + " instead it's " + rparam.toString()));
                             return false;
                         }
                     }
                 }
                 else{
-                    this.reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(child.get("line")), Integer.valueOf(child.get("col")), "Wrong number of arguments, " + child.getChildren().size() + " instead of " + params.size()));
+                    this.addReport(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(child.get("line")), Integer.valueOf(child.get("col")), "Wrong number of arguments, " + child.getChildren().size() + " instead of " + params.size()));
                     return false;
                 }
             }
@@ -77,9 +92,4 @@ public class FunctionVerifier extends PreorderJmmVisitor<Boolean, Boolean> imple
         return true;
     }
 
-    @Override
-    public List<Report> getReports() {
-        this.visit(root);
-        return this.reports;
-    }
 }

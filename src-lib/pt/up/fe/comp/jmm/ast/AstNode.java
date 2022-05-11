@@ -50,7 +50,8 @@ public enum AstNode {
     TRUE,
     FALSE,
     THIS,
-    INT;
+    INT,
+    INT_TYPE;
 
 
     private final String name;
