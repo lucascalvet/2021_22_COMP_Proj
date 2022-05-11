@@ -1,5 +1,7 @@
 package pt.up.fe.comp.jmm.analysis.table;
 
+import pt.up.fe.comp.jmm.ast.JmmNode;
+
 public class Type {
     private final String name;
     private final boolean isArray;
@@ -17,6 +19,17 @@ public class Type {
         return isArray;
     }
 
+    public static Type fromString(JmmNode node){
+        switch(node.get("type")){
+            case "String": return new Type("String", false);
+            case "String[]": return new Type("String", true);
+            case "Boolean": return new Type("boolean", true);
+            case "int": return new Type("int", false);
+            case "int[]": return new Type("int", true);
+            case "custom": return new Type(node.getChildren().get(0).get("name"), false);
+            default: return new Type(node.get("type"), false);
+        }
+    }
     @Override
     public String toString() {
         return "Type [name=" + name + ", isArray=" + isArray + "]";

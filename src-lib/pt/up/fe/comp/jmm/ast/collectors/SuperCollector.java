@@ -8,7 +8,7 @@ public class SuperCollector extends Collector {
 
     public SuperCollector() {
         this.visits = 0;
-        this.super_name = null;
+        this.super_name = "";
         addVisit(AstNode.PROGRAM, this::visitDefault);
         addVisit(AstNode.CLASS_DECL, this::visitDefault);
         addVisit(AstNode.EXTENDS, this::visitExtends);

@@ -2,6 +2,9 @@ package pt.up.fe.comp.jmm.ast.collectors;
 
 import pt.up.fe.comp.jmm.ast.AstNode;
 import pt.up.fe.comp.jmm.ast.JmmNode;
+import pt.up.fe.comp.jmm.report.Report;
+import pt.up.fe.comp.jmm.report.ReportType;
+import pt.up.fe.comp.jmm.report.Stage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,75 +30,21 @@ public class MethodCollector extends Collector {
     }
 
     private Integer visitFunction(JmmNode func, Boolean dummy) {
-        String kind = "";
         String name = "";
-        List<String> args = new ArrayList<>();
-        String method = "";
         for (var child : func.getChildren()) {
-            /*
-            if (child.getKind().equals(AstNode.FUNC_RETURN.toString())){
-                kind = child.getChildren().get(0).get("type");
-            }
-            */
             if (child.getKind().equals(AstNode.FUNC_NAME.toString())){
                 name = child.getChildren().get(0).get("name");
-            }
-            /*
-            if (child.getKind().equals(AstNode.FUNC_ARGS.toString())){
-                args = visitFunctionArgs(child);
-            }
-            */
-        }
-        //method = kind + " " + name + "(";
-        //method = name + "(";
-        method = name;
-        /*
-        Boolean first = true;
-        for (String arg : args){
-            if (first){
-                method += arg;
-                first = false;
-            }
-            else{
-                method += ", " + arg;
+                if(this.methods.contains(name)){
+                    this.addReport(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(child.get("line")), Integer.valueOf(child.get("column")), "Found duplicate method with signature '" + name + "'"));
+                    return -1;
+                }
+                break;
             }
         }
-        method += ")";
-        */
-        this.methods.add(method);
+        this.methods.add(name);
         return ++visits;
     }
 
-    /*
-    private List <String> visitFunctionArgs(JmmNode node){
-        List <String> args = new ArrayList<>();
-        String t = "";
-        for (var child : node.getChildren()) {
-            if (child.getKind().equals(AstNode.TYPE.toString())){
-                t = child.get("type");
-                if (t.equals("int array")){
-                    t = "int[]";
-                }
-            }
-            else{
-                if (child.getKind().equals(AstNode.ID.toString())){
-                    args.add(t + " " + child.get("name"));
-                }
-            }
-        }
-        return args;
-    }
-
-    private Integer visitMainArgs(JmmNode node, Boolean dummy){
-        for (var child : node.getChildren()) {
-            if (child.getKind().equals(AstNode.ID.toString())){
-                this.methods.add("main(String[] " + child.get("name") + ")");
-            }
-        }
-        return ++visits;
-    }
-
-    */
 
     private Integer visitMain(JmmNode main, Boolean dummy){
         this.methods.add("main");
