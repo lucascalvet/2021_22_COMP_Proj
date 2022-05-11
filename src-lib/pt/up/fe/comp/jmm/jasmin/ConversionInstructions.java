@@ -60,6 +60,19 @@ public class ConversionInstructions {
                 right.append(stackHandle.load(single, scope));
                 result.append(stackHandle.load(single, scope));
                 break;
+            case GETFIELD:
+                Element classElement = ((GetFieldInstruction) rightSide).getFirstOperand();
+                Element field = ((GetFieldInstruction) rightSide).getSecondOperand();
+
+                String className = utils.getJasminType(classElement.getType());
+                String fieldName = ((Operand) field).getName();
+                String fieldType = utils.getJasminType(field.getType());
+
+                result.append(stackHandle.load(classElement, scope));
+                result.append("getfield ").append(className).append("/");
+                result.append(fieldName).append(" ").append(fieldType).append("\n");
+
+                break;
             default:
                 throw new NotImplementedException(this);
         }
