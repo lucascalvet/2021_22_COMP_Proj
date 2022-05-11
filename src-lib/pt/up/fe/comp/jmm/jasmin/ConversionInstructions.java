@@ -73,6 +73,22 @@ public class ConversionInstructions {
                 result.append(fieldName).append(" ").append(fieldType).append("\n");
 
                 break;
+            case BINARYOPER:
+                Element rightElement = ((BinaryOpInstruction) rightSide).getRightOperand();
+                Element leftElement = ((BinaryOpInstruction) rightSide).getLeftOperand();
+
+                String leftInstruction = stackHandle.load(leftElement, scope);
+                String rightInstruction = stackHandle.load(rightElement, scope);
+                OperationType operationType = ((BinaryOpInstruction) rightSide).getOperation().getOpType();
+
+                if(operationType == OperationType.ADD || operationType == OperationType.DIV || operationType == OperationType.MUL || operationType == OperationType.SUB){
+
+                    result.append(stackHandle.load(leftElement, scope));
+                    result.append(stackHandle.load(rightElement, scope));
+                    result.append(stackHandle.getOperation(operationType));
+                }
+
+                break;
             default:
                 throw new NotImplementedException(this);
         }

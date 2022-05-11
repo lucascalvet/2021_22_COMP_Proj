@@ -1,6 +1,7 @@
 package pt.up.fe.comp.jmm.jasmin;
 
 import org.specs.comp.ollir.*;
+import pt.up.fe.specs.util.exceptions.NotImplementedException;
 
 import java.util.HashMap;
 
@@ -48,4 +49,24 @@ public class StackHandle {
         return result.toString();
     }
 
+    public String getOperation(OperationType operationType) {
+        StringBuilder result = new StringBuilder();
+        switch (operationType){
+            case MUL:
+                result.append("imul \n");
+                break;
+            case DIV:
+                result.append("div \n");
+                break;
+            case ADD:
+                result.append("iadd \n");
+                break;
+            case SUB:
+                result.append("isub \n");
+                break;
+            default:
+                throw new NotImplementedException(this);
+        }
+        return  result.toString();
+    }
 }
