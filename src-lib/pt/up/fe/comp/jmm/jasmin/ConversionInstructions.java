@@ -5,6 +5,7 @@ import pt.up.fe.specs.util.classmap.FunctionClassMap;
 import pt.up.fe.specs.util.exceptions.NotImplementedException;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ConversionInstructions {
@@ -41,9 +42,27 @@ public class ConversionInstructions {
             //TODO : ver as outras invocações
             case invokestatic:
                 return getCodeInvokeStatic(instruction);
+            case invokespecial:
+                return getCodeInvokeSpecial(instruction);
+            case invokevirtual:
+                return getCodeInvokeVirtual(instruction);
+            case NEW:
+                return getCodeNew(instruction);
             default:
                 return ""; //throw new NotImplementedException(instruction.getInvocationType());
         }
+    }
+
+    private String getCodeNew(CallInstruction instruction) {
+        return "";
+    }
+
+    private String getCodeInvokeVirtual(CallInstruction instruction) {
+        return "";
+    }
+
+    private String getCodeInvokeSpecial(CallInstruction instruction) {
+        return "";
     }
 
     public String getCode(AssignInstruction instruction){
@@ -137,9 +156,33 @@ public class ConversionInstructions {
     }
 
     private String getCodeInvokeStatic(CallInstruction instruction) {
-        var code = new StringBuilder();
-        code.append("invokestatic ");
+        var result = new StringBuilder();
 
+        ArrayList<Element> parameters = instruction.getListOfOperands();
+        Type returnType = instruction.getReturnType();
+        for (Element param : parameters){
+            result.append(stackHandle.load(param, scope));
+        }
+        result.append("invokestatic ");
+
+        var methodClass = ((Operand) instruction.getFirstArg()).getName();
+        result.append(utils.getFullyQualifiedName(methodClass)).append(".");
+
+        String methodName = ((LiteralElement) instruction.getSecondArg()).getLiteral();
+        result.append(methodName.replace("\"", ""));
+
+        result.append("(");
+
+        for(var operand : parameters){
+            result.append(getArgumentCode(operand));
+        }
+
+        result.append(")");
+
+        result.append(utils.getJasminType(instruction.getReturnType()));
+        result.append("\n");
+
+/*
         //Operandos, FirstArg(classe), SecondArgs (nomemétodo), ReturnType
 
         var methodClass = ((Operand) instruction.getFirstArg()).getName();
@@ -155,13 +198,16 @@ public class ConversionInstructions {
 
         code.append(")");
         code.append(utils.getJasminType(instruction.getReturnType()));
-        code.append("\n");
+        code.append("\n");*/
 
-        return code.toString();
+        return result.toString();
     }
 
-    private void getArgumentCode(Element operand) {
-        throw new NotImplementedException(this);
+    private String getArgumentCode(Element operand) {
+        StringBuilder result = new StringBuilder();
+
+        result.append(utils.getJasminType(operand.getType()));
+        return result.toString();
     }
 
 

@@ -33,7 +33,7 @@ public class ConversionUtils {
         }
 
         if(!imports.equals(Collections.emptyList())){
-            throw new RuntimeException("Could not find import for class " + className);
+            System.out.println("Empty");//throw new RuntimeException("Could not find import for class " + className);
         }
 
         return "java/lang/Object";
