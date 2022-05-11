@@ -33,7 +33,7 @@ public class FunctionVerifier extends PreorderJmmVisitor<Boolean, Boolean> imple
         for(var child : access.getChildren()){
             if(child.getKind().equals(AstNode.ID.toString())){
                 String name = child.get("name");
-                if(!symbolTable.getClassName().equals(name) && !symbolTable.getImports().contains(name)){
+                if(!symbolTable.getClassName().equals(name) && !symbolTable.getImports().contains(name) && !symbolTable.getSuper().equals(name)){
                     this.reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(child.get("line")), Integer.valueOf(child.get("col")), "Couldn't find class named '" + name + "'"));
                     return false;
                 }
@@ -47,10 +47,12 @@ public class FunctionVerifier extends PreorderJmmVisitor<Boolean, Boolean> imple
             String name = "";
             if (child.getKind().equals(AstNode.ID.toString())) {
                 name = child.get("name");
+                /*
                 if (!symbolTable.getMethods().contains(name) && symbolTable.getSuper().equals("")) {
                     this.reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(child.get("line")), Integer.valueOf(child.get("col")), "Couldn't find method named '" + name + "' and class " + symbolTable.getClassName() + " doesn't have a super class"));
                     return false;
                 }
+                */
             }
             else if (name != "" && child.getKind().equals(AstNode.ARGS.toString())){
                 var params = symbolTable.getParameters(name);

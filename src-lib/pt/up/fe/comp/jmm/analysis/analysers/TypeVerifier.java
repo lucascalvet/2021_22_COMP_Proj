@@ -46,19 +46,15 @@ public class TypeVerifier extends PreorderJmmVisitor<Boolean, Boolean> implement
 
     protected Type getExpressionType(JmmNode expr){
         var kind = expr.getKind();
-        System.out.println("GET: " + expr.getKind());
         var expected_type = new Type("int", false);
         var return_type = new Type("int", false);
         if(AstNode.getTerminalNodes().contains(kind)){
             if(kind.equals(AstNode.ID.toString()) || kind.equals(AstNode.THIS.toString())){
                 if(kind.equals(AstNode.ID.toString())){
-                    System.out.println("GETT: " + expr.get("name"));
                     Symbol id_var = this.getVar(expr.get("name"));
                     if(id_var == null){
-                        System.out.println("GETTY: " + expr.get("name"));
                         this.reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(expr.get("line")), Integer.valueOf(expr.get("col")), "Variable " + expr.get("name") + " isn't declared"));
                     }
-                    System.out.println("GETT: " + expr.get("name"));
                     return id_var.getType();
                 }
                 else{
