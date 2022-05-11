@@ -24,11 +24,14 @@ public class ParserTest {
         var result = TestUtils.parse(code);
         TestUtils.noErrors(result);
 
-        JmmSymbolTable symbolTable = new JmmSymbolTable(result.getRootNode());
+        //JmmSymbolTable symbolTable = new JmmSymbolTable(result.getRootNode());
+        var new_result = new JmmAnalyser().semanticAnalysis(result);
 
-        System.out.println("SymbolTable:\n\n" + symbolTable.print());
-        System.out.println("Code: " + code + "\n");
-        System.out.println("AST:\n\n" + result.getRootNode().toTree());
+        System.out.println("\nCode:\n" + code + "\n\n");
+        System.out.println("SymbolTable:\n\n" + new_result.getSymbolTable().print());
+        System.out.println("Reports:\n\n" + new_result.getReports());
+
+        //System.out.println("AST:\n\n" + result.getRootNode().toTree());
     }
 
     private static void mustFail(String code) {
