@@ -44,62 +44,26 @@ public class TypeVerifier extends PreorderJmmVisitor<Boolean, Boolean> implement
         return null;
     }
 
-    private Boolean visitMethodDeclaration(JmmNode method, Boolean dummy){
-        String name = "";
-        for(var child : method.getChildren()){
-            if(child.getKind().equals(AstNode.FUNC_NAME.toString())){
-                name = child.get("name");
-            }
-            if(name != "" && child.getKind().equals(AstNode.BODY.toString())){
-                for(var grandchild : child.getChildren()){
-                    if(grandchild.getKind().equals(AstNode.FUNC_RETURN.toString())){
-                        var rt = this.getExpressionType(grandchild.getJmmChild(0));
-                        if (!rt.equals(symbolTable.getReturnType(name))){
-                            this.reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(grandchild.get("line")), Integer.valueOf(grandchild.get("col")), "Return type must be of the type " + symbolTable.getReturnType(name).toString() + " but it instead is " + rt.toString()));
-                            return false;
-                        }
-                    }
-                }
-            }
-        }
-        return true;
-    }
-
-    private Boolean visitAssign(JmmNode assign, Boolean dummy){
-
-        if(assign.getChildren().size() == 2){
-            Type t1 = this.getExpressionType(assign.getJmmChild(0));
-            Type t2 = this.getExpressionType(assign.getJmmChild(1));
-            if (!t1.equals(t2)){
-                this.reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(assign.get("line")), Integer.valueOf(assign.get("col")), "Assignment types " + t1.toString() + " and " + t2.toString() + " don't match!"));
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private Boolean visitCondition(JmmNode condition, Boolean dummy){
-        var child = condition.getJmmChild(0);
-        var child_type = this.getExpressionType(child);
-        if(!child_type.equals(new Type("boolean", false))){
-            this.reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(child.get("line")), Integer.valueOf(child.get("col")), "Condition " + child.toString() + " should be a bool, instead it's of the type " + child_type.toString()));
-            return false;
-        }
-        return true;
-    }
-
     protected Type getExpressionType(JmmNode expr){
         var kind = expr.getKind();
+        System.out.println("GET: " + expr.getKind());
         var expected_type = new Type("int", false);
         var return_type = new Type("int", false);
         if(AstNode.getTerminalNodes().contains(kind)){
             if(kind.equals(AstNode.ID.toString()) || kind.equals(AstNode.THIS.toString())){
                 if(kind.equals(AstNode.ID.toString())){
-                    if(this.getVar(expr.get("name")) == null){
+                    System.out.println("GETT: " + expr.get("name"));
+                    Symbol id_var = this.getVar(expr.get("name"));
+                    if(id_var == null){
+                        System.out.println("GETTY: " + expr.get("name"));
                         this.reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(expr.get("line")), Integer.valueOf(expr.get("col")), "Variable " + expr.get("name") + " isn't declared"));
                     }
+                    System.out.println("GETT: " + expr.get("name"));
+                    return id_var.getType();
                 }
-                return Type.fromString(expr);
+                else{
+                    return new Type("this", false);
+                }
             }
             if(kind.equals(AstNode.TRUE.toString()) || kind.equals(AstNode.FALSE.toString())){
                 return new Type("boolean", false);
@@ -145,6 +109,53 @@ public class TypeVerifier extends PreorderJmmVisitor<Boolean, Boolean> implement
             }
         }
         return return_type;
+    }
+
+    private Boolean visitMethodDeclaration(JmmNode method, Boolean dummy){
+        String name = "";
+        for(var child : method.getChildren()){
+            if(child.getKind().equals(AstNode.FUNC_NAME.toString())){
+                name = child.get("name");
+            }
+            if(name != "" && child.getKind().equals(AstNode.BODY.toString())){
+                for(var grandchild : child.getChildren()){
+                    if(grandchild.getKind().equals(AstNode.FUNC_RETURN.toString())){
+                        var rt = this.getExpressionType(grandchild.getJmmChild(0));
+                        if (!rt.equals(symbolTable.getReturnType(name))){
+                            this.reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(grandchild.get("line")), Integer.valueOf(grandchild.get("col")), "Return type must be of the type " + symbolTable.getReturnType(name).toString() + " but it instead is " + rt.toString()));
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    private Boolean visitAssign(JmmNode assign, Boolean dummy){
+        System.out.println("Ass: " + assign.toString());
+        System.out.println("Asss: " + assign.getJmmChild(0));
+        if(assign.getChildren().size() == 2){
+            Type t1 = this.getExpressionType(assign.getJmmChild(0));
+            System.out.println("T1: " + t1.toString());
+            Type t2 = this.getExpressionType(assign.getJmmChild(1));
+            System.out.println("T2: " + t2.toString());
+            if (!t1.equals(t2)){
+                this.reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(assign.get("line")), Integer.valueOf(assign.get("col")), "Assignment types " + t1.toString() + " and " + t2.toString() + " don't match!"));
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private Boolean visitCondition(JmmNode condition, Boolean dummy){
+        var child = condition.getJmmChild(0);
+        var child_type = this.getExpressionType(child);
+        if(!child_type.equals(new Type("boolean", false))){
+            this.reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(child.get("line")), Integer.valueOf(child.get("col")), "Condition " + child.toString() + " should be a bool, instead it's of the type " + child_type.toString()));
+            return false;
+        }
+        return true;
     }
 
     @Override
