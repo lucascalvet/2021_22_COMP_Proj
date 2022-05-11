@@ -44,7 +44,9 @@ public class ConversionUtils {
         if(type instanceof ArrayType){
             return "[" + getJasminType(((ArrayType) type).getTypeOfElements());
         }
-
+        if(type.getTypeOfElement() == ElementType.OBJECTREF){
+            return ((ClassType)type).getName();
+        }
         return getJasminType(type.getTypeOfElement());
     }
 
@@ -74,10 +76,10 @@ public class ConversionUtils {
                 break;
             case ARRAYREF:
                 break;
-            case OBJECTREF:
+           /* case OBJECTREF:
                 //TODO: check if right
-                jasminType = type.getClass().getName();
-                break;
+                jasminType = ((Type) (type))//type.getClass().getName();
+                break;*/
             default:
                 throw new NotImplementedException(type);
         }

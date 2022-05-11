@@ -54,15 +54,26 @@ public class ConversionInstructions {
     }
 
     private String getCodeNew(CallInstruction instruction) {
-        return "";
+        StringBuilder result = new StringBuilder();
+        Type returnType = instruction.getReturnType();
+
+        if(returnType.getTypeOfElement() == ElementType.OBJECTREF){
+            result.append("new ").append(utils.getJasminType(returnType)).append("\n");
+            result.append("dup\n");
+        } else{
+            throw new NotImplementedException(this);
+        }
+        return result.toString();
     }
 
     private String getCodeInvokeVirtual(CallInstruction instruction) {
-        return "";
+        StringBuilder result = new StringBuilder();
+        return result.toString();
     }
 
     private String getCodeInvokeSpecial(CallInstruction instruction) {
-        return "";
+        StringBuilder result = new StringBuilder();
+        return result.toString();
     }
 
     public String getCode(AssignInstruction instruction){
@@ -107,6 +118,9 @@ public class ConversionInstructions {
                     result.append(stackHandle.getOperation(operationType));
                 }
 
+                break;
+            case CALL:
+                result.append(getCode((CallInstruction) rightSide));
                 break;
             default:
                 throw new NotImplementedException(this);
