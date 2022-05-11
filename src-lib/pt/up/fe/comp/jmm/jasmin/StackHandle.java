@@ -18,6 +18,15 @@ public class StackHandle {
                     result.append("iload ").append(register).append("\n");
                 else
                     result.append("iload_").append(register).append("\n");
+            } else {
+                if(type == ElementType.CLASS || type == ElementType.THIS || type == ElementType.OBJECTREF){
+                    int register = scope.get(((Operand)element).getName()).getVirtualReg();
+                    if (register > 3 || register < 0)
+                        result.append("aload ").append(register).append("\n");
+                    else
+                        result.append("aload_").append(register).append("\n");
+
+                }
             }
         }
         return result.toString();

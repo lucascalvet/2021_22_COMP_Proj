@@ -21,6 +21,8 @@ public class ConversionInstructions {
         instructionMap.put(CallInstruction.class,this::getCode);
         instructionMap.put(AssignInstruction.class,this::getCode);
         instructionMap.put(ReturnInstruction.class, this::getCode);
+        instructionMap.put(PutFieldInstruction.class, this::getCode);
+
         this.scope = new HashMap<>();
         this.stackHandle = new StackHandle();
     }
@@ -81,6 +83,27 @@ public class ConversionInstructions {
             }
 
         }
+        return result.toString();
+    }
+
+    public String getCode(PutFieldInstruction instruction){
+        StringBuilder result = new StringBuilder();
+
+        Element classElement = instruction.getFirstOperand();
+        Element field = instruction.getSecondOperand();
+        Element value = instruction.getThirdOperand();
+
+        result.append(stackHandle.load(classElement, scope));
+        result.append(stackHandle.load(value, scope));
+
+        String className = utils.getJasminType(classElement.getType());
+        String fieldName = ((Operand) field).getName();
+        String type = utils.getJasminType(field.getType());
+
+        result.append("putfield ").append(className).append("/").append(fieldName);
+        result.append(" ").append(type).append("\n");
+
+
         return result.toString();
     }
 

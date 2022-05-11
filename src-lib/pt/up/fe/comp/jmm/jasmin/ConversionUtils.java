@@ -1,9 +1,6 @@
 package pt.up.fe.comp.jmm.jasmin;
 
-import org.specs.comp.ollir.ArrayType;
-import org.specs.comp.ollir.ClassUnit;
-import org.specs.comp.ollir.ElementType;
-import org.specs.comp.ollir.Type;
+import org.specs.comp.ollir.*;
 import pt.up.fe.specs.util.exceptions.NotImplementedException;
 
 import java.util.Collections;
@@ -43,6 +40,7 @@ public class ConversionUtils {
     }
 
     public String getJasminType(Type type){
+
         if(type instanceof ArrayType){
             return "[" + getJasminType(((ArrayType) type).getTypeOfElements());
         }
@@ -68,11 +66,13 @@ public class ConversionUtils {
                 break;
             case THIS:
                 //TODO verificar se está correto
-                jasminType = type.getClass().getName();
+                jasminType = classUnit.getClassName();
                 break;
             case CLASS:
                 //TODO: check if right
                 jasminType = type.getClass().getName();
+                break;
+            case ARRAYREF:
                 break;
             case OBJECTREF:
                 //TODO: check if right
