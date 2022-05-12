@@ -46,6 +46,12 @@ public class StackHandle {
             else
                 result.append("istore_").append(register).append("\n");
         }
+        else if (type == ElementType.OBJECTREF || type == ElementType.ARRAYREF || type == ElementType.THIS){
+            int register = scope.get(((Operand)element).getName()).getVirtualReg();
+            if (register > 3 || register < 0)
+                result.append("astore ").append(register).append("\n");
+            else result.append("astore_").append(register).append("\n");
+        }
         return result.toString();
     }
 

@@ -15,6 +15,8 @@ public class ConversionInstructions {
     private HashMap<String, Descriptor> scope;
     private StackHandle stackHandle;
 
+    private Element leftSideNew;
+    private String rightSideNew;
     public ConversionInstructions(ClassUnit classUnit) {
         this.classUnit = classUnit;
         this.utils = new ConversionUtils(classUnit);
@@ -73,6 +75,27 @@ public class ConversionInstructions {
 
     private String getCodeInvokeSpecial(CallInstruction instruction) {
         StringBuilder result = new StringBuilder();
+        ArrayList<Element> parameters = instruction.getListOfOperands();
+        String methodName =  ((LiteralElement) instruction.getSecondArg()).getLiteral().replace("\"", "");
+        Element classElement = instruction.getFirstArg();
+        Type returnType = instruction.getReturnType();
+
+        for (Element param : parameters){
+            result.append(stackHandle.load(param, scope));
+        }
+        result.append("invokespecial ").append(((ClassType) classElement.getType()).getName());
+        result.append(".").append(methodName);
+
+        result.append("(");
+
+        for(var operand : parameters){
+            result.append(getArgumentCode(operand));
+        }
+
+        result.append(")");
+        result.append(utils.getJasminType(returnType)).append("\n");
+        result.append(stackHandle.store(this.leftSideNew, this.scope, this.rightSideNew));
+
         return result.toString();
     }
 
@@ -80,6 +103,7 @@ public class ConversionInstructions {
         StringBuilder result = new StringBuilder();
         Instruction rightSide = instruction.getRhs();
         Element leftSide = instruction.getDest();
+        this.leftSideNew = instruction.getDest();
 
         //handling right side
         StringBuilder right = new StringBuilder();
@@ -120,12 +144,15 @@ public class ConversionInstructions {
 
                 break;
             case CALL:
+                this.rightSideNew = right.toString();
                 result.append(getCode((CallInstruction) rightSide));
-                break;
+                return result.toString();
+
             default:
                 throw new NotImplementedException(this);
         }
-        result.append(stackHandle.store(leftSide, scope, right.toString()));
+        this.rightSideNew = right.toString();
+        result.append(stackHandle.store(leftSide, scope, rightSideNew));
         return result.toString();
     }
 
@@ -195,24 +222,6 @@ public class ConversionInstructions {
 
         result.append(utils.getJasminType(instruction.getReturnType()));
         result.append("\n");
-
-/*
-        //Operandos, FirstArg(classe), SecondArgs (nomemétodo), ReturnType
-
-        var methodClass = ((Operand) instruction.getFirstArg()).getName();
-
-        code.append(utils.getFullyQualifiedName(methodClass));
-        code.append("/");
-        code.append((((LiteralElement) instruction.getSecondArg()).getLiteral()).replace("\"", ""));
-        code.append("(");
-
-        for(var operand : instruction.getListOfOperands()){
-            getArgumentCode(operand);
-        }
-
-        code.append(")");
-        code.append(utils.getJasminType(instruction.getReturnType()));
-        code.append("\n");*/
 
         return result.toString();
     }
