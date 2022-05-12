@@ -70,6 +70,32 @@ public class ConversionInstructions {
 
     private String getCodeInvokeVirtual(CallInstruction instruction) {
         StringBuilder result = new StringBuilder();
+        ArrayList<Element> operands = instruction.getListOfOperands();
+        Type returnType = instruction.getReturnType();
+        Element firstArg = instruction.getFirstArg();
+
+        String className = ((ClassType) firstArg.getType()).getName();
+        String methodCall = ((LiteralElement) instruction.getSecondArg()).getLiteral();
+
+        result.append(stackHandle.load(firstArg, scope));
+
+        for(Element operand : operands){
+            result.append(stackHandle.load(operand, scope));
+        }
+
+        result.append("invokevirtual ").append(className).append(".");
+        result.append(methodCall.replace("\"", ""));
+
+        result.append("(");
+
+        for(var operand : operands){
+            result.append(getArgumentCode(operand));
+        }
+
+        result.append(")");
+
+        result.append(utils.getJasminType(returnType)).append("\n");
+
         return result.toString();
     }
 
