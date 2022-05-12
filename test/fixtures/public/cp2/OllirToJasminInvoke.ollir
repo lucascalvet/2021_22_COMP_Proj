@@ -10,7 +10,7 @@ Test {
 		test.Test :=.Test new(Test).Test;
 		invokespecial(test.Test,"<init>").V;
 
-
+		invokevirtual(test.Test, "foo").V;
 		ret.V;
 	}
 
