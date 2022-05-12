@@ -1,9 +1,6 @@
 import ioPlus;
 class HelloWorld {
 	public static void main(String[] args) {
-	    a = true;
-	    if (a < 10) {}
-	    else{}
 		ioPlus.printHelloWorld();
 	}
 }

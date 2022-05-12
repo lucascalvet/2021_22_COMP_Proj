@@ -31,7 +31,6 @@ public class JmmAnalyser implements JmmAnalysis {
 
             reports.addAll(analyser.getReports());
         }
-        System.out.println("OUTLOOP");
 
         return new JmmSemanticsResult(parserResult, symbolTable, reports);
     }

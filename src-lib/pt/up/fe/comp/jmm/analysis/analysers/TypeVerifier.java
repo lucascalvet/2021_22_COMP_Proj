@@ -18,34 +18,39 @@ public class TypeVerifier extends Verifier{
 
     public TypeVerifier(JmmNode root, SymbolTable symbolTable) {
         super(root, symbolTable);
-        addVisit(AstNode.METHOD_DECL, this::visitMethodDeclaration);
+        addVisit(AstNode.FUNCTION, this::visitFunction);
+        addVisit(AstNode.MAIN, this::visitMain);
         addVisit(AstNode.RETURN_STATEMENT, this::visitReturnStatement);
         addVisit(AstNode.CONDITION, this::visitCondition);
         addVisit(AstNode.ASSIGN, this::visitAssign);
     }
 
+    private Boolean visitMain(JmmNode main, Boolean dummy){
+        this.scope = "main";
+        return true;
+    }
+
     private Boolean visitReturnStatement(JmmNode ret_statement, Boolean dummy){
-        for(var child : ret_statement.getChildren()){
-            this.getExpressionType(child);
+        var child = ret_statement.getJmmChild(0);
+        var child_type = this.getExpressionType(child);
+        String methodSignature = ret_statement.getJmmParent().getJmmParent().getJmmChild(1).getJmmChild(0).get("name");
+        if(!symbolTable.getReturnType(methodSignature).getName().equals("") && !child_type.getName().equals("") && !symbolTable.getReturnType(methodSignature).equals(child_type)){
+            this.addReport(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(ret_statement.get("line")), Integer.valueOf(ret_statement.get("col")), "Return type must be of the type " + symbolTable.getReturnType(methodSignature) + " but it instead is " + child_type));
+            return false;
         }
         return true;
     }
 
-    private Boolean visitMethodDeclaration(JmmNode method, Boolean dummy){
-        String name = "";
-        for(var child : method.getChildren()){
-            if(child.getKind().equals(AstNode.FUNC_NAME.toString())){
-                name = child.get("name");
-            }
-            if(name != "" && child.getKind().equals(AstNode.BODY.toString())){
-                for(var grandchild : child.getChildren()){
-                    if(grandchild.getKind().equals(AstNode.FUNC_RETURN.toString())){
-                        var rt = this.getExpressionType(grandchild.getJmmChild(0));
-                        if (!rt.equals(symbolTable.getReturnType(name))){
-                            this.addReport(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(grandchild.get("line")), Integer.valueOf(grandchild.get("col")), "Return type must be of the type " + symbolTable.getReturnType(name).toString() + " but it instead is " + rt.toString()));
-                            return false;
-                        }
-                    }
+    private Boolean visitFunction(JmmNode func, Boolean dummy){
+        String name =  func.getJmmChild(1).getJmmChild(0).get("name");
+        this.scope = name;
+        var body = func.getJmmChild(3);
+        for(var child : body.getChildren()){
+            if(child.getKind().equals(AstNode.FUNC_RETURN.toString())){
+                var rt = this.getExpressionType(child.getJmmChild(0));
+                if (!rt.equals(symbolTable.getReturnType(name))){
+                    this.addReport(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(child.get("line")), Integer.valueOf(child.get("col")), "Return type must be of the type " + symbolTable.getReturnType(name).toString() + " but it instead is " + rt.toString()));
+                    return false;
                 }
             }
         }
@@ -59,7 +64,7 @@ public class TypeVerifier extends Verifier{
             Type t2 = this.getExpressionType(assign.getJmmChild(1));
             //System.out.println("T2: " + t2.toString());
             if (!t1.equals(t2)){
-                if((!symbolTable.getImports().contains(t1.getName()) || !symbolTable.getImports().contains(t2.getName())) && (!symbolTable.getClassName().equals(t1.getName()) || !symbolTable.getSuper().equals(t2.getName()))){
+                if((!symbolTable.getImports().contains(t1.getName()) || !symbolTable.getImports().contains(t2.getName())) && (!symbolTable.getClassName().equals(t2.getName()) || !symbolTable.getSuper().equals(t1.getName()))){
                     this.addReport(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(assign.get("line")), Integer.valueOf(assign.get("col")), "Assignment types " + t1.toString() + " and " + t2.toString() + " don't match!"));
                     return false;
                 }
@@ -74,7 +79,7 @@ public class TypeVerifier extends Verifier{
         var child_type = this.getExpressionType(child);
         //System.out.println("DEBUG2: " + child_type.toString());
         if(!child_type.equals(new Type("boolean", false))){
-            this.addReport(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(child.get("line")), Integer.valueOf(child.get("col")), "Condition " + child.toString() + " should be a bool, instead it's of the type " + child_type.toString()));
+            this.addReport(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(child.get("line")), Integer.valueOf(child.get("col")), "Condition in '" + condition.getJmmParent().getKind() + "' should be a bool, instead it's of the type " + child_type.toString()));
             return false;
         }
         return true;

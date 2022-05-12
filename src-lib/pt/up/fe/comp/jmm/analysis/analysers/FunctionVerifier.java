@@ -18,8 +18,20 @@ public class FunctionVerifier extends Verifier{
 
     public FunctionVerifier(JmmNode root, SymbolTable symbolTable) {
         super(root, symbolTable);
+        addVisit(AstNode.FUNCTION, this::visitFunction);
+        addVisit(AstNode.MAIN, this::visitMain);
         addVisit(AstNode.ACCESS, this::visitAccess);
         addVisit(AstNode.CHAINED, this::visitChained);
+    }
+
+    private Boolean visitFunction(JmmNode func, Boolean dummy){
+        this.scope = func.getJmmChild(1).getJmmChild(0).get("name");
+        return true;
+    }
+
+    private Boolean visitMain(JmmNode main, Boolean dummy){
+        this.scope = "main";
+        return true;
     }
 
     private Boolean visitAccess(JmmNode access, Boolean dummy){
@@ -37,13 +49,19 @@ public class FunctionVerifier extends Verifier{
                     current_class = true;
                 }
                 else if(!symbolTable.getClassName().equals(name) && !symbolTable.getImports().contains(name) && !symbolTable.getSuper().equals(name)){
-                    String class_name = this.getVar(name).getType().getName();
-                    if(symbolTable.getClassName().equals(class_name)){
-                        current_class = true;
-                    }
-                    else if(!symbolTable.getClassName().equals(class_name) && !symbolTable.getImports().contains(class_name) && !symbolTable.getSuper().equals(class_name)){
+                    if(this.getVar(name) == null){
                         this.addReport(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(child.get("line")), Integer.valueOf(child.get("col")), "Couldn't find class named '" + name + "'"));
                         return false;
+                    }
+                    else{
+                        String class_name = this.getVar(name).getType().getName();
+                        if(symbolTable.getClassName().equals(class_name)){
+                            current_class = true;
+                        }
+                        else if(!symbolTable.getClassName().equals(class_name) && !symbolTable.getImports().contains(class_name) && !symbolTable.getSuper().equals(class_name)){
+                            this.addReport(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(child.get("line")), Integer.valueOf(child.get("col")), "Couldn't find class named '" + name + "'"));
+                            return false;
+                        }
                     }
                 }
                 if(current_class && symbolTable.getSuper().equals("")){
@@ -59,32 +77,25 @@ public class FunctionVerifier extends Verifier{
     }
 
     private Boolean visitChained(JmmNode chained, Boolean dummy){
-        for(var child : chained.getChildren()) {
-            String name = "";
-            if (child.getKind().equals(AstNode.ID.toString())) {
-                name = child.get("name");
-                /*
-                if (!symbolTable.getMethods().contains(name) && symbolTable.getSuper().equals("")) {
-                    this.reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(child.get("line")), Integer.valueOf(child.get("col")), "Couldn't find method named '" + name + "' and class " + symbolTable.getClassName() + " doesn't have a super class"));
-                    return false;
-                }
-                */
-            }
-            else if (name != "" && child.getKind().equals(AstNode.ARGS.toString())){
+        var first_child = chained.getJmmChild(0);
+        if(!first_child.getKind().equals(AstNode.LENGTH.toString())){
+            String name = first_child.get("name");
+            if(symbolTable.getMethods().contains(name)){
+                var args = chained.getJmmChild(1);
                 var params = symbolTable.getParameters(name);
-                if(params.size() == child.getChildren().size()){
+                if(params.size() == args.getChildren().size()){
                     for (int i = 0; i < params.size(); i++){
-                        var grandchild = child.getJmmChild(i);
-                        var rparam = this.getExpressionType(grandchild);
+                        var arg = args.getJmmChild(i);
+                        var rparam = this.getExpressionType(arg);
                         var tparam = params.get(i).getType();
                         if(!rparam.equals(tparam)){
-                            this.addReport(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(grandchild.get("line")), Integer.valueOf(grandchild.get("col")), "Argument number " + i + " of method " + name + " should be of type " + tparam.toString() + " instead it's " + rparam.toString()));
+                            this.addReport(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(arg.get("line")), Integer.valueOf(arg.get("col")), "Argument number " + i + " of method " + name + " should be of type " + tparam.toString() + " instead it's " + rparam.toString()));
                             return false;
                         }
                     }
                 }
                 else{
-                    this.addReport(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(child.get("line")), Integer.valueOf(child.get("col")), "Wrong number of arguments, " + child.getChildren().size() + " instead of " + params.size()));
+                    this.addReport(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(args.get("line")), Integer.valueOf(args.get("col")), "Wrong number of arguments, " + args.getChildren().size() + " instead of " + params.size()));
                     return false;
                 }
             }

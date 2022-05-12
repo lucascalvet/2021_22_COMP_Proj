@@ -34,10 +34,12 @@ public class ReturnTypeCollector extends Collector {
         String rtype = "";
         for (var child : func.getChildren()) {
             if (child.getKind().equals(AstNode.FUNC_RETURN.toString())) {
-                rtype = child.getChildren().get(0).get("type");
+                rtype = child.getJmmChild(0).get("type");
+                if(rtype.equals("custom")){
+                    rtype = child.getJmmChild(0).getJmmChild(0).get("name");
+                }
             }
             if (child.getKind().equals(AstNode.FUNC_NAME.toString())){
-                //if (child.getChildren().get(0).get("name").equals(this.signature.substring(0, this.signature.indexOf('(')))){
                 if (child.getChildren().get(0).get("name").equals(this.signature)){
                     if(rtype.equals("int array")){
                         this.return_type = new Type("int", true);

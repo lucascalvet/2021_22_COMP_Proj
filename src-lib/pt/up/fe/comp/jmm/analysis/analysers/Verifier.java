@@ -18,29 +18,32 @@ public abstract class Verifier extends PreorderJmmVisitor<Boolean, Boolean> impl
     protected final SymbolTable symbolTable;
     private final JmmNode root;
     private List<Report> reports;
-    private final List<Symbol> vars;
-    protected final List<String> classes;
+    protected String scope;
 
     public Verifier(JmmNode root, SymbolTable symbolTable){
         this.root = root;
+        this.scope = "";
         this.symbolTable = symbolTable;
-        this.reports = new ArrayList<Report>();
-        this.classes = symbolTable.getImports();
-        this.classes.add(symbolTable.getClassName());
-        if(symbolTable.getSuper() != ""){
-            this.classes.add(symbolTable.getSuper());
-        }
-        this.vars = symbolTable.getFields();
-        for(var methodSignature : symbolTable.getMethods()){
-            this.vars.addAll(symbolTable.getParameters(methodSignature));
-            this.vars.addAll(symbolTable.getLocalVariables(methodSignature));
-        }
+        this.reports = new ArrayList<>();
     }
 
     protected Symbol getVar(String name){
-        for(var variable : this.vars){
-            if(variable.getName().equals(name)){
-                return variable;
+        if(!this.scope.equals("")){
+            for(var local_variable : symbolTable.getLocalVariables(this.scope)){
+                if(local_variable.getName().equals(name)){
+                    return local_variable;
+                }
+            }
+            for(var param : symbolTable.getParameters(this.scope)){
+                if(param.getName().equals(name)){
+                    return param;
+                }
+            }
+        }
+
+        for(var field : symbolTable.getFields()){
+            if(field.getName().equals(name)){
+                return field;
             }
         }
         return null;
@@ -58,7 +61,7 @@ public abstract class Verifier extends PreorderJmmVisitor<Boolean, Boolean> impl
                     Symbol id_var = this.getVar(expr.get("name"));
                     if(id_var == null){
                         //System.out.println("NULL: " + expr.get("name"));
-                        this.addReport(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(expr.get("line")), Integer.valueOf(expr.get("col")), "Variable " + expr.get("name") + " isn't declared"));
+                        this.addReport(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(expr.get("line")), Integer.valueOf(expr.get("col")), "Variable '" + expr.get("name") + "' isn't declared"));
                         return expected_type;
                     }
                     return id_var.getType();
@@ -90,11 +93,11 @@ public abstract class Verifier extends PreorderJmmVisitor<Boolean, Boolean> impl
                 this.addReport(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(index.get("line")), Integer.valueOf(index.get("col")), "Array index must be an integer"));
             }
             if(this.getVar(arr_name) == null){
-                this.addReport(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(arr.get("line")), Integer.valueOf(arr.get("col")), "Array " + arr_name + " doesn't exist"));
+                this.addReport(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(arr.get("line")), Integer.valueOf(arr.get("col")), "Array '" + arr_name + "' doesn't exist"));
                 return new Type("int", false);
             }
             else if (!this.getVar(arr_name).getType().isArray()){
-                this.addReport(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(arr.get("line")), Integer.valueOf(arr.get("col")), "To access " + arr_name + " it must be an array, instead it's of the type " + this.getVar(arr_name).getType().toString()));
+                this.addReport(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(arr.get("line")), Integer.valueOf(arr.get("col")), "To access '" + arr_name + "' it must be an array, instead it's of the type " + this.getVar(arr_name).getType().toString()));
             }
 
             return new Type(this.getVar(arr_name).getType().getName(), false);

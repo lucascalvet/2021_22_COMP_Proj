@@ -21,7 +21,7 @@ public class SuperImportCheck implements SemanticAnalyser {
     @Override
     public List<Report> getReports(){
         if(!symbolTable.getSuper().equals("") && !symbolTable.getImports().contains(symbolTable.getSuper())){
-            return Arrays.asList(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "Super Class " + symbolTable.getSuper() + " is not imported"));
+            return Arrays.asList(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "Super Class '" + symbolTable.getSuper() + "' is not imported"));
         }
         return Collections.emptyList();
     }
