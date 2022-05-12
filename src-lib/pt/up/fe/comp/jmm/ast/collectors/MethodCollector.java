@@ -33,10 +33,10 @@ public class MethodCollector extends Collector {
         String name = "";
         for (var child : func.getChildren()) {
             if (child.getKind().equals(AstNode.FUNC_NAME.toString())){
-                name = child.getChildren().get(0).get("name");
+                name = child.getJmmChild(0).get("name");
                 if(this.methods.contains(name)){
-                    this.addReport(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(child.get("line")), Integer.valueOf(child.get("column")), "Found duplicate method with signature '" + name + "'"));
-                    return -1;
+                    this.addReport(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(child.getJmmChild(0).get("line")), Integer.valueOf(child.getJmmChild(0).get("col")), "Found duplicate method with signature '" + name + "'"));
+                    //return -1;
                 }
                 break;
             }

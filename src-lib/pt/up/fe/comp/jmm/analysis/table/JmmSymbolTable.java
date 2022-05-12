@@ -27,7 +27,7 @@ public class JmmSymbolTable implements SymbolTable{
 
     public JmmSymbolTable(JmmNode root) {
         this.root = root;
-        this.reports = new ArrayList<>();
+        this.reports = new ArrayList<Report>();
 
         this.return_type = new HashMap<String,Type>();
         this.params = new HashMap<String,List<Symbol>>();

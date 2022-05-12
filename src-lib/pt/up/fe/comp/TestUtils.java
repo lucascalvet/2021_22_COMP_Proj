@@ -192,6 +192,10 @@ public class TestUtils {
 
         JmmAnalysis analysis = getJmmAnalysis();
 
+        for(Report rep : analysis.semanticAnalysis(parserResult).getReports()){
+            System.out.println(rep);
+        }
+
         return analysis.semanticAnalysis(parserResult);
     }
 

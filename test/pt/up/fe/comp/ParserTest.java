@@ -32,6 +32,7 @@ public class ParserTest {
         System.out.println("Reports:\n\n" + new_result.getReports());
 
         //System.out.println("AST:\n\n" + result.getRootNode().toTree());
+        //System.out.println("SymbolTable:\n\n" + symbolTable.print());
     }
 
     private static void mustFail(String code) {
