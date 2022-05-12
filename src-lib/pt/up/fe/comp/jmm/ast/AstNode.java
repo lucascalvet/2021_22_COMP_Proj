@@ -30,7 +30,15 @@ public enum AstNode {
     CONDITION,
     ELSE,
     TYPE,
-    ID;
+    ID,
+    INT,
+    NEW,
+    ACCESS,
+    LENGTH,
+    ADD,
+    SUBTRACT,
+    MULTIPLY,
+    DIVIDE;
 
     private final String name;
 
