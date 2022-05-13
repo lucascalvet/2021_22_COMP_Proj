@@ -26,7 +26,8 @@ public class ConversionInstructions {
         instructionMap.put(AssignInstruction.class,this::getCode);
         instructionMap.put(ReturnInstruction.class, this::getCode);
         instructionMap.put(PutFieldInstruction.class, this::getCode);
-
+        instructionMap.put(GotoInstruction.class, this::getCode);
+        instructionMap.put(CondBranchInstruction.class, this::getCode);
         this.scope = new HashMap<>();
         this.stackHandle = new StackHandle();
     }
@@ -39,6 +40,15 @@ public class ConversionInstructions {
         return instructionMap.apply(instruction);
     }
 
+    public String getCode(GotoInstruction instruction){
+        return "goto " + instruction.getLabel() + "\n";
+
+    }
+
+    public String getCode(CondBranchInstruction instruction){
+        Element left = instruction.getOperands().
+        return "";
+    }
     public String getCode(CallInstruction instruction){
 
         switch(instruction.getInvocationType()){
@@ -241,6 +251,16 @@ public class ConversionInstructions {
 
     private String lthConversion(String leftInstruction, String rightInstruction, OperationType operationType) {
         StringBuilder result = new StringBuilder();
+        result.append(leftInstruction).append(rightInstruction);
+        int index = OllirToJasmin.index;
+        String label1 = "IFICMP_"+ (index*2);
+        String label2 = "IFICMP_"+ (index*2+1);
+        result.append("if_icmplt ").append(label1).append("\n");
+        result.append("iconst_0");
+        result.append("goto ").append(label2).append("\n");
+        result.append(label1).append(":\n");
+        result.append("iconst_1");
+        result.append(label1).append(":\n");
         return result.toString();
     }
 
