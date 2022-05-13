@@ -222,6 +222,20 @@ public class ConversionInstructions {
 
     private String andConversion(String leftInstruction, String rightInstruction, OperationType operationType) {
         StringBuilder result = new StringBuilder();
+        int index = OllirToJasmin.index;
+        String label1 = "IFEQ_"+ (index*2);
+        String label2 = "IFEQ_"+ (index*2+1);
+
+        result.append(leftInstruction);
+        result.append("ifeq ").append(label1).append("\n");
+        result.append(rightInstruction);
+        result.append("ifeq ").append(label1).append("\n");
+
+        result.append("iconst_1");
+        result.append("goto ").append(label2).append("\n");
+        result.append(label1).append(":\n");
+        result.append("iconst_0");
+        result.append(label2).append(":\n");
         return result.toString();
     }
 
