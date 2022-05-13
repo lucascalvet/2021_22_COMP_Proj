@@ -46,7 +46,6 @@ public class ConversionInstructions {
     }
 
     public String getCode(CondBranchInstruction instruction){
-        Element left = instruction.getOperands().
         return "";
     }
     public String getCode(CallInstruction instruction){
