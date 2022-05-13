@@ -112,7 +112,7 @@ AddExpr #void:  MultiplyExpr (<PLUS_> MultiplyExpr #Add(2) | <MINUS_> MultiplyEx
 
 MultiplyExpr #void: NewExpr (<TIMES_> NewExpr #Multiply(2) | <DIVIDE_> NewExpr #Divide(2))*;
 
-NewExpr #void: NotExpr | (<NEW_> ((<INT_> #Int_type <OPEN_SQUARE_BRA_> Expression <CLOSE_SQUARE_BRA_>) | (Identifier <OPEN_PAREN_> <CLOSE_PAREN_>))  #New);
+NewExpr #void: NotExpr | (<NEW_> ((<INT_> #IntType <OPEN_SQUARE_BRA_> Expression <CLOSE_SQUARE_BRA_>) | (Identifier <OPEN_PAREN_> <CLOSE_PAREN_>))  #New);
 
 NotExpr #void: Access | <NOT_> NotExpr #Not;
 

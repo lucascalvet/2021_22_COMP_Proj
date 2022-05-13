@@ -32,6 +32,7 @@ public enum AstNode {
     TYPE,
     ID,
     INT,
+    INT_TYPE,
     NEW,
     ACCESS,
     LENGTH,

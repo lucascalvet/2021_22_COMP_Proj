@@ -30,15 +30,22 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
         addVisit(AstNode.INT, this::intVisit);
         addVisit(AstNode.NEW, this::newVisit);
         addVisit(AstNode.ACCESS, this::accessVisit);
+        addVisit(AstNode.BLOCK, this::blockVisit);
         addVisit(AstNode.RETURN_STATEMENT, this::returnVisit);
         addVisit(AstNode.ADD, this::opVisit);
         addVisit(AstNode.SUBTRACT, this::opVisit);
         addVisit(AstNode.MULTIPLY, this::opVisit);
         addVisit(AstNode.DIVIDE, this::opVisit);
+        addVisit(AstNode.IF, this::ifVisit);
+        addVisit(AstNode.WHILE, this::whileVisit);
     }
 
     public String getCode() {
         return code.toString();
+    }
+
+    private String getLabel() {
+        return "Label" + labelCounter++ + ":\n";
     }
 
     private Integer programVisit(JmmNode program, Integer dummy) {
@@ -167,6 +174,15 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
     }
 
     private Integer newVisit(JmmNode newNode, Integer dummy) {
+        if (newNode.getJmmChild(0).getKind().equals(AstNode.INT_TYPE.toString())) {
+            Type type = new Type("int", true);
+            code.append("new(array, ");
+            visit(newNode.getJmmChild(1));
+            code.append(").")
+                    .append(OllirUtils.getCode(type));
+            return 0;
+        }
+
         String typeName = newNode.getJmmChild(0).get("name");
 
         code.append("new(")
@@ -218,6 +234,15 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
         return 0;
     }
 
+    private Integer blockVisit(JmmNode blockNode, Integer dummy) {
+        for (JmmNode stmt : blockNode.getChildren()) {
+            visit(stmt);
+            code.append(";\n");
+        }
+
+        return 0;
+    }
+
     private Integer returnVisit(JmmNode retNode, Integer dummy) {
         code.append("ret.")
                 .append(OllirUtils.getCode(symbolTable.getReturnType(methodSignature)))
@@ -250,6 +275,55 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
                 .append(" ");
 
         visit(opNode.getJmmChild(1));
+
+        return 0;
+    }
+
+    private Integer ifVisit(JmmNode ifNode, Integer dummy) {
+        String thenLabel = getLabel();
+        String endLabel = getLabel();
+
+        code.append("if (");
+        // Condition
+        visit(ifNode.getJmmChild(0));
+        code.append(") goto ")
+                .append(thenLabel)
+                .append(";\n");
+
+        // Else block
+        visit(ifNode.getJmmChild(2));
+
+        code.append("goto ")
+                .append(endLabel)
+                .append(";\n")
+                .append(thenLabel);
+
+        // Then block
+        visit(ifNode.getJmmChild(1));
+
+        code.append(endLabel);
+
+        return 0;
+    }
+
+    private Integer whileVisit(JmmNode whileNode, Integer dummy) {
+        String loopLabel = getLabel();
+        String bodyLabel = getLabel();
+        String endLoopLabel = getLabel();
+
+        code.append(loopLabel);
+
+        code.append("goto ")
+                .append(endLoopLabel)
+                .append(";\n")
+                .append(bodyLabel);
+
+        visit(whileNode.getJmmChild(1));
+
+        code.append("goto ")
+                .append(loopLabel)
+                .append(";\n")
+                .append(endLoopLabel);
 
         return 0;
     }
