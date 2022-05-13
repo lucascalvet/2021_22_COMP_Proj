@@ -15,8 +15,10 @@ public class ConversionInstructions {
     private HashMap<String, Descriptor> scope;
     private StackHandle stackHandle;
 
+    private boolean assign = false;
     private Element leftSideNew;
     private String rightSideNew;
+
     public ConversionInstructions(ClassUnit classUnit) {
         this.classUnit = classUnit;
         this.utils = new ConversionUtils(classUnit);
@@ -96,6 +98,11 @@ public class ConversionInstructions {
 
         result.append(utils.getJasminType(returnType)).append("\n");
 
+        if(!this.assign && returnType.getTypeOfElement() != ElementType.VOID){
+            result.append("pop\n");
+            this.assign = false;
+        }
+
         return result.toString();
     }
 
@@ -126,6 +133,7 @@ public class ConversionInstructions {
     }
 
     public String getCode(AssignInstruction instruction){
+        this.assign = true;
         StringBuilder result = new StringBuilder();
         Instruction rightSide = instruction.getRhs();
         Element leftSide = instruction.getDest();
@@ -248,6 +256,11 @@ public class ConversionInstructions {
 
         result.append(utils.getJasminType(instruction.getReturnType()));
         result.append("\n");
+
+        if(!this.assign && returnType.getTypeOfElement() != ElementType.VOID){
+            result.append("pop\n");
+            this.assign = false;
+        }
 
         return result.toString();
     }

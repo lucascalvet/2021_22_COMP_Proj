@@ -107,7 +107,6 @@ public class OllirToJasmin {
             code.append(inst.getCode(instruction));
         }
 
-        //TODO: Return Statement
         if(!hasReturn)
             code.append("return\n"); //se for return Void
 
