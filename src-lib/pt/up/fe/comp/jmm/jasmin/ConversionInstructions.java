@@ -46,7 +46,32 @@ public class ConversionInstructions {
     }
 
     public String getCode(CondBranchInstruction instruction){
-        return "";
+        StringBuilder result = new StringBuilder();
+        Element operand1 = instruction.getOperands().get(0);
+        Element operand2 = instruction.getOperands().get(1);
+
+        String op1 = stackHandle.load(operand1, scope);
+        String op2 = stackHandle.load(operand2, scope);
+        Instruction operation = instruction.getCondition();
+
+        BinaryOpInstruction op = (BinaryOpInstruction) operation;
+        OperationType type = op.getOperation().getOpType();
+
+        switch (type){
+            case LTH:
+                result.append(lthConversion(op1, op2));
+                break;
+            case ANDB:
+                result.append(andConversion(op1, op2));
+                break;
+            case NOTB:
+                result.append(notConversion(op1));
+                break;
+            default:
+                throw new NotImplementedException(this);
+        }
+
+        return result.toString();
     }
     public String getCode(CallInstruction instruction){
 
@@ -186,10 +211,10 @@ public class ConversionInstructions {
                 } else if(operationType == OperationType.ANDB || operationType == OperationType.LTH || operationType == OperationType.NOTB){
                     switch (operationType){
                         case LTH:
-                            result.append(lthConversion(leftInstruction, rightInstruction, operationType));
+                            result.append(lthConversion(leftInstruction, rightInstruction));
                             break;
                         case ANDB:
-                            result.append(andConversion(leftInstruction, rightInstruction, operationType));
+                            result.append(andConversion(leftInstruction, rightInstruction));
                             break;
                         case NOTB:
                             result.append(notConversion(rightInstruction));
@@ -229,7 +254,7 @@ public class ConversionInstructions {
         return result.toString();
     }
 
-    private String andConversion(String leftInstruction, String rightInstruction, OperationType operationType) {
+    private String andConversion(String leftInstruction, String rightInstruction) {
         StringBuilder result = new StringBuilder();
         int index = OllirToJasmin.index;
         String label1 = "IFEQ_"+ (index*2);
@@ -248,7 +273,7 @@ public class ConversionInstructions {
         return result.toString();
     }
 
-    private String lthConversion(String leftInstruction, String rightInstruction, OperationType operationType) {
+    private String lthConversion(String leftInstruction, String rightInstruction) {
         StringBuilder result = new StringBuilder();
         result.append(leftInstruction).append(rightInstruction);
         int index = OllirToJasmin.index;
