@@ -60,9 +60,7 @@ public class TypeVerifier extends Verifier{
     private Boolean visitAssign(JmmNode assign, Boolean dummy){
         if(assign.getChildren().size() == 2){
             Type t1 = this.getExpressionType(assign.getJmmChild(0));
-            //System.out.println("T1: " + t1.toString());
             Type t2 = this.getExpressionType(assign.getJmmChild(1));
-            //System.out.println("T2: " + t2.toString());
             if (!t1.equals(t2)){
                 if((!symbolTable.getImports().contains(t1.getName()) || !symbolTable.getImports().contains(t2.getName())) && (!symbolTable.getClassName().equals(t2.getName()) || !symbolTable.getSuper().equals(t1.getName()))){
                     this.addReport(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(assign.get("line")), Integer.valueOf(assign.get("col")), "Assignment types " + t1.toString() + " and " + t2.toString() + " don't match!"));
@@ -75,9 +73,7 @@ public class TypeVerifier extends Verifier{
 
     private Boolean visitCondition(JmmNode condition, Boolean dummy){
         var child = condition.getJmmChild(0);
-        //System.out.println("DEBUG: " + child.getKind());
         var child_type = this.getExpressionType(child);
-        //System.out.println("DEBUG2: " + child_type.toString());
         if(!child_type.equals(new Type("boolean", false))){
             this.addReport(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(child.get("line")), Integer.valueOf(child.get("col")), "Condition in '" + condition.getJmmParent().getKind() + "' should be a bool, instead it's of the type " + child_type.toString()));
             return false;

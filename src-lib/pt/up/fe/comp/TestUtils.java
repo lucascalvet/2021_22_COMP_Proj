@@ -355,6 +355,7 @@ public class TestUtils {
      * @param provider
      */
     public static void noErrors(ReportsProvider provider) {
+        System.out.println(provider.getReports());
         noErrors(provider.getReports());
     }
 

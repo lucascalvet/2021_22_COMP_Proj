@@ -36,7 +36,6 @@ public class MethodCollector extends Collector {
                 name = child.getJmmChild(0).get("name");
                 if(this.methods.contains(name)){
                     this.addReport(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(child.getJmmChild(0).get("line")), Integer.valueOf(child.getJmmChild(0).get("col")), "Found duplicate method with signature '" + name + "'"));
-                    //return -1;
                 }
                 break;
             }

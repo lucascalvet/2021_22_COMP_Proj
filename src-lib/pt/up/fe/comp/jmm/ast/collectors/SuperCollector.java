@@ -20,7 +20,7 @@ public class SuperCollector extends Collector {
     }
 
     private Integer visitExtends(JmmNode super_extends, Boolean dummy) {
-        this.super_name = super_extends.getChildren().get(0).get("name");
+        this.super_name = super_extends.getJmmChild(0).get("name");
         return ++visits;
     }
 }

@@ -41,8 +41,7 @@ public class ParametersCollector extends Collector {
         List<Symbol> args = new ArrayList<>();
         for (var child : func.getChildren()) {
             if (child.getKind().equals(AstNode.FUNC_NAME.toString())){
-                //if(child.getChildren().get(0).get("name").equals(this.signature.substring(0, this.signature.indexOf('(')))){
-                if(child.getChildren().get(0).get("name").equals(this.signature)){
+                if(child.getJmmChild(0).get("name").equals(this.signature)){
                     check = true;
                 }
                 else break;

@@ -19,7 +19,7 @@ public class ClassNameCollector extends Collector {
     }
 
     private Integer visitClassDecl(JmmNode class_decl, Boolean dummy) {
-        this.class_name = class_decl.getChildren().get(0).get("name");
+        this.class_name = class_decl.getJmmChild(0).get("name");
         return ++visits;
     }
 }

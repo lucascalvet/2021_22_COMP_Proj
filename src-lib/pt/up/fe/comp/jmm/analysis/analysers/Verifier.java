@@ -51,8 +51,6 @@ public abstract class Verifier extends PreorderJmmVisitor<Boolean, Boolean> impl
 
     protected Type getExpressionType(JmmNode expr){
         var kind = expr.getKind();
-        //System.out.println("START");
-        //System.out.println(kind);
         var expected_type = new Type("int", false);
         var return_type = new Type("int", false);
         if(AstNode.getTerminalNodes().contains(kind)){
@@ -60,7 +58,6 @@ public abstract class Verifier extends PreorderJmmVisitor<Boolean, Boolean> impl
                 if(kind.equals(AstNode.ID.toString())){
                     Symbol id_var = this.getVar(expr.get("name"));
                     if(id_var == null){
-                        //System.out.println("NULL: " + expr.get("name"));
                         this.addReport(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(expr.get("line")), Integer.valueOf(expr.get("col")), "Variable '" + expr.get("name") + "' isn't declared"));
                         return expected_type;
                     }
@@ -113,7 +110,6 @@ public abstract class Verifier extends PreorderJmmVisitor<Boolean, Boolean> impl
         if(kind.equals(AstNode.LOWER.toString())){
             expected_type = new Type("int", false);
             return_type = new Type("boolean", false);
-            //System.out.println(return_type.toString());
         }
         if(AstNode.getAritmeticOp().contains(kind)){
             expected_type = new Type("int", false);

@@ -20,7 +20,6 @@ public class LocalVariablesCollector extends Collector {
         addVisit(AstNode.CLASS_DECL, this::visitDefault);
         addVisit(AstNode.CLASS_BODY, this::visitClassBody);
         addVisit(AstNode.METHOD_DECL, this::visitDefault);
-        //if (this.signature.substring(0, this.signature.indexOf('(')).equals("main")){
         if (this.signature.equals("main")){
             addVisit(AstNode.MAIN, this::visitDefault);
             addVisit(AstNode.MAIN_BODY, this::visitDefault);
@@ -49,8 +48,7 @@ public class LocalVariablesCollector extends Collector {
     private Integer visitFunction(JmmNode node, Boolean dummy) {
         for (var child : node.getChildren()) {
             if (child.getKind().equals(AstNode.FUNC_NAME.toString())) {
-                //if (!child.getChildren().get(0).get("name").equals(this.signature.substring(0, this.signature.indexOf('(')))) {
-                if (!child.getChildren().get(0).get("name").equals(this.signature)) {
+                if (!child.getJmmChild(0).get("name").equals(this.signature)) {
                     break;
                 }
             }
@@ -66,7 +64,7 @@ public class LocalVariablesCollector extends Collector {
             if (child.getKind().equals(AstNode.TYPE.toString())){
                 switch(child.get("type")){
                     case "custom":
-                        t = new Type(child.getChildren().get(0).get("name"), false);
+                        t = new Type(child.getJmmChild(0).get("name"), false);
                         break;
                     case "int array":
                         t = new Type("int", true);
@@ -82,10 +80,6 @@ public class LocalVariablesCollector extends Collector {
         }
         this.local_vars.add(new Symbol(t, n));
         return ++visits;
-    }
-
-    private String getCustomVarType(JmmNode custom_var){
-        return custom_var.getChildren().get(0).get("name");
     }
 }
 

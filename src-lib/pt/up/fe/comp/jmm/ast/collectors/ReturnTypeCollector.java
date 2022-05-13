@@ -12,7 +12,6 @@ public class ReturnTypeCollector extends Collector {
         this.visits = 0;
         this.return_type = new Type("", false);
         this.signature = methodSignature;
-        //if (this.signature.substring(0, this.signature.indexOf('(')).equals("main")){
         if (this.signature.equals("main")){
             this.return_type = new Type("void", false);
         }
@@ -40,7 +39,7 @@ public class ReturnTypeCollector extends Collector {
                 }
             }
             if (child.getKind().equals(AstNode.FUNC_NAME.toString())){
-                if (child.getChildren().get(0).get("name").equals(this.signature)){
+                if (child.getJmmChild(0).get("name").equals(this.signature)){
                     if(rtype.equals("int array")){
                         this.return_type = new Type("int", true);
                     }
