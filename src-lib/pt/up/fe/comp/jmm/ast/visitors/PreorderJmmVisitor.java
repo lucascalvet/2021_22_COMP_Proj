@@ -32,7 +32,8 @@ public class PreorderJmmVisitor<D, R> extends AllNodesJmmVisitor<D, R> {
         SpecsCheck.checkNotNull(jmmNode, () -> "Node should not be null");
 
         var visit = getVisit(jmmNode.getKind());
-
+        //System.out.println("DEBUG\n");
+        //System.out.println(jmmNode.getKind());
         // Preorder: 1st visit the node
         var nodeResult = visit.apply(jmmNode, data);
 

@@ -2,6 +2,9 @@ package pt.up.fe.comp.jmm.ast;
 
 import pt.up.fe.specs.util.SpecsStrings;
 
+import java.util.Arrays;
+import java.util.List;
+
 
 public enum AstNode {
 
@@ -29,8 +32,27 @@ public enum AstNode {
     IF,
     CONDITION,
     ELSE,
+    ACCESS,
+    CHAINED,
     TYPE,
-    ID;
+    ID,
+    AND,
+    LOWER,
+    ADD,
+    SUBTRACT,
+    MULTIPLY,
+    DIVIDE,
+    LENGTH,
+    NEW,
+    NOT,
+    ARRAY_ACCESS,
+    ARGS,
+    TRUE,
+    FALSE,
+    THIS,
+    INT,
+    INT_TYPE;
+
 
     private final String name;
 
@@ -38,6 +60,9 @@ public enum AstNode {
         this.name = SpecsStrings.toCamelCase(name(), "_", true);
     }
 
+    public static List<String> getBooleanOp(){return Arrays.asList(AstNode.NOT.toString(), AstNode.AND.toString());}
+    public static List<String> getAritmeticOp(){return Arrays.asList(AstNode.ADD.toString(), AstNode.SUBTRACT.toString(), AstNode.MULTIPLY.toString(), AstNode.DIVIDE.toString());}
+    public static List<String> getTerminalNodes(){return Arrays.asList(AstNode.INT.toString(), AstNode.ID.toString(), AstNode.TRUE.toString() , AstNode.FALSE.toString(), AstNode.THIS.toString());}
     @Override
     public String toString(){
         return this.name;
