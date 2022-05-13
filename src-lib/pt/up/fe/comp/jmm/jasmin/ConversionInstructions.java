@@ -4,7 +4,6 @@ import org.specs.comp.ollir.*;
 import pt.up.fe.specs.util.classmap.FunctionClassMap;
 import pt.up.fe.specs.util.exceptions.NotImplementedException;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -184,7 +183,7 @@ public class ConversionInstructions {
                             result.append(andConversion(leftInstruction, rightInstruction, operationType));
                             break;
                         case NOTB:
-                            result.append(notConversion(leftInstruction));
+                            result.append(notConversion(rightInstruction));
                             break;
                         default:
                             throw new NotImplementedException(this);
@@ -205,8 +204,19 @@ public class ConversionInstructions {
         return result.toString();
     }
 
-    private String notConversion(String leftInstruction) {
+    private String notConversion(String rightInstruction) {
         StringBuilder result = new StringBuilder();
+        int index = OllirToJasmin.index;
+
+        result.append(rightInstruction);
+        String label1 = "IFNE"+ (index*2);
+        result.append("ifne ").append(label1+"\n");
+        result.append("iconst_1\n");
+        String label2 = "IFNE_"+(index*2+1);
+        result.append("goto ").append(label2+"\n");
+        result.append(label1).append(":\n");
+        result.append("iconst_0\n");
+        result.append(label2).append(":\n");
         return result.toString();
     }
 

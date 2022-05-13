@@ -15,6 +15,7 @@ public class OllirToJasmin {
     private final ClassUnit classUnit;
     private final ConversionUtils utils;
     private final ConversionInstructions inst;
+    public static int index = 0;
 
     public OllirToJasmin(ClassUnit classUnit) {
         this.classUnit = classUnit;
@@ -101,10 +102,11 @@ public class OllirToJasmin {
         code.append(".limit locals 99\n");
 
         boolean hasReturn = false;
-
+        index = 0;
         for(var instruction : method.getInstructions()){
             if(instruction.getInstType()==InstructionType.RETURN) hasReturn = true;
             code.append(inst.getCode(instruction));
+            index++;
         }
 
         if(!hasReturn)
