@@ -169,13 +169,27 @@ public class ConversionInstructions {
                 String rightInstruction = stackHandle.load(rightElement, scope);
                 OperationType operationType = ((BinaryOpInstruction) rightSide).getOperation().getOpType();
 
-                if(operationType == OperationType.ADD || operationType == OperationType.DIV || operationType == OperationType.MUL || operationType == OperationType.SUB){
+                if(operationType == OperationType.ADD || operationType == OperationType.DIV || operationType == OperationType.MUL ||
+                        operationType == OperationType.SUB){
 
                     result.append(stackHandle.load(leftElement, scope));
                     result.append(stackHandle.load(rightElement, scope));
                     result.append(stackHandle.getOperation(operationType));
+                } else if(operationType == OperationType.ANDB || operationType == OperationType.LTH || operationType == OperationType.NOTB){
+                    switch (operationType){
+                        case LTH:
+                            result.append(lthConversion(leftInstruction, rightInstruction, operationType));
+                            break;
+                        case ANDB:
+                            result.append(andConversion(leftInstruction, rightInstruction, operationType));
+                            break;
+                        case NOTB:
+                            result.append(notConversion(leftInstruction));
+                            break;
+                        default:
+                            throw new NotImplementedException(this);
+                    }
                 }
-
                 break;
             case CALL:
                 this.rightSideNew = right.toString();
@@ -187,6 +201,22 @@ public class ConversionInstructions {
         }
         this.rightSideNew = right.toString();
         result.append(stackHandle.store(leftSide, scope, rightSideNew));
+        this.assign = false;
+        return result.toString();
+    }
+
+    private String notConversion(String leftInstruction) {
+        StringBuilder result = new StringBuilder();
+        return result.toString();
+    }
+
+    private String andConversion(String leftInstruction, String rightInstruction, OperationType operationType) {
+        StringBuilder result = new StringBuilder();
+        return result.toString();
+    }
+
+    private String lthConversion(String leftInstruction, String rightInstruction, OperationType operationType) {
+        StringBuilder result = new StringBuilder();
         return result.toString();
     }
 
