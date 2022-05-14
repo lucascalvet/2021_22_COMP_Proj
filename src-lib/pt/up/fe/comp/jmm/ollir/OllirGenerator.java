@@ -28,8 +28,11 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
         addVisit(AstNode.ASSIGN, this::assignVisit);
         addVisit(AstNode.ID, this::idVisit);
         addVisit(AstNode.INT, this::intVisit);
+        addVisit(AstNode.TRUE, this::trueVisit);
+        addVisit(AstNode.FALSE, this::falseVisit);
         addVisit(AstNode.NEW, this::newVisit);
         addVisit(AstNode.ACCESS, this::accessVisit);
+        addVisit(AstNode.ARRAY_ACCESS, this::arrayAccessVisit);
         addVisit(AstNode.BLOCK, this::blockVisit);
         addVisit(AstNode.RETURN_STATEMENT, this::returnVisit);
         addVisit(AstNode.ADD, this::opVisit);
@@ -45,7 +48,7 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
     }
 
     private String getLabel() {
-        return "Label" + labelCounter++ + ":\n";
+        return "Label" + labelCounter++;
     }
 
     private Integer programVisit(JmmNode program, Integer dummy) {
@@ -125,7 +128,7 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
         visit(assign.getJmmChild(0));
 
         code.append(" :=.")
-                .append(OllirUtils.getCode(varType))
+                .append(OllirUtils.getOllirType(varType.getName()))
                 .append(" ");
 
         visit(assign.getJmmChild(1));
@@ -173,6 +176,16 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
         return 0;
     }
 
+    private Integer trueVisit(JmmNode trueNode, Integer dummy) {
+        code.append("1.bool");
+        return 0;
+    }
+
+    private Integer falseVisit(JmmNode falseNode, Integer dummy) {
+        code.append("0.bool");
+        return 0;
+    }
+
     private Integer newVisit(JmmNode newNode, Integer dummy) {
         if (newNode.getJmmChild(0).getKind().equals(AstNode.INT_TYPE.toString())) {
             Type type = new Type("int", true);
@@ -189,8 +202,7 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
                 .append(typeName)
                 .append(").")
                 .append(typeName)
-                .append(";\n")
-                .append("invokespecial(");
+                .append(";\ninvokespecial(");
 
         visit(newNode.getJmmParent().getJmmChild(0));
 
@@ -230,6 +242,46 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
         }
 
         code.append(")");
+
+        return 0;
+    }
+
+    private Integer arrayAccessVisit(JmmNode arrayAccessNode, Integer dummy) {
+        JmmNode idNode = arrayAccessNode.getJmmChild(0);
+
+        List<Symbol> parameters = symbolTable.getParameters(methodSignature);
+        List<Symbol> variables = symbolTable.getLocalVariables(methodSignature);
+
+        Symbol symbol;
+
+        for (Symbol variable : variables) {
+            if (variable.getName().equals(idNode.get("name")) && variable.getType().isArray()) {
+                symbol = variable;
+                code.append(symbol.getName())
+                        .append("[");
+                visit(arrayAccessNode.getJmmChild(1).getJmmChild(0));
+                code.append("].")
+                        .append(OllirUtils.getOllirType(symbol.getType().getName()));
+                varType = symbol.getType();
+                return 0;
+            }
+        }
+
+        for (int param_idx = 0; param_idx < parameters.size(); param_idx++) {
+            if (parameters.get(param_idx).getName().equals(idNode.get("name")) && parameters.get(param_idx).getType().isArray()) {
+                symbol = parameters.get(param_idx);
+                code.append("$")
+                        .append(param_idx + 1)
+                        .append(".")
+                        .append(symbol.getName())
+                        .append("[");
+                visit(arrayAccessNode.getJmmChild(1).getJmmChild(0));
+                code.append("].")
+                        .append(OllirUtils.getCode(symbol.getType()));
+                varType = symbol.getType();
+                return 0;
+            }
+        }
 
         return 0;
     }
@@ -296,12 +348,14 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
         code.append("goto ")
                 .append(endLabel)
                 .append(";\n")
-                .append(thenLabel);
+                .append(thenLabel)
+                .append(":\n");
 
         // Then block
         visit(ifNode.getJmmChild(1));
 
-        code.append(endLabel);
+        code.append(endLabel)
+                .append(":\n");
 
         return 0;
     }
@@ -311,19 +365,28 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
         String bodyLabel = getLabel();
         String endLoopLabel = getLabel();
 
-        code.append(loopLabel);
+        code.append(loopLabel)
+                .append(":\n");
+
+        //TODO: "if" here
+        code.append("IF...")
+                .append("goto ")
+                .append(bodyLabel)
+                .append(";\n");
 
         code.append("goto ")
                 .append(endLoopLabel)
                 .append(";\n")
-                .append(bodyLabel);
+                .append(bodyLabel)
+                .append(":\n");
 
         visit(whileNode.getJmmChild(1));
 
         code.append("goto ")
                 .append(loopLabel)
                 .append(";\n")
-                .append(endLoopLabel);
+                .append(endLoopLabel)
+                .append(":\n");
 
         return 0;
     }
