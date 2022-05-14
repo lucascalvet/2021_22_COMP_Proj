@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
     private final StringBuilder code;
     private final SymbolTable symbolTable;
-    private String methodSignature;
+    private String methodSignature = null;
     private Type varType;
     private Integer tempVarCounter = 0;
     private Integer labelCounter = 0;
@@ -71,6 +71,14 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
 
         code.append(" {\n");
 
+        List<Symbol> fields = symbolTable.getFields();
+
+        for (Symbol field : fields) {
+            code.append(".field private ")
+                    .append(OllirUtils.getCode(field))
+                    .append(";\n");
+        }
+
         JmmNode classBody = null;
         for (JmmNode child : classDecl.getChildren()) {
             if (child.getKind().equals("ClassBody")) {
@@ -124,26 +132,26 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
         return 0;
     }
 
-    private Integer assignVisit(JmmNode assign, Integer dummy) {
-        visit(assign.getJmmChild(0));
+    private Integer assignVisit(JmmNode assignNode, Integer dummy) {
+        visit(assignNode.getJmmChild(0));
 
         code.append(" :=.")
                 .append(OllirUtils.getOllirType(varType.getName()))
                 .append(" ");
 
-        visit(assign.getJmmChild(1));
+        visit(assignNode.getJmmChild(1));
 
         return 0;
     }
 
-    private Integer idVisit(JmmNode id, Integer dummy) {
+    private Integer idVisit(JmmNode idNode, Integer dummy) {
         List<Symbol> parameters = symbolTable.getParameters(methodSignature);
         List<Symbol> variables = symbolTable.getLocalVariables(methodSignature);
 
         Symbol symbol;
 
         for (Symbol variable : variables) {
-            if (variable.getName().equals(id.get("name"))) {
+            if (variable.getName().equals(idNode.get("name"))) {
                 symbol = variable;
                 code.append(OllirUtils.getCode(symbol));
                 varType = symbol.getType();
@@ -152,7 +160,7 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
         }
 
         for (int param_idx = 0; param_idx < parameters.size(); param_idx++) {
-            if (parameters.get(param_idx).getName().equals(id.get("name"))) {
+            if (parameters.get(param_idx).getName().equals(idNode.get("name"))) {
                 symbol = parameters.get(param_idx);
                 code.append("$")
                         .append(param_idx + 1)
