@@ -1,0 +1,33 @@
+import ioPlus;
+class ComplexExpr {
+	public static void main(String[] args) {
+		ioPlus.printHelloWorld();
+	}
+
+	public int compl(boolean a){
+	    int b;
+	    int[] arr;
+	    boolean c;
+	    int d;
+
+
+
+	    if(a){
+	        b = 0;
+	    }
+	    else{
+	        b = 10 * a + 1 / 4;
+	    }
+
+        {
+	    arr[0] = 2;
+	    arr[1] = 34;
+	    }
+
+
+	    c = b * 5 + 2 < arr[0] / 4;
+
+
+	    return 0;
+	}
+}

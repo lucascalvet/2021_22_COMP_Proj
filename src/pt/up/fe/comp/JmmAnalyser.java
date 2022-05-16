@@ -8,10 +8,7 @@ import java.util.List;
 import pt.up.fe.comp.jmm.analysis.JmmAnalysis;
 import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
 import pt.up.fe.comp.jmm.analysis.SemanticAnalyser;
-import pt.up.fe.comp.jmm.analysis.analysers.FunctionVerifier;
-import pt.up.fe.comp.jmm.analysis.analysers.SingleMainMethodCheck;
-import pt.up.fe.comp.jmm.analysis.analysers.SuperImportCheck;
-import pt.up.fe.comp.jmm.analysis.analysers.TypeVerifier;
+import pt.up.fe.comp.jmm.analysis.analysers.*;
 import pt.up.fe.comp.jmm.analysis.table.JmmSymbolTable;
 import pt.up.fe.comp.jmm.analysis.table.SymbolTable;
 import pt.up.fe.comp.jmm.parser.JmmParserResult;
@@ -23,7 +20,7 @@ public class JmmAnalyser implements JmmAnalysis {
     public JmmSemanticsResult semanticAnalysis(JmmParserResult parserResult) {
         JmmSymbolTable symbolTable = new JmmSymbolTable(parserResult.getRootNode());
         List <Report> reports = symbolTable.getReports();
-        List <SemanticAnalyser> analysers = Arrays.asList(new SingleMainMethodCheck(symbolTable), new FunctionVerifier(parserResult.getRootNode(), symbolTable), new TypeVerifier(parserResult.getRootNode(), symbolTable), new SuperImportCheck(symbolTable));
+        List <SemanticAnalyser> analysers = Arrays.asList(new SingleMainMethodCheck(symbolTable), new FunctionVerifier(parserResult.getRootNode(), symbolTable), new TypeVerifier(parserResult.getRootNode(), symbolTable), new SuperImportCheck(symbolTable), new BlockVerifier(parserResult.getRootNode(), symbolTable));
 
         for(var analyser : analysers){
             System.out.println(analyser.toString());
