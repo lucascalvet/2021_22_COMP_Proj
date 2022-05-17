@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Collector extends AJmmVisitor<Boolean, Integer> {
-    protected int visits;
+    protected int visits = 0;
     private List<Report> reports = new ArrayList<>();
 
     protected Integer visitDefault(JmmNode node, Boolean dummy) {
@@ -20,5 +20,9 @@ public abstract class Collector extends AJmmVisitor<Boolean, Integer> {
 
     public List<Report> getReports(){
         return this.reports;
+    }
+
+    protected void addReport(Report report){
+        this.reports.add(report);
     }
 }

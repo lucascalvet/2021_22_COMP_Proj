@@ -32,7 +32,7 @@ public class FieldsCollector extends Collector {
             if (child.getKind().equals(AstNode.TYPE.toString())){
                 switch(child.get("type")){
                     case "custom":
-                        t = new Type(child.getChildren().get(0).get("name"), false);
+                        t = new Type(child.getJmmChild(0).get("name"), false);
                         break;
                     case "int array":
                         t = new Type("int", true);
@@ -48,10 +48,6 @@ public class FieldsCollector extends Collector {
         }
         this.fields.add(new Symbol(t, n));
         return ++visits;
-    }
-
-    private String getCustomVarType(JmmNode custom_var){
-        return custom_var.getChildren().get(0).get("name");
     }
 }
 

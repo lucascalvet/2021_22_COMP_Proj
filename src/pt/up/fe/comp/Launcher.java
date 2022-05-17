@@ -67,14 +67,14 @@ public class Launcher {
         // Check if there are parsing errors
         TestUtils.noErrors(optimizationResult.getReports());
 
-//        // Instantiate jasminBackend
-//        JasminBackendClass jasminBackend = new JasminBackendClass();
-//
-//        // Jasmin Backend stage
-//        JasminResult jasminResult = jasminBackend.toJasmin(ollirCode);
-//
-//        // Check if there are parsing errors
-//        TestUtils.noErrors(jasminResult.getReports());
+        // Instantiate jasminBackend
+        JasminBackendClass jasminBackend = new JasminBackendClass();
+
+        // Jasmin Backend stage
+        JasminResult jasminResult = jasminBackend.toJasmin(ollirCode);
+
+        // Check if there are parsing errors
+        TestUtils.noErrors(jasminResult.getReports());
 
         // ... add remaining stages
 

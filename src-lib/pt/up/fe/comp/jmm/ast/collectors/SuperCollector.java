@@ -8,7 +8,7 @@ public class SuperCollector extends Collector {
 
     public SuperCollector() {
         this.visits = 0;
-        this.super_name = null;
+        this.super_name = "";
         addVisit(AstNode.PROGRAM, this::visitDefault);
         addVisit(AstNode.CLASS_DECL, this::visitDefault);
         addVisit(AstNode.EXTENDS, this::visitExtends);
@@ -20,7 +20,7 @@ public class SuperCollector extends Collector {
     }
 
     private Integer visitExtends(JmmNode super_extends, Boolean dummy) {
-        this.super_name = super_extends.getChildren().get(0).get("name");
+        this.super_name = super_extends.getJmmChild(0).get("name");
         return ++visits;
     }
 }

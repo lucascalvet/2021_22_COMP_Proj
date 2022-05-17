@@ -192,6 +192,10 @@ public class TestUtils {
 
         JmmAnalysis analysis = getJmmAnalysis();
 
+        for(Report rep : analysis.semanticAnalysis(parserResult).getReports()){
+            System.out.println(rep);
+        }
+
         return analysis.semanticAnalysis(parserResult);
     }
 
@@ -351,6 +355,7 @@ public class TestUtils {
      * @param provider
      */
     public static void noErrors(ReportsProvider provider) {
+        System.out.println(provider.getReports());
         noErrors(provider.getReports());
     }
 

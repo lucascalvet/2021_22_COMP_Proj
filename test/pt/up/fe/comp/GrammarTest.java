@@ -96,7 +96,7 @@ public class GrammarTest {
 
     @Test
     public void testStmtIfElse() {
-        noErrors("if(a){ifStmt1;ifStmt2;}else{elseStmt1;elseStmt2;}", STATEMENT);
+        noErrors("if(a + 5){ifStmt1;ifStmt2;}else{elseStmt1;elseStmt2;}", STATEMENT);
     }
 
     @Test
@@ -231,7 +231,7 @@ public class GrammarTest {
 
     @Test
     public void testExprSub() {
-        noErrors("2 - 3", EXPRESSION);
+        noErrors("v - 3", EXPRESSION);
     }
 
     @Test
