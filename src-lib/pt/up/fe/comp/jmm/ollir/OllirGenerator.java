@@ -7,6 +7,7 @@ import pt.up.fe.comp.jmm.ast.AstNode;
 import pt.up.fe.comp.jmm.ast.JmmNode;
 import pt.up.fe.comp.jmm.ast.visitors.AJmmVisitor;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,8 +16,14 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
     private final SymbolTable symbolTable;
     private String methodSignature = null;
     private Type varType;
+    private boolean isAssign = false;
+    private boolean wasField = false;
+
+    private String simpleExpression;
     private Integer tempVarCounter = 0;
     private Integer labelCounter = 0;
+    private static final Type INT_TYPE = new Type("int", false);
+    private static final Type BOOL_TYPE = new Type("bool", false);
 
     public OllirGenerator(SymbolTable symbolTable) {
         this.code = new StringBuilder();
@@ -28,8 +35,8 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
         addVisit(AstNode.ASSIGN, this::assignVisit);
         addVisit(AstNode.ID, this::idVisit);
         addVisit(AstNode.INT, this::intVisit);
-        addVisit(AstNode.TRUE, this::trueVisit);
-        addVisit(AstNode.FALSE, this::falseVisit);
+        addVisit(AstNode.TRUE, this::boolVisit);
+        addVisit(AstNode.FALSE, this::boolVisit);
         addVisit(AstNode.NEW, this::newVisit);
         addVisit(AstNode.ACCESS, this::accessVisit);
         addVisit(AstNode.ARRAY_ACCESS, this::arrayAccessVisit);
@@ -39,6 +46,8 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
         addVisit(AstNode.SUBTRACT, this::opVisit);
         addVisit(AstNode.MULTIPLY, this::opVisit);
         addVisit(AstNode.DIVIDE, this::opVisit);
+        addVisit(AstNode.LOWER, this::opVisit);
+        addVisit(AstNode.AND, this::opVisit);
         addVisit(AstNode.IF, this::ifVisit);
         addVisit(AstNode.WHILE, this::whileVisit);
     }
@@ -49,6 +58,10 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
 
     private String getLabel() {
         return "Label" + labelCounter++;
+    }
+
+    private String getTemp() {
+        return "t" + tempVarCounter++;
     }
 
     private Integer programVisit(JmmNode program, Integer dummy) {
@@ -65,7 +78,7 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
     private Integer classDeclVisit(JmmNode classDecl, Integer dummy) {
         code.append("public ").append(symbolTable.getClassName());
         String superClass = symbolTable.getSuper();
-        if (superClass != null) {
+        if (!superClass.isEmpty()) {
             code.append(" extends ").append(superClass);
         }
 
@@ -124,7 +137,10 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
         for (var stmt : stmts) {
             if (stmt.getKind().equals(AstNode.VAR.toString())) continue;
             visit(stmt);
-            code.append(";\n");
+            if (!simpleExpression.isEmpty()) {
+                code.append(simpleExpression);
+                code.append(";\n");
+            }
         }
 
         code.append("}\n");
@@ -133,88 +149,180 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
     }
 
     private Integer assignVisit(JmmNode assignNode, Integer dummy) {
-        visit(assignNode.getJmmChild(0));
 
+        visit(assignNode.getJmmChild(1));
+        String right = simpleExpression;
+
+        isAssign = true;
+        visit(assignNode.getJmmChild(0));
+        isAssign = false;
+        code.append(simpleExpression);
+        simpleExpression = "";
+
+        if (wasField) {
+            wasField = false;
+            return 0;
+        }
         code.append(" :=.")
                 .append(OllirUtils.getOllirType(varType.getName()))
                 .append(" ");
 
-        visit(assignNode.getJmmChild(1));
+        code.append(right);
+
+        code.append(";\n");
+
 
         return 0;
     }
 
     private Integer idVisit(JmmNode idNode, Integer dummy) {
-        List<Symbol> parameters = symbolTable.getParameters(methodSignature);
-        List<Symbol> variables = symbolTable.getLocalVariables(methodSignature);
+        final StringBuilder terminalCode = new StringBuilder();
 
         Symbol symbol;
 
+        List<Symbol> variables = symbolTable.getLocalVariables(methodSignature);
         for (Symbol variable : variables) {
             if (variable.getName().equals(idNode.get("name"))) {
                 symbol = variable;
-                code.append(OllirUtils.getCode(symbol));
+                terminalCode.append(OllirUtils.getCode(symbol));
                 varType = symbol.getType();
+                simpleExpression = terminalCode.toString();
                 return 0;
             }
         }
 
+        List<Symbol> parameters = symbolTable.getParameters(methodSignature);
         for (int param_idx = 0; param_idx < parameters.size(); param_idx++) {
             if (parameters.get(param_idx).getName().equals(idNode.get("name"))) {
                 symbol = parameters.get(param_idx);
-                code.append("$")
+                terminalCode.append("$")
                         .append(param_idx + 1)
                         .append(".")
                         .append(OllirUtils.getCode(symbol));
                 varType = symbol.getType();
+                simpleExpression = terminalCode.toString();
                 return 0;
             }
+        }
+
+        List<Symbol> fields = symbolTable.getFields();
+        for (Symbol field : fields) {
+            symbol = field;
+            varType = symbol.getType();
+            if (isAssign) {
+                wasField = true;
+                JmmNode valueNode = idNode.getJmmParent().getJmmChild(1);
+                visit(valueNode);
+                if (!valueNode.getKind().equals(AstNode.ID.toString())) {
+                    String temp = getTemp();
+                    code.append(temp)
+                            .append(".")
+                            .append(OllirUtils.getCode(varType))
+                            .append(" :=.")
+                            .append(OllirUtils.getCode(varType))
+                            .append(" ")
+                            .append(simpleExpression)
+                            .append(";\n");
+
+                    simpleExpression = temp + "." + OllirUtils.getCode(varType);
+                }
+                terminalCode.append("putfield(this, ")
+                        .append(OllirUtils.getCode(symbol))
+                        .append(", ")
+                        .append(simpleExpression)
+                        .append(").V;\n");
+
+                simpleExpression = terminalCode.toString();
+                return 0;
+            }
+            String temp = getTemp();
+            code.append(temp)
+                    .append(".")
+                    .append(OllirUtils.getCode(symbol.getType()))
+                    .append(" :=.")
+                    .append(OllirUtils.getCode(symbol.getType()))
+                    .append(" getfield(this, ")
+                    .append(OllirUtils.getCode(symbol))
+                    .append(").")
+                    .append(OllirUtils.getCode(symbol.getType()))
+                    .append(";\n");
+
+            simpleExpression = temp + "." + OllirUtils.getCode(symbol.getType());
         }
 
         return 0;
     }
 
     private Integer intVisit(JmmNode intNode, Integer dummy) {
-        Type type = new Type("int", false);
+        final StringBuilder terminalCode = new StringBuilder();
 
-        code.append(intNode.get("value"))
+        terminalCode.append(intNode.get("value"))
                 .append(".")
-                .append(OllirUtils.getCode(type));
+                .append(OllirUtils.getCode(INT_TYPE));
 
+        simpleExpression = terminalCode.toString();
         return 0;
     }
 
-    private Integer trueVisit(JmmNode trueNode, Integer dummy) {
-        code.append("1.bool");
-        return 0;
-    }
+    private Integer boolVisit(JmmNode boolNode, Integer dummy) {
+        final StringBuilder terminalCode = new StringBuilder();
 
-    private Integer falseVisit(JmmNode falseNode, Integer dummy) {
-        code.append("0.bool");
+        if (boolNode.getKind().equals(AstNode.TRUE.toString())) terminalCode.append("1.");
+        else if (boolNode.getKind().equals(AstNode.FALSE.toString())) terminalCode.append("0.");
+
+        terminalCode.append(OllirUtils.getCode(BOOL_TYPE));
+
+        simpleExpression = terminalCode.toString();
         return 0;
     }
 
     private Integer newVisit(JmmNode newNode, Integer dummy) {
+
+
         if (newNode.getJmmChild(0).getKind().equals(AstNode.INT_TYPE.toString())) {
-            Type type = new Type("int", true);
-            code.append("new(array, ");
             visit(newNode.getJmmChild(1));
-            code.append(").")
-                    .append(OllirUtils.getCode(type));
+
+            if (!(newNode.getJmmChild(1).getKind().equals(AstNode.ID.toString()) || newNode.getJmmChild(1).getKind().equals(AstNode.INT.toString()))) {
+                final String temp = getTemp();
+
+                code.append(temp)
+                        .append(".")
+                        .append(OllirUtils.getCode(INT_TYPE))
+                        .append(" :=.")
+                        .append(OllirUtils.getCode(INT_TYPE))
+                        .append(" ")
+                        .append(simpleExpression)
+                        .append(";\n");
+
+                simpleExpression = temp;
+            }
+
+            final StringBuilder terminalCode = new StringBuilder();
+
+            terminalCode.append("new(array, ")
+                    .append(simpleExpression)
+                    .append(").")
+                    .append(OllirUtils.getCode(INT_TYPE));
+
+            simpleExpression = terminalCode.toString();
             return 0;
         }
 
+        final StringBuilder terminalCode = new StringBuilder();
+
         String typeName = newNode.getJmmChild(0).get("name");
 
-        code.append("new(")
+        terminalCode.append("new(")
                 .append(typeName)
                 .append(").")
                 .append(typeName)
                 .append(";\ninvokespecial(");
 
         visit(newNode.getJmmParent().getJmmChild(0));
+        terminalCode.append(simpleExpression)
+                .append(", \"<init>\").V");
 
-        code.append(", \"<init>\").V");
+        simpleExpression = terminalCode.toString();
 
         return 0;
     }
@@ -223,70 +331,152 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
         JmmNode chained = accessNode.getJmmChild(1);
 
         if (chained.getJmmChild(0).getKind().equals(AstNode.LENGTH.toString())) {
-            code.append("arraylength(");
             visit(accessNode.getJmmChild(0));
-            Type type = new Type("int", false);
-            code.append(").")
-                    .append(OllirUtils.getCode(type));
+            final StringBuilder terminalCode = new StringBuilder();
+
+            terminalCode.append("arraylength(")
+                    .append(simpleExpression)
+                    .append(").")
+                    .append(OllirUtils.getCode(INT_TYPE));
+
+            simpleExpression = terminalCode.toString();
 
             return 0;
         }
 
         //TODO: Detect if Id is from an import, and call invokestatic.
-
-        code.append("invokevirtual(");
+        final StringBuilder terminalCode = new StringBuilder();
 
         visit(accessNode.getJmmChild(0));
 
-        code.append(", \"")
+        List<String> argsExpr = new ArrayList<>();
+        JmmNode args = chained.getJmmChild(1);
+        for (JmmNode arg : args.getChildren()) {
+            visit(arg);
+            argsExpr.add(simpleExpression);
+        }
+
+        terminalCode.append("invokevirtual(");
+
+        terminalCode.append(simpleExpression);
+
+        terminalCode.append(", \"")
                 .append(chained.getJmmChild(0).get("name"))
                 .append("\"");
 
-        JmmNode args = chained.getJmmChild(1);
-
-        for (JmmNode arg : args.getChildren()) {
-            code.append(", ");
-            visit(arg);
+        for (String arg : argsExpr) {
+            terminalCode.append(", ");
+            terminalCode.append(arg);
         }
 
-        code.append(")");
+        terminalCode.append(").")
+                .append(OllirUtils.getCode(varType)); //TODO: Figure out the type when void
+
+        simpleExpression = terminalCode.toString();
 
         return 0;
     }
 
     private Integer arrayAccessVisit(JmmNode arrayAccessNode, Integer dummy) {
-        JmmNode idNode = arrayAccessNode.getJmmChild(0);
+        final StringBuilder terminalCode = new StringBuilder();
 
-        List<Symbol> parameters = symbolTable.getParameters(methodSignature);
-        List<Symbol> variables = symbolTable.getLocalVariables(methodSignature);
+        JmmNode idNode = arrayAccessNode.getJmmChild(0);
 
         Symbol symbol;
 
+        List<Symbol> variables = symbolTable.getLocalVariables(methodSignature);
         for (Symbol variable : variables) {
             if (variable.getName().equals(idNode.get("name")) && variable.getType().isArray()) {
+                JmmNode indexNode = arrayAccessNode.getJmmChild(1).getJmmChild(0);
+                visit(indexNode);
+                if (!indexNode.getKind().equals(AstNode.ID.toString())) {
+                    String temp = getTemp();
+                    code.append(temp)
+                            .append(".")
+                            .append(OllirUtils.getCode(INT_TYPE))
+                            .append(" :=.")
+                            .append(OllirUtils.getCode(INT_TYPE))
+                            .append(" ")
+                            .append(simpleExpression)
+                            .append(";\n");
+
+                    simpleExpression = temp + "." + OllirUtils.getCode(INT_TYPE);
+                }
                 symbol = variable;
-                code.append(symbol.getName())
-                        .append("[");
-                visit(arrayAccessNode.getJmmChild(1).getJmmChild(0));
-                code.append("].")
+                terminalCode.append(symbol.getName())
+                        .append("[")
+                        .append(simpleExpression)
+                        .append("].")
                         .append(OllirUtils.getOllirType(symbol.getType().getName()));
                 varType = symbol.getType();
+
+                simpleExpression = terminalCode.toString();
                 return 0;
             }
         }
 
+
+        List<Symbol> parameters = symbolTable.getParameters(methodSignature);
         for (int param_idx = 0; param_idx < parameters.size(); param_idx++) {
             if (parameters.get(param_idx).getName().equals(idNode.get("name")) && parameters.get(param_idx).getType().isArray()) {
+                JmmNode indexNode = arrayAccessNode.getJmmChild(1).getJmmChild(0);
+                visit(indexNode);
+                if (!indexNode.getKind().equals(AstNode.ID.toString())) {
+                    String temp = getTemp();
+                    code.append(temp)
+                            .append(".")
+                            .append(OllirUtils.getCode(INT_TYPE))
+                            .append(" :=.")
+                            .append(OllirUtils.getCode(INT_TYPE))
+                            .append(" ")
+                            .append(simpleExpression)
+                            .append(";\n");
+
+                    simpleExpression = temp + "." + OllirUtils.getCode(INT_TYPE);
+                }
                 symbol = parameters.get(param_idx);
-                code.append("$")
+                terminalCode.append("$")
                         .append(param_idx + 1)
                         .append(".")
                         .append(symbol.getName())
-                        .append("[");
-                visit(arrayAccessNode.getJmmChild(1).getJmmChild(0));
-                code.append("].")
+                        .append("[")
+                        .append(simpleExpression)
+                        .append("].")
                         .append(OllirUtils.getCode(symbol.getType()));
                 varType = symbol.getType();
+
+                simpleExpression = terminalCode.toString();
+                return 0;
+            }
+        }
+
+        List<Symbol> fields = symbolTable.getFields();
+        for (Symbol field : fields) {
+            if (field.getName().equals(idNode.get("name")) && field.getType().isArray()) {
+                JmmNode indexNode = arrayAccessNode.getJmmChild(1).getJmmChild(0);
+                visit(indexNode);
+                if (!indexNode.getKind().equals(AstNode.ID.toString())) {
+                    String temp = getTemp();
+                    code.append(temp)
+                            .append(".")
+                            .append(OllirUtils.getCode(INT_TYPE))
+                            .append(" :=.")
+                            .append(OllirUtils.getCode(INT_TYPE))
+                            .append(" ")
+                            .append(simpleExpression)
+                            .append(";\n");
+
+                    simpleExpression = temp + "." + OllirUtils.getCode(INT_TYPE);
+                }
+                symbol = field;
+                terminalCode.append(symbol.getName())
+                        .append("[")
+                        .append(simpleExpression)
+                        .append("].")
+                        .append(OllirUtils.getOllirType(symbol.getType().getName()));
+                varType = symbol.getType();
+
+                simpleExpression = terminalCode.toString();
                 return 0;
             }
         }
@@ -297,45 +487,98 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
     private Integer blockVisit(JmmNode blockNode, Integer dummy) {
         for (JmmNode stmt : blockNode.getChildren()) {
             visit(stmt);
-            code.append(";\n");
+            code.append(simpleExpression);
         }
-
+        simpleExpression = "";
         return 0;
     }
 
     private Integer returnVisit(JmmNode retNode, Integer dummy) {
-        code.append("ret.")
-                .append(OllirUtils.getCode(symbolTable.getReturnType(methodSignature)))
-                .append(" ");
+        final StringBuilder terminalCode = new StringBuilder();
 
         visit(retNode.getJmmChild(0));
+        terminalCode.append("ret.")
+                .append(OllirUtils.getCode(symbolTable.getReturnType(methodSignature)))
+                .append(" ")
+                .append(simpleExpression);
 
+        simpleExpression = terminalCode.toString();
         return 0;
     }
 
     private Integer opVisit(JmmNode opNode, Integer dummy) {
-        Type type = new Type("int", false);
+        final StringBuilder terminalCode = new StringBuilder();
 
-        visit(opNode.getJmmChild(0));
-
-        code.append(" ");
+        String op = "";
+        Type type = INT_TYPE;
 
         if (opNode.getKind().equals(AstNode.ADD.toString())) {
-            code.append("+");
+            op = "+";
         } else if (opNode.getKind().equals(AstNode.SUBTRACT.toString())) {
-            code.append("-");
+            op = "-";
         } else if (opNode.getKind().equals(AstNode.MULTIPLY.toString())) {
-            code.append("*");
+            op = "*";
         } else if (opNode.getKind().equals(AstNode.DIVIDE.toString())) {
-            code.append("/");
+            op = "/";
+        } else if (opNode.getKind().equals(AstNode.LOWER.toString())) {
+            op = "<";
+            type = BOOL_TYPE;
+        } else if (opNode.getKind().equals(AstNode.AND.toString())) {
+            op = "&&";
+            type = BOOL_TYPE;
         }
 
-        code.append(".")
-                .append(OllirUtils.getCode(type))
-                .append(" ");
-
+        visit(opNode.getJmmChild(0));
+        String leftExpr = simpleExpression;
+        Type leftType = varType;
         visit(opNode.getJmmChild(1));
+        String rightExpr = simpleExpression;
+        Type rightType = varType;
 
+        if (!(opNode.getJmmChild(0).getKind().equals(AstNode.INT.toString())
+                || opNode.getJmmChild(0).getKind().equals(AstNode.TRUE.toString())
+                || opNode.getJmmChild(0).getKind().equals(AstNode.FALSE.toString())
+                || opNode.getJmmChild(0).getKind().equals(AstNode.ID.toString()))) {
+            String temp = getTemp();
+
+            code.append(temp)
+                    .append(".")
+                    .append(OllirUtils.getCode(leftType))
+                    .append(" :=.")
+                    .append(OllirUtils.getCode(leftType))
+                    .append(" ")
+                    .append(leftExpr)
+                    .append(";\n");
+
+            leftExpr = temp + "." + OllirUtils.getCode(leftType);
+        }
+        if (!(opNode.getJmmChild(1).getKind().equals(AstNode.INT.toString())
+                || opNode.getJmmChild(1).getKind().equals(AstNode.TRUE.toString())
+                || opNode.getJmmChild(1).getKind().equals(AstNode.FALSE.toString())
+                || opNode.getJmmChild(1).getKind().equals(AstNode.ID.toString()))) {
+            String temp = getTemp();
+
+            code.append(temp)
+                    .append(".")
+                    .append(OllirUtils.getCode(rightType))
+                    .append(" :=.")
+                    .append(OllirUtils.getCode(rightType))
+                    .append(" ")
+                    .append(rightExpr)
+                    .append(";\n");
+
+            rightExpr = temp + "." + OllirUtils.getCode(rightType);
+        }
+
+        terminalCode.append(leftExpr)
+                .append(" ")
+                .append(op)
+                .append(".")
+                .append(OllirUtils.getCode(type))
+                .append(" ")
+                .append(rightExpr);
+
+        simpleExpression = terminalCode.toString();
         return 0;
     }
 
@@ -343,17 +586,20 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
         String thenLabel = getLabel();
         String endLabel = getLabel();
 
-        code.append("if (");
         // Condition
-        visit(ifNode.getJmmChild(0));
-        code.append(") goto ")
+        visit(ifNode.getJmmChild(0).getJmmChild(0));
+
+        code.append("if (")
+                .append(simpleExpression)
+                .append(") goto ")
                 .append(thenLabel)
                 .append(";\n");
 
         // Else block
-        visit(ifNode.getJmmChild(2));
+        visit(ifNode.getJmmChild(2).getJmmChild(0));
 
-        code.append("goto ")
+        code.append(simpleExpression)
+                .append("goto ")
                 .append(endLabel)
                 .append(";\n")
                 .append(thenLabel)
@@ -362,8 +608,11 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
         // Then block
         visit(ifNode.getJmmChild(1));
 
-        code.append(endLabel)
+        code.append(simpleExpression)
+                .append(endLabel)
                 .append(":\n");
+
+        simpleExpression = "";
 
         return 0;
     }
@@ -376,25 +625,30 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
         code.append(loopLabel)
                 .append(":\n");
 
-        //TODO: "if" here
-        code.append("IF...")
-                .append("goto ")
-                .append(bodyLabel)
-                .append(";\n");
+        // Condition
+        visit(whileNode.getJmmChild(0).getJmmChild(0));
 
-        code.append("goto ")
+        code.append("if (")
+                .append(simpleExpression)
+                .append(") goto ")
+                .append(bodyLabel)
+                .append(";\n")
+                .append("goto ")
                 .append(endLoopLabel)
                 .append(";\n")
                 .append(bodyLabel)
                 .append(":\n");
 
         visit(whileNode.getJmmChild(1));
+        code.append(simpleExpression);
 
         code.append("goto ")
                 .append(loopLabel)
                 .append(";\n")
                 .append(endLoopLabel)
                 .append(":\n");
+
+        simpleExpression = "";
 
         return 0;
     }
