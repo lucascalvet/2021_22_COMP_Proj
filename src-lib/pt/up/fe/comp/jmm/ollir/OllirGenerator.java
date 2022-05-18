@@ -497,6 +497,21 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
         final StringBuilder terminalCode = new StringBuilder();
 
         visit(retNode.getJmmChild(0));
+
+        if (!retNode.getKind().equals(AstNode.ID.toString())) {
+            String temp = getTemp();
+            code.append(temp)
+                    .append(".")
+                    .append(OllirUtils.getCode(INT_TYPE))
+                    .append(" :=.")
+                    .append(OllirUtils.getCode(INT_TYPE))
+                    .append(" ")
+                    .append(simpleExpression)
+                    .append(";\n");
+
+            simpleExpression = temp + "." + OllirUtils.getCode(INT_TYPE);
+        }
+
         terminalCode.append("ret.")
                 .append(OllirUtils.getCode(symbolTable.getReturnType(methodSignature)))
                 .append(" ")
