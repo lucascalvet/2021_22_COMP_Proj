@@ -24,6 +24,7 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
     private Integer labelCounter = 0;
     private static final Type INT_TYPE = new Type("int", false);
     private static final Type BOOL_TYPE = new Type("bool", false);
+    private static final Type VOID_TYPE = new Type("void", false);
 
     public OllirGenerator(SymbolTable symbolTable) {
         this.code = new StringBuilder();
@@ -207,49 +208,51 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
 
         List<Symbol> fields = symbolTable.getFields();
         for (Symbol field : fields) {
-            symbol = field;
-            varType = symbol.getType();
-            if (isAssign) {
-                wasField = true;
-                JmmNode valueNode = idNode.getJmmParent().getJmmChild(1);
-                visit(valueNode);
-                if (!valueNode.getKind().equals(AstNode.ID.toString())) {
-                    String temp = getTemp();
-                    code.append(temp)
-                            .append(".")
-                            .append(OllirUtils.getCode(varType))
-                            .append(" :=.")
-                            .append(OllirUtils.getCode(varType))
-                            .append(" ")
+            if (field.getName().equals(idNode.get("name"))) {
+                symbol = field;
+                varType = symbol.getType();
+                if (isAssign) {
+                    wasField = true;
+                    JmmNode valueNode = idNode.getJmmParent().getJmmChild(1);
+                    visit(valueNode);
+                    if (!valueNode.getKind().equals(AstNode.ID.toString())) {
+                        String temp = getTemp();
+                        code.append(temp)
+                                .append(".")
+                                .append(OllirUtils.getCode(varType))
+                                .append(" :=.")
+                                .append(OllirUtils.getCode(varType))
+                                .append(" ")
+                                .append(simpleExpression)
+                                .append(";\n");
+
+                        simpleExpression = temp + "." + OllirUtils.getCode(varType);
+                    }
+                    terminalCode.append("putfield(this, ")
+                            .append(OllirUtils.getCode(symbol))
+                            .append(", ")
                             .append(simpleExpression)
-                            .append(";\n");
+                            .append(").V;\n");
 
-                    simpleExpression = temp + "." + OllirUtils.getCode(varType);
+                    simpleExpression = terminalCode.toString();
+                    return 0;
                 }
-                terminalCode.append("putfield(this, ")
+                String temp = getTemp();
+                code.append(temp)
+                        .append(".")
+                        .append(OllirUtils.getCode(symbol.getType()))
+                        .append(" :=.")
+                        .append(OllirUtils.getCode(symbol.getType()))
+                        .append(" getfield(this, ")
                         .append(OllirUtils.getCode(symbol))
-                        .append(", ")
-                        .append(simpleExpression)
-                        .append(").V;\n");
+                        .append(").")
+                        .append(OllirUtils.getCode(symbol.getType()))
+                        .append(";\n");
 
-                simpleExpression = terminalCode.toString();
+                simpleExpression = temp + "." + OllirUtils.getCode(symbol.getType());
                 return 0;
             }
-            String temp = getTemp();
-            code.append(temp)
-                    .append(".")
-                    .append(OllirUtils.getCode(symbol.getType()))
-                    .append(" :=.")
-                    .append(OllirUtils.getCode(symbol.getType()))
-                    .append(" getfield(this, ")
-                    .append(OllirUtils.getCode(symbol))
-                    .append(").")
-                    .append(OllirUtils.getCode(symbol.getType()))
-                    .append(";\n");
-
-            simpleExpression = temp + "." + OllirUtils.getCode(symbol.getType());
         }
-
         return 0;
     }
 
@@ -260,6 +263,7 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
                 .append(".")
                 .append(OllirUtils.getCode(INT_TYPE));
 
+        varType = INT_TYPE;
         simpleExpression = terminalCode.toString();
         return 0;
     }
@@ -277,7 +281,6 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
     }
 
     private Integer newVisit(JmmNode newNode, Integer dummy) {
-
 
         if (newNode.getJmmChild(0).getKind().equals(AstNode.INT_TYPE.toString())) {
             visit(newNode.getJmmChild(1));
@@ -339,28 +342,86 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
                     .append(").")
                     .append(OllirUtils.getCode(INT_TYPE));
 
+            varType = INT_TYPE;
             simpleExpression = terminalCode.toString();
 
             return 0;
         }
 
-        //TODO: Detect if Id is from an import, and call invokestatic.
         final StringBuilder terminalCode = new StringBuilder();
-
-        visit(accessNode.getJmmChild(0));
 
         List<String> argsExpr = new ArrayList<>();
         JmmNode args = chained.getJmmChild(1);
         for (JmmNode arg : args.getChildren()) {
             visit(arg);
+            if (!arg.getKind().equals(AstNode.ID.toString())) {
+                String temp = getTemp();
+                code.append(temp)
+                        .append(".")
+                        .append(OllirUtils.getCode(varType))
+                        .append(" :=.")
+                        .append(OllirUtils.getCode(varType))
+                        .append(" ")
+                        .append(simpleExpression)
+                        .append(";\n");
+                simpleExpression = temp + "." + OllirUtils.getCode(varType);
+            }
             argsExpr.add(simpleExpression);
         }
 
-        terminalCode.append("invokevirtual(");
+        simpleExpression = "";
+        visit(accessNode.getJmmChild(0));
 
-        terminalCode.append(simpleExpression);
+        boolean isThis = false;
+        if (accessNode.getJmmChild(0).getKind().equals(AstNode.THIS.toString())) {
+            varType = new Type(symbolTable.getClassName(), false);
+            simpleExpression = "this";
+            isThis = true;
+        }
 
-        terminalCode.append(", \"")
+        // Check if it is a static method invocation from an import
+        if (!isThis && simpleExpression.isEmpty()) {
+            List<String> imports = symbolTable.getImports();
+            for (String importName : imports) {
+                if (importName.equals(accessNode.getJmmChild(0).get("name"))) {
+                    terminalCode.append("invokestatic(")
+                            .append(importName)
+                            .append(", \"")
+                            .append(chained.getJmmChild(0).get("name"))
+                            .append("\"");
+
+                    for (String arg : argsExpr) {
+                        terminalCode.append(", ");
+                        terminalCode.append(arg);
+                    }
+
+                    terminalCode.append(").");
+
+                    if (isAssign) {
+                        terminalCode.append(varType);
+                    }
+                    else {
+                        terminalCode.append("V");
+                    }
+
+                    varType = VOID_TYPE;
+                    simpleExpression = terminalCode.toString();
+
+                    return 0;
+                }
+            }
+        }
+
+        if (varType.getName().equals(symbolTable.getClassName())) {
+            varType = symbolTable.getReturnType(chained.getJmmChild(0).get("name"));
+        }
+        else {
+            varType = VOID_TYPE;
+        }
+
+        terminalCode.append("invokevirtual(")
+                .append(simpleExpression)
+                .append(", \"")
                 .append(chained.getJmmChild(0).get("name"))
                 .append("\"");
 
@@ -370,7 +431,7 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
         }
 
         terminalCode.append(").")
-                .append(OllirUtils.getCode(varType)); //TODO: Figure out the type when void
+                .append(OllirUtils.getCode(varType));
 
         simpleExpression = terminalCode.toString();
 
