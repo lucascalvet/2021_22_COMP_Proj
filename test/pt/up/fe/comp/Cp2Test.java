@@ -228,13 +228,6 @@ public class Cp2Test {
     }
 
     @Test
-    public void test_1_20_ComplexExpr() {
-        var result = TestUtils
-                .analyse(SpecsIo.getResource("fixtures/public/cp2/ComplexExpr.jmm"));
-        TestUtils.mustFail(result);
-    }
-
-    @Test
     public void test_2_01_CompileBasic() {
         testJmmCompilation("fixtures/public/cp2/CompileBasic.jmm", this::ollirTest_2_01_CompileBasic);
     }
@@ -327,8 +320,11 @@ public class Cp2Test {
         assertNotNull("Could not find method " + methodName, methodFoo);
 
         var binOpInst = methodFoo.getInstructions().stream()
-                .filter(inst -> inst instanceof BinaryOpInstruction)
+                .filter(inst -> inst instanceof AssignInstruction)
+                .map(instr -> (AssignInstruction)instr)
+                .filter(assign -> assign.getRhs() instanceof BinaryOpInstruction)
                 .findFirst();
+
         assertTrue("Could not find a binary op instruction in method " + methodName, binOpInst.isPresent());
 
         var retInst = methodFoo.getInstructions().stream()
