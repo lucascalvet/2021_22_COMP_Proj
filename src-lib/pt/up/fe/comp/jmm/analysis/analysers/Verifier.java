@@ -27,6 +27,18 @@ public abstract class Verifier extends PreorderJmmVisitor<Boolean, Boolean> impl
         this.reports = new ArrayList<>();
     }
 
+    protected boolean isValidExternal(JmmNode access){
+        if(!access.getKind().equals(AstNode.ACCESS.toString())){
+            return false;
+        }
+        String accessIdName = access.getJmmChild(0).get("name");
+        String className = accessIdName;
+        if(getVar(accessIdName) != null){
+            className = getVar(accessIdName).getType().getName();
+        }
+        return (symbolTable.getSuper().equals(className) || symbolTable.getImports().contains(className));
+    }
+
     protected Symbol getVar(String name){
         if(!this.scope.equals("")){
             for(var local_variable : symbolTable.getLocalVariables(this.scope)){
@@ -79,7 +91,8 @@ public abstract class Verifier extends PreorderJmmVisitor<Boolean, Boolean> impl
                 return new Type("int", false);
             }
             else{
-                return symbolTable.getReturnType(expr.getJmmChild(1).getJmmChild(0).get("name"));
+                Type function_type = symbolTable.getReturnType(expr.getJmmChild(1).getJmmChild(0).get("name"));
+                return function_type;
             }
         }
         if(kind.equals(AstNode.ARRAY_ACCESS.toString())){
