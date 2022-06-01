@@ -276,6 +276,7 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
 
         terminalCode.append(OllirUtils.getCode(BOOL_TYPE));
 
+        varType = BOOL_TYPE;
         simpleExpression = terminalCode.toString();
         return 0;
     }
@@ -563,14 +564,14 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
             String temp = getTemp();
             code.append(temp)
                     .append(".")
-                    .append(OllirUtils.getCode(INT_TYPE))
+                    .append(OllirUtils.getCode(varType))
                     .append(" :=.")
-                    .append(OllirUtils.getCode(INT_TYPE))
+                    .append(OllirUtils.getCode(varType))
                     .append(" ")
                     .append(simpleExpression)
                     .append(";\n");
 
-            simpleExpression = temp + "." + OllirUtils.getCode(INT_TYPE);
+            simpleExpression = temp + "." + OllirUtils.getCode(varType);
         }
 
         terminalCode.append("ret.")
@@ -654,6 +655,7 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
                 .append(" ")
                 .append(rightExpr);
 
+        varType = type;
         simpleExpression = terminalCode.toString();
         return 0;
     }
