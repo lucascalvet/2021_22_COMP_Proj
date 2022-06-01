@@ -41,8 +41,7 @@ public class OllirToJasmin {
 
         //Constructor
         //TODO : solve the problem of file location
-        code.append(SpecsIo.getResource("../test/templates/constructor.txt").replace("${SUPER_CLASS}", qualifiedNameSuper));
-        code.append("\n\n");
+        code.append(buildConstructor(qualifiedNameSuper));
 
         //Methods
         for(var method : classUnit.getMethods()){
@@ -53,6 +52,18 @@ public class OllirToJasmin {
         var result = code.toString();
         System.out.println("\nJasmin Code: \n" + result);
         return result;
+    }
+
+    private String buildConstructor(String qualifiedNameSuper){
+        var result = new StringBuilder();
+        result.append(".method public <init>()V\n");
+        result.append("aload_0\n");
+        result.append("invokenonvirtual ").append(qualifiedNameSuper).append("/<init>()V\n");
+        result.append("return\n");
+        result.append(".end method");
+
+        result.append("\n\n");
+        return result.toString();
     }
 
     private String getCode(Field field) {

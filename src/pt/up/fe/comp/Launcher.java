@@ -96,12 +96,18 @@ public class Launcher {
             System.out.println("    " + rep);
         }
 
-//        System.out.println("   Jasmin reports: ");
-//        for (Report rep : jasminResult.getReports()) {
-//            System.out.println("    " + rep);
-//        }
+        System.out.println("   Jasmin reports: ");
+        for (Report rep : jasminResult.getReports()) {
+            System.out.println("    " + rep);
+        }
 
         System.out.println("\n");
+
+        System.out.println("\n-----------------------------------------------------------------------------------------------------------");
+        System.out.println(" Running... \n");
+
+        jasminResult.compile();
+        jasminResult.run();
     }
 
 }

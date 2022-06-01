@@ -37,12 +37,6 @@ public class OptimizeTest {
     }
 
     @Test
-    public void testLazysort() {
-        var result = TestUtils.optimize(SpecsIo.getResource("fixtures/public/Lazysort.jmm"));
-        TestUtils.noErrors(result.getReports());
-    }
-
-    @Test
     public void testOllirMethodInvocation() {
         var result = TestUtils.optimize(SpecsIo.getResource("fixtures/public/cp2/OllirMethodInvocation.jmm"));
         TestUtils.noErrors(result.getReports());
