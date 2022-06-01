@@ -40,7 +40,6 @@ public class OllirToJasmin {
         }
 
         //Constructor
-        //TODO : solve the problem of file location
         code.append(buildConstructor(qualifiedNameSuper));
 
         //Methods
