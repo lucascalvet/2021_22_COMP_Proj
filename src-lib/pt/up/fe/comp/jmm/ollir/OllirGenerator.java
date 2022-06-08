@@ -145,6 +145,10 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
             }
         }
 
+        if (methodSignature.equals("main")) {
+            code.append("ret.V;\n");
+        }
+
         code.append("}\n");
 
         return 0;
