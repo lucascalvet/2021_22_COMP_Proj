@@ -550,7 +550,10 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
     private Integer blockVisit(JmmNode blockNode, Integer dummy) {
         for (JmmNode stmt : blockNode.getChildren()) {
             visit(stmt);
-            code.append(simpleExpression);
+            if (!simpleExpression.isEmpty()) {
+                code.append(simpleExpression);
+                code.append(";\n");
+            }
         }
         simpleExpression = "";
         return 0;
