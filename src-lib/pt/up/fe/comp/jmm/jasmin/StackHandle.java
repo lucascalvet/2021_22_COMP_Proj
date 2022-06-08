@@ -62,7 +62,7 @@ public class StackHandle {
                 result.append("imul \n");
                 break;
             case DIV:
-                result.append("div \n");
+                result.append("idiv \n");
                 break;
             case ADD:
                 result.append("iadd \n");
