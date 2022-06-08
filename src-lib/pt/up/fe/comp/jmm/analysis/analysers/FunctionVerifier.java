@@ -20,6 +20,8 @@ public class FunctionVerifier extends Verifier{
         super(root, symbolTable);
         addVisit(AstNode.FUNCTION, this::visitFunction);
         addVisit(AstNode.MAIN, this::visitMain);
+        addVisit(AstNode.THIS, this::visitThis);
+        addVisit(AstNode.ID, this::visitId);
         addVisit(AstNode.ACCESS, this::visitAccess);
         addVisit(AstNode.CHAINED, this::visitChained);
     }
@@ -31,6 +33,20 @@ public class FunctionVerifier extends Verifier{
 
     private Boolean visitMain(JmmNode main, Boolean dummy){
         this.scope = "main";
+        return true;
+    }
+
+    private Boolean visitThis(JmmNode node, Boolean dummy){
+        if(this.scope.equals("main")){
+            this.addReport(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(node.get("line")), Integer.valueOf(node.get("col")), "Key-word 'this' found in static method"));
+        }
+        return true;
+    }
+
+    private Boolean visitId(JmmNode node, Boolean dummy){
+        if(this.scope.equals("main") && isField(node.get("name"))){
+            this.addReport(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(node.get("line")), Integer.valueOf(node.get("col")), "Field '" + node.get("name") + "' found in static method"));
+        }
         return true;
     }
 
