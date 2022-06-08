@@ -45,7 +45,7 @@ public class ConversionUtils {
             return "[" + getJasminType(((ArrayType) type).getTypeOfElements());
         }
         if(type.getTypeOfElement() == ElementType.OBJECTREF){
-            return ((ClassType)type).getName();
+            return "L" + ((ClassType)type).getName() + ";";
         }
         return getJasminType(type.getTypeOfElement());
     }

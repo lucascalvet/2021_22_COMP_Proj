@@ -95,7 +95,7 @@ public class ConversionInstructions {
         Type returnType = instruction.getReturnType();
 
         if(returnType.getTypeOfElement() == ElementType.OBJECTREF){
-            result.append("new ").append(utils.getJasminType(returnType)).append("\n");
+            result.append("new ").append(((ClassType) returnType).getName()).append("\n");
             result.append("dup\n");
         } else{
             throw new NotImplementedException(this);
