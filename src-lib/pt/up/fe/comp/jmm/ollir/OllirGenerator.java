@@ -87,6 +87,7 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
 
         List<Symbol> fields = symbolTable.getFields();
 
+
         for (Symbol field : fields) {
             code.append(".field private ")
                     .append(OllirUtils.getCode(field))

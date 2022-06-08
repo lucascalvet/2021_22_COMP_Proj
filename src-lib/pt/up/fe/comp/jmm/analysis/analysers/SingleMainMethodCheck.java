@@ -21,9 +21,11 @@ public class SingleMainMethodCheck implements SemanticAnalyser {
 
     @Override
     public List<Report> getReports(){
+        /*
         if(!symbolTable.getMethods().contains("main")){
             return Arrays.asList(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "Class '" + symbolTable.getClassName() + "' does not contain 'main' method"));
         }
+         */
         return Collections.emptyList();
     }
 

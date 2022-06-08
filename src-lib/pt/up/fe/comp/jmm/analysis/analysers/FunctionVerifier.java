@@ -89,7 +89,7 @@ public class FunctionVerifier extends Verifier{
                         var rparam = this.getExpressionType(arg);
                         var tparam = params.get(i).getType();
                         if(!rparam.equals(tparam)){
-                            this.addReport(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(arg.get("line")), Integer.valueOf(arg.get("col")), "Argument number " + i + " of method " + name + " should be of type " + tparam.toString() + " instead it's " + rparam.toString()));
+                            this.addReport(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(arg.get("line")), Integer.valueOf(arg.get("col")), "Argument number " + (i+1) + " of method " + name + " should be of type " + tparam.toString() + " instead it's " + rparam.toString()));
                             return false;
                         }
                     }
