@@ -98,7 +98,8 @@ public class ConversionInstructions {
             result.append("new ").append(((ClassType) returnType).getName()).append("\n");
             result.append("dup\n");
         } else{
-            throw new NotImplementedException(this);
+            //TODO : new array
+            //throw new NotImplementedException(this);
         }
         return result.toString();
     }

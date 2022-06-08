@@ -42,7 +42,11 @@ public class ConversionUtils {
     public String getJasminType(Type type){
 
         if(type instanceof ArrayType){
-            return "[" + getJasminType(((ArrayType) type).getTypeOfElements());
+            StringBuilder result = new StringBuilder();
+
+            result.append("[".repeat(Math.max(0, ((ArrayType) type).getNumDimensions())));
+            result.append(getJasminType(((ArrayType) type).getArrayType()));
+            return result.toString();
         }
         if(type.getTypeOfElement() == ElementType.OBJECTREF){
             return "L" + ((ClassType)type).getName() + ";";
@@ -75,6 +79,7 @@ public class ConversionUtils {
                 jasminType = type.getClass().getName();
                 break;
             case ARRAYREF:
+                jasminType = "batatas";
                 break;
            /* case OBJECTREF:
                 //TODO: check if right
