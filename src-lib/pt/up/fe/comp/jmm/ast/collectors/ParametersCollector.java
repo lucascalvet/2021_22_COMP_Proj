@@ -63,6 +63,9 @@ public class ParametersCollector extends Collector {
                 if (ts.equals("int array")){
                     t = new Type("int", true);
                 }
+                else if (ts.equals("custom")){
+                    t = new Type(child.getChildren().get(0).get("name"), true);
+                }
                 else{
                     t = new Type(ts, false);
                 }
