@@ -104,6 +104,11 @@ public class Cp2Test {
     }
 
     @Test
+    public void test() {
+        var result = TestUtils.analyse(SpecsIo.getResource("fixtures/public/Lazysort.jmm"));
+        TestUtils.mustFail(result);
+    }
+    @Test
     public void test_1_00_SymbolTable() {
         // System.out.println(TestUtils.parse(SpecsIo.getResource("fixtures/public/cp2/SymbolTable.jmm"))
         // .getRootNode().toTree());
