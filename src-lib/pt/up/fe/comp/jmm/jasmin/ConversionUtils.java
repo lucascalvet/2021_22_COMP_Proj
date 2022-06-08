@@ -78,13 +78,6 @@ public class ConversionUtils {
                 //TODO: check if right
                 jasminType = type.getClass().getName();
                 break;
-            case ARRAYREF:
-                jasminType = "batatas";
-                break;
-           /* case OBJECTREF:
-                //TODO: check if right
-                jasminType = ((Type) (type))//type.getClass().getName();
-                break;*/
             default:
                 throw new NotImplementedException(type);
         }
