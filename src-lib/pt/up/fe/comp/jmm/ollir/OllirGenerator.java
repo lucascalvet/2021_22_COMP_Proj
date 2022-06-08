@@ -38,6 +38,7 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
         addVisit(AstNode.INT, this::intVisit);
         addVisit(AstNode.TRUE, this::boolVisit);
         addVisit(AstNode.FALSE, this::boolVisit);
+        addVisit(AstNode.NOT, this::notVisit);
         addVisit(AstNode.NEW, this::newVisit);
         addVisit(AstNode.ACCESS, this::accessVisit);
         addVisit(AstNode.ARRAY_ACCESS, this::arrayAccessVisit);
@@ -63,6 +64,23 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
 
     private String getTemp() {
         return "t" + tempVarCounter++;
+    }
+
+    private void visitAndCreateTemp(JmmNode expressionNode) {
+        visit(expressionNode);
+        if (!expressionNode.getKind().equals(AstNode.ID.toString())) {
+            String temp = getTemp();
+            code.append(temp)
+                    .append(".")
+                    .append(OllirUtils.getCode(varType))
+                    .append(" :=.")
+                    .append(OllirUtils.getCode(varType))
+                    .append(" ")
+                    .append(simpleExpression)
+                    .append(";\n");
+
+            simpleExpression = temp + "." + OllirUtils.getCode(varType);
+        }
     }
 
     private Integer programVisit(JmmNode program, Integer dummy) {
@@ -219,20 +237,7 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
                 if (isAssign) {
                     wasField = true;
                     JmmNode valueNode = idNode.getJmmParent().getJmmChild(1);
-                    visit(valueNode);
-                    if (!valueNode.getKind().equals(AstNode.ID.toString())) {
-                        String temp = getTemp();
-                        code.append(temp)
-                                .append(".")
-                                .append(OllirUtils.getCode(varType))
-                                .append(" :=.")
-                                .append(OllirUtils.getCode(varType))
-                                .append(" ")
-                                .append(simpleExpression)
-                                .append(";\n");
-
-                        simpleExpression = temp + "." + OllirUtils.getCode(varType);
-                    }
+                    visitAndCreateTemp(valueNode);
                     terminalCode.append("putfield(this, ")
                             .append(OllirUtils.getCode(symbol))
                             .append(", ")
@@ -283,6 +288,14 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
 
         varType = BOOL_TYPE;
         simpleExpression = terminalCode.toString();
+        return 0;
+    }
+
+    private Integer notVisit(JmmNode notNode, Integer dummy) {
+        JmmNode expressionNode = notNode.getJmmChild(0);
+
+        visitAndCreateTemp(expressionNode);
+        simpleExpression = "!.bool " + simpleExpression;
         return 0;
     }
 
@@ -455,20 +468,7 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
         for (Symbol variable : variables) {
             if (variable.getName().equals(idNode.get("name")) && variable.getType().isArray()) {
                 JmmNode indexNode = arrayAccessNode.getJmmChild(1).getJmmChild(0);
-                visit(indexNode);
-                if (!indexNode.getKind().equals(AstNode.ID.toString())) {
-                    String temp = getTemp();
-                    code.append(temp)
-                            .append(".")
-                            .append(OllirUtils.getCode(INT_TYPE))
-                            .append(" :=.")
-                            .append(OllirUtils.getCode(INT_TYPE))
-                            .append(" ")
-                            .append(simpleExpression)
-                            .append(";\n");
-
-                    simpleExpression = temp + "." + OllirUtils.getCode(INT_TYPE);
-                }
+                visitAndCreateTemp(indexNode);
                 symbol = variable;
                 terminalCode.append(symbol.getName())
                         .append("[")
@@ -487,20 +487,7 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
         for (int param_idx = 0; param_idx < parameters.size(); param_idx++) {
             if (parameters.get(param_idx).getName().equals(idNode.get("name")) && parameters.get(param_idx).getType().isArray()) {
                 JmmNode indexNode = arrayAccessNode.getJmmChild(1).getJmmChild(0);
-                visit(indexNode);
-                if (!indexNode.getKind().equals(AstNode.ID.toString())) {
-                    String temp = getTemp();
-                    code.append(temp)
-                            .append(".")
-                            .append(OllirUtils.getCode(INT_TYPE))
-                            .append(" :=.")
-                            .append(OllirUtils.getCode(INT_TYPE))
-                            .append(" ")
-                            .append(simpleExpression)
-                            .append(";\n");
-
-                    simpleExpression = temp + "." + OllirUtils.getCode(INT_TYPE);
-                }
+                visitAndCreateTemp(indexNode);
                 symbol = parameters.get(param_idx);
                 terminalCode.append("$")
                         .append(param_idx + 1)
@@ -521,20 +508,7 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
         for (Symbol field : fields) {
             if (field.getName().equals(idNode.get("name")) && field.getType().isArray()) {
                 JmmNode indexNode = arrayAccessNode.getJmmChild(1).getJmmChild(0);
-                visit(indexNode);
-                if (!indexNode.getKind().equals(AstNode.ID.toString())) {
-                    String temp = getTemp();
-                    code.append(temp)
-                            .append(".")
-                            .append(OllirUtils.getCode(INT_TYPE))
-                            .append(" :=.")
-                            .append(OllirUtils.getCode(INT_TYPE))
-                            .append(" ")
-                            .append(simpleExpression)
-                            .append(";\n");
-
-                    simpleExpression = temp + "." + OllirUtils.getCode(INT_TYPE);
-                }
+                visitAndCreateTemp(indexNode);
                 symbol = field;
                 terminalCode.append(symbol.getName())
                         .append("[")
@@ -684,8 +658,12 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
         // Else block
         visit(ifNode.getJmmChild(2).getJmmChild(0));
 
-        code.append(simpleExpression)
-                .append("goto ")
+        if (!simpleExpression.isEmpty()) {
+            code.append(simpleExpression);
+            code.append(";\n");
+        }
+
+        code.append("goto ")
                 .append(endLabel)
                 .append(";\n")
                 .append(thenLabel)
@@ -694,8 +672,12 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
         // Then block
         visit(ifNode.getJmmChild(1));
 
-        code.append(simpleExpression)
-                .append(endLabel)
+        if (!simpleExpression.isEmpty()) {
+            code.append(simpleExpression);
+            code.append(";\n");
+        }
+
+        code.append(endLabel)
                 .append(":\n");
 
         simpleExpression = "";
@@ -726,7 +708,11 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
                 .append(":\n");
 
         visit(whileNode.getJmmChild(1));
-        code.append(simpleExpression);
+
+        if (!simpleExpression.isEmpty()) {
+            code.append(simpleExpression);
+            code.append(";\n");
+        }
 
         code.append("goto ")
                 .append(loopLabel)
