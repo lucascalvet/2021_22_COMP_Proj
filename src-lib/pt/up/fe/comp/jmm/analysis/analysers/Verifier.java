@@ -31,6 +31,9 @@ public abstract class Verifier extends PreorderJmmVisitor<Boolean, Boolean> impl
         if(!access.getKind().equals(AstNode.ACCESS.toString())){
             return false;
         }
+        if (!access.getJmmChild(0).getAttributes().contains("name")){
+            return false;
+        }
         String accessIdName = access.getJmmChild(0).get("name");
         String className = accessIdName;
         if(getVar(accessIdName) != null){

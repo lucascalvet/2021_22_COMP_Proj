@@ -35,6 +35,9 @@ public class FunctionVerifier extends Verifier{
     }
 
     private Boolean visitAccess(JmmNode access, Boolean dummy){
+        if(isValidExternal(access)){
+            return true;
+        }
         var child = access.getJmmChild(0);
         if(access.getJmmChild(1).getJmmChild(0).getKind().equals(AstNode.LENGTH.toString())){
             if(!child.getKind().equals(AstNode.ID.toString()) || !this.getVar(child.get("name")).getType().isArray()){
@@ -77,6 +80,9 @@ public class FunctionVerifier extends Verifier{
     }
 
     private Boolean visitChained(JmmNode chained, Boolean dummy){
+        if(isValidExternal(chained.getJmmParent())){
+            return true;
+        }
         var first_child = chained.getJmmChild(0);
         if(!first_child.getKind().equals(AstNode.LENGTH.toString())){
             String name = first_child.get("name");
