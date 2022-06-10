@@ -293,14 +293,16 @@ public class ConversionInstructions {
         StringBuilder result = new StringBuilder();
         result.append(leftInstruction).append(rightInstruction);
         int index = OllirToJasmin.index;
-        String label1 = "IFICMP_"+ (index*2);
-        String label2 = "IFICMP_"+ (index*2+1);
+
+        String label1 = "$IFICMP_"+ (index*2);
+        String label2 = "$IFICMP_"+ (index*2+1);
+
         result.append("if_icmplt ").append(label1).append("\n");
-        result.append("iconst_0");
+        result.append("iconst_0").append("\n");
         result.append("goto ").append(label2).append("\n");
         result.append(label1).append(":\n");
-        result.append("iconst_1");
-        result.append(label1).append(":\n");
+        result.append("iconst_1").append("\n");
+        result.append(label2).append(":\n");
         return result.toString();
     }
 
