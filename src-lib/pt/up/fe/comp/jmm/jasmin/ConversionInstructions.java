@@ -28,6 +28,7 @@ public class ConversionInstructions {
         instructionMap.put(PutFieldInstruction.class, this::getCode);
         instructionMap.put(GotoInstruction.class, this::getCode);
         instructionMap.put(CondBranchInstruction.class, this::getCode);
+        //instructionMap.put()
         this.scope = new HashMap<>();
         this.stackHandle = new StackHandle();
     }
@@ -47,6 +48,14 @@ public class ConversionInstructions {
 
     public String getCode(CondBranchInstruction instruction){
         StringBuilder result = new StringBuilder();
+        if(instruction.getOperands().size() == 1) {
+            Element op1 = instruction.getOperands().get(0);
+            String op11 = stackHandle.load(op1, scope);
+            result.append(op11);
+            result.append("ifne ");
+            result.append(instruction.getLabel()).append("\n");
+        }
+/*
         Element operand1 = instruction.getOperands().get(0);
         Element operand2 = instruction.getOperands().get(1);
 
@@ -69,10 +78,11 @@ public class ConversionInstructions {
                 break;
             default:
                 throw new NotImplementedException(this);
-        }
+        }*/
 
         return result.toString();
     }
+
     public String getCode(CallInstruction instruction){
 
         switch(instruction.getInvocationType()){
@@ -258,19 +268,24 @@ public class ConversionInstructions {
     private String andConversion(String leftInstruction, String rightInstruction) {
         StringBuilder result = new StringBuilder();
         int index = OllirToJasmin.index;
-        String label1 = "IFEQ_"+ (index*2);
-        String label2 = "IFEQ_"+ (index*2+1);
+        String labelFalse = "$isFalse_"+ (index*2);
+        String labelTrue = "$isTrue_"+ (index*2+1);
 
+        //is left 0?
         result.append(leftInstruction);
-        result.append("ifeq ").append(label1).append("\n");
-        result.append(rightInstruction);
-        result.append("ifeq ").append(label1).append("\n");
+        result.append("ifeq ").append(labelFalse).append("\n");
 
-        result.append("iconst_1");
-        result.append("goto ").append(label2).append("\n");
-        result.append(label1).append(":\n");
-        result.append("iconst_0");
-        result.append(label2).append(":\n");
+        //is right 0?
+        result.append(rightInstruction);
+        result.append("ifeq ").append(labelFalse).append("\n");
+
+        //if it is true it reached here
+        result.append("iconst_1").append("\n");
+        result.append("goto ").append(labelTrue ).append("\n"); //jump to the end
+
+        result.append(labelFalse).append(":\n");
+        result.append("iconst_0").append("\n");
+        result.append(labelTrue ).append(":\n");
         return result.toString();
     }
 

@@ -6,8 +6,10 @@ import pt.up.fe.specs.util.SpecsIo;
 import pt.up.fe.specs.util.classmap.FunctionClassMap;
 import pt.up.fe.specs.util.exceptions.NotImplementedException;
 
+import java.awt.*;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class OllirToJasmin {
@@ -114,6 +116,9 @@ public class OllirToJasmin {
         boolean hasReturn = false;
         index = 0;
         for(var instruction : method.getInstructions()){
+            List<String> labels = method.getLabels(instruction);
+            for (String label: labels)
+                code.append(label).append(":\n");
             if(instruction.getInstType()==InstructionType.RETURN) hasReturn = true;
             code.append(inst.getCode(instruction));
             index++;
