@@ -1,62 +1,22 @@
 package pt.up.fe.comp.jasmin;
 
 import org.specs.comp.ollir.*;
-import org.specs.comp.ollir.Type;
 import pt.up.fe.specs.util.classmap.FunctionClassMap;
-import pt.up.fe.specs.util.exceptions.NotImplementedException;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import static pt.up.fe.comp.jasmin.CallInstructions.getCodeNew;
 
 
 public class ConversionInstructions {
-    private final ClassUnit classUnit;
-
-    public ConversionUtils getUtils() {
-        return utils;
-    }
-
-    public HashMap<String, Descriptor> getScope() {
-        return scope;
-    }
-
+    private Element leftSideNew;
+    private String rightSideNew;
     private final ConversionUtils utils;
     private final FunctionClassMap<Instruction, String> instructionMap;
     private HashMap<String, Descriptor> scope;
 
     private boolean assign = false;
 
-    public Element getLeftSideNew() {
-        return leftSideNew;
-    }
-
-    public String getRightSideNew() {
-        return rightSideNew;
-    }
-
-    public void setLeftSideNew(Element leftSideNew) {
-        this.leftSideNew = leftSideNew;
-    }
-
-    public void setRightSideNew(String rightSideNew) {
-        this.rightSideNew = rightSideNew;
-    }
-
-    private Element leftSideNew;
-    private String rightSideNew;
-
-    public boolean isAssign() {
-        return assign;
-    }
-
-    public void setAssign(boolean assign) {
-        this.assign = assign;
-    }
-
     public ConversionInstructions(ClassUnit classUnit) {
-        this.classUnit = classUnit;
         this.utils = new ConversionUtils(classUnit);
         this.instructionMap = new FunctionClassMap<>();
         instructionMap.put(CallInstruction.class,this::getCode);
@@ -104,8 +64,6 @@ public class ConversionInstructions {
         return AssignOperation.getCode(instruction, this);
     }
 
-
-    //return
     public String getCode(ReturnInstruction instruction){
         StringBuilder result = new StringBuilder();
         if(!instruction.hasReturnValue()) {
@@ -127,6 +85,38 @@ public class ConversionInstructions {
     public String getCode(PutFieldInstruction instruction){
         return FieldsOperations.getPutFieldCode(instruction, utils, scope);
 
+    }
+
+    public ConversionUtils getUtils() {
+        return utils;
+    }
+
+    public HashMap<String, Descriptor> getScope() {
+        return scope;
+    }
+
+    public Element getLeftSideNew() {
+        return leftSideNew;
+    }
+
+    public String getRightSideNew() {
+        return rightSideNew;
+    }
+
+    public void setLeftSideNew(Element leftSideNew) {
+        this.leftSideNew = leftSideNew;
+    }
+
+    public void setRightSideNew(String rightSideNew) {
+        this.rightSideNew = rightSideNew;
+    }
+
+    public boolean isAssign() {
+        return assign;
+    }
+
+    public void setAssign(boolean assign) {
+        this.assign = assign;
     }
 
 }
