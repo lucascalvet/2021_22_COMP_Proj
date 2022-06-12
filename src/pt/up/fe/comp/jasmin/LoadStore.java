@@ -55,4 +55,12 @@ public class LoadStore {
         return result.toString();
     }
 
+    public static String newArray(Element element, HashMap<String, Descriptor> scope){
+        StringBuilder result = new StringBuilder();
+        //result.append(LoadStore.load(element, scope)).append("\n");
+
+        result.append("newarray " + "int" + "\n");
+        return result.toString();
+    }
+
 }

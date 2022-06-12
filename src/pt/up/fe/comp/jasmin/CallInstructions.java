@@ -1,6 +1,7 @@
 package pt.up.fe.comp.jasmin;
 
 import org.specs.comp.ollir.*;
+import pt.up.fe.specs.util.exceptions.NotImplementedException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -114,16 +115,24 @@ public class CallInstructions {
         return result.toString();
     }
 
-    public static String getCodeNew(CallInstruction instruction) {
+    public static String getCodeNew(CallInstruction instruction, ConversionInstructions converter) {
         StringBuilder result = new StringBuilder();
-        org.specs.comp.ollir.Type returnType = instruction.getReturnType();
+        Type returnType = instruction.getReturnType();
 
         if(returnType.getTypeOfElement() == ElementType.OBJECTREF){
             result.append("new ").append(((ClassType) returnType).getName()).append("\n");
             result.append("dup\n");
         } else{
+            Element element;
+            if(instruction.getListOfOperands().size() != 0){
+                element = instruction.getListOfOperands().get(0);
+            } else {
+                element = instruction.getFirstArg();
+            }
+            result.append(LoadStore.newArray(element, converter.getScope()));
+            //result.append("newarray int\n");
             //TODO : new array
-            //throw new NotImplementedException(this);
+            //throw new NotImplementedException("Array new");
         }
         return result.toString();
     }

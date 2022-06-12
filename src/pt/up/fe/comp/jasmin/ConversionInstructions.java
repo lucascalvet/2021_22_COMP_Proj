@@ -54,7 +54,7 @@ public class ConversionInstructions {
             case invokevirtual:
                 return CallInstructions.getCodeInvokeVirtual(instruction, this);
             case NEW:
-                return getCodeNew(instruction);
+                return getCodeNew(instruction, this);
             default:
                 return "";
         }
