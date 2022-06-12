@@ -1,6 +1,29 @@
 package pt.up.fe.comp.jasmin;
 
+import org.specs.comp.ollir.OperationType;
+import pt.up.fe.specs.util.exceptions.NotImplementedException;
+
 public class BooleanOperations {
+
+    public static String operate(OperationType type, String op1, String op2){
+        StringBuilder result = new StringBuilder();
+        //availar a expressção
+        switch (type){
+            case LTH:
+                result.append(lthConversion(op1, op2));
+                break;
+            case ANDB:
+                result.append(andConversion(op1, op2));
+                break;
+            case NOTB:
+                result.append(notConversion(op1));
+                break;
+            default:
+                throw new NotImplementedException("Binary op");
+        }
+        return result.toString();
+    }
+
     public static String notConversion(String rightInstruction) {
         StringBuilder result = new StringBuilder();
         int index = OllirToJasmin.index;

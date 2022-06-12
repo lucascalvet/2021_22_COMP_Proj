@@ -44,7 +44,6 @@ public class ConversionInstructions {
 
     public String getCode(GotoInstruction instruction){
         return "goto " + instruction.getLabel() + "\n";
-
     }
 
     public String getCode(CondBranchInstruction instruction){

@@ -29,20 +29,7 @@ public class ConditionalOperations {
             BinaryOpInstruction op = (BinaryOpInstruction) operation;
             OperationType type = op.getOperation().getOpType();
 
-            //availar a expressção
-            switch (type){
-                case LTH:
-                    result.append(lthConversion(op1, op2));
-                    break;
-                case ANDB:
-                    result.append(andConversion(op1, op2));
-                    break;
-                case NOTB:
-                    result.append(notConversion(op1));
-                    break;
-                default:
-                    throw new NotImplementedException("Binary op");
-            }
+            result.append(BooleanOperations.operate(type, op1, op2));
 
             result.append("ifne ");
             result.append(instruction.getLabel()).append("\n");

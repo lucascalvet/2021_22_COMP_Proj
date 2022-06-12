@@ -20,7 +20,7 @@ import org.junit.Test;
 import pt.up.fe.comp.CpUtils;
 import pt.up.fe.comp.TestUtils;
 import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
-import pt.up.fe.comp.jasmin.JasminResult;
+import pt.up.fe.comp.jmm.jasmin.JasminResult;
 import pt.up.fe.specs.util.SpecsIo;
 
 public class Cpf2_SemanticAnalysis {
