@@ -5,8 +5,8 @@ import pt.up.fe.specs.util.exceptions.NotImplementedException;
 
 import java.util.HashMap;
 
-public class StackHandle {
-    public String load(Element element, HashMap<String, Descriptor> scope){
+public class LoadStore {
+    public static String load(Element element, HashMap<String, Descriptor> scope){
         StringBuilder result = new StringBuilder();
 
         ElementType type = element.getType().getTypeOfElement();
@@ -33,7 +33,7 @@ public class StackHandle {
         return result.toString();
     }
 
-    public String store(Element element, HashMap<String, Descriptor> scope, String rightSide){
+    public static String store(Element element, HashMap<String, Descriptor> scope, String rightSide){
         StringBuilder result = new StringBuilder();
         ElementType type = element.getType().getTypeOfElement();
 
@@ -55,24 +55,4 @@ public class StackHandle {
         return result.toString();
     }
 
-    public String getOperation(OperationType operationType) {
-        StringBuilder result = new StringBuilder();
-        switch (operationType){
-            case MUL:
-                result.append("imul \n");
-                break;
-            case DIV:
-                result.append("idiv \n");
-                break;
-            case ADD:
-                result.append("iadd \n");
-                break;
-            case SUB:
-                result.append("isub \n");
-                break;
-            default:
-                throw new NotImplementedException(this);
-        }
-        return  result.toString();
-    }
 }

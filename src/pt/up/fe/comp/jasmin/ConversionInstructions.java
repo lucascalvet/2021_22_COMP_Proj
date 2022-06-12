@@ -13,7 +13,7 @@ public class ConversionInstructions {
     private final ConversionUtils utils;
     private final FunctionClassMap<Instruction, String> instructionMap;
     private HashMap<String, Descriptor> scope;
-    private StackHandle stackHandle;
+    //private LoadStore stackHandle;
 
     private boolean assign = false;
     private Element leftSideNew;
@@ -31,7 +31,7 @@ public class ConversionInstructions {
         instructionMap.put(CondBranchInstruction.class, this::getCode);
         //instructionMap.put()
         this.scope = new HashMap<>();
-        this.stackHandle = new StackHandle();
+        //this.stackHandle = new LoadStore();
     }
 
     public void updateScope(HashMap newScope){
@@ -51,7 +51,7 @@ public class ConversionInstructions {
         StringBuilder result = new StringBuilder();
         if(instruction.getOperands().size() == 1) {
             Element op1 = instruction.getOperands().get(0);
-            String op11 = stackHandle.load(op1, scope);
+            String op11 = LoadStore.load(op1, scope);
             result.append(op11);
             result.append("ifne ");
             result.append(instruction.getLabel()).append("\n");
@@ -60,8 +60,8 @@ public class ConversionInstructions {
             Element operand1 = instruction.getOperands().get(0);
             Element operand2 = instruction.getOperands().get(1);
 
-            String op1 = stackHandle.load(operand1, scope);
-            String op2 = stackHandle.load(operand2, scope);
+            String op1 = LoadStore.load(operand1, scope);
+            String op2 = LoadStore.load(operand2, scope);
             Instruction operation = instruction.getCondition();
 
             BinaryOpInstruction op = (BinaryOpInstruction) operation;
@@ -125,16 +125,16 @@ public class ConversionInstructions {
     private String getCodeInvokeVirtual(CallInstruction instruction) {
         StringBuilder result = new StringBuilder();
         ArrayList<Element> operands = instruction.getListOfOperands();
-        org.specs.comp.ollir.Type returnType = instruction.getReturnType();
+        Type returnType = instruction.getReturnType();
         Element firstArg = instruction.getFirstArg();
 
         String className = ((ClassType) firstArg.getType()).getName();
         String methodCall = ((LiteralElement) instruction.getSecondArg()).getLiteral();
 
-        result.append(stackHandle.load(firstArg, scope));
+        result.append(LoadStore.load(firstArg, scope));
 
         for(Element operand : operands){
-            result.append(stackHandle.load(operand, scope));
+            result.append(LoadStore.load(operand, scope));
         }
 
         result.append("invokevirtual ").append(className).append(".");
@@ -163,10 +163,10 @@ public class ConversionInstructions {
         ArrayList<Element> parameters = instruction.getListOfOperands();
         String methodName =  ((LiteralElement) instruction.getSecondArg()).getLiteral().replace("\"", "");
         Element classElement = instruction.getFirstArg();
-        org.specs.comp.ollir.Type returnType = instruction.getReturnType();
+        Type returnType = instruction.getReturnType();
 
         for (Element param : parameters){
-            result.append(stackHandle.load(param, scope));
+            result.append(LoadStore.load(param, scope));
         }
         result.append("invokespecial ").append(((ClassType) classElement.getType()).getName());
         result.append(".").append(methodName);
@@ -179,7 +179,7 @@ public class ConversionInstructions {
 
         result.append(")");
         result.append(utils.getJasminType(returnType)).append("\n");
-        result.append(stackHandle.store(this.leftSideNew, this.scope, this.rightSideNew));
+        result.append(LoadStore.store(this.leftSideNew, this.scope, this.rightSideNew));
 
         return result.toString();
     }
@@ -197,8 +197,8 @@ public class ConversionInstructions {
         switch (type){
             case NOPER:
                 Element single = ((SingleOpInstruction) rightSide).getSingleOperand();
-                right.append(stackHandle.load(single, scope));
-                result.append(stackHandle.load(single, scope));
+                right.append(LoadStore.load(single, scope));
+                result.append(LoadStore.load(single, scope));
                 break;
             case GETFIELD:
                 Element classElement = ((GetFieldInstruction) rightSide).getFirstOperand();
@@ -208,7 +208,7 @@ public class ConversionInstructions {
                 String fieldName = ((Operand) field).getName();
                 String fieldType = utils.getJasminType(field.getType());
 
-                result.append(stackHandle.load(classElement, scope));
+                result.append(LoadStore.load(classElement, scope));
                 result.append("getfield ").append(className).append("/");
                 result.append(fieldName).append(" ").append(fieldType).append("\n");
 
@@ -217,16 +217,16 @@ public class ConversionInstructions {
                 Element rightElement = ((BinaryOpInstruction) rightSide).getRightOperand();
                 Element leftElement = ((BinaryOpInstruction) rightSide).getLeftOperand();
 
-                String leftInstruction = stackHandle.load(leftElement, scope);
-                String rightInstruction = stackHandle.load(rightElement, scope);
+                String leftInstruction = LoadStore.load(leftElement, scope);
+                String rightInstruction = LoadStore.load(rightElement, scope);
                 OperationType operationType = ((BinaryOpInstruction) rightSide).getOperation().getOpType();
 
                 if(operationType == OperationType.ADD || operationType == OperationType.DIV || operationType == OperationType.MUL ||
                         operationType == OperationType.SUB){
 
-                    result.append(stackHandle.load(leftElement, scope));
-                    result.append(stackHandle.load(rightElement, scope));
-                    result.append(stackHandle.getOperation(operationType));
+                    result.append(LoadStore.load(leftElement, scope));
+                    result.append(LoadStore.load(rightElement, scope));
+                    result.append(BinaryOps.getOperation(operationType));
                 } else if(operationType == OperationType.ANDB || operationType == OperationType.LTH || operationType == OperationType.NOTB){
                     switch (operationType){
                         case LTH:
@@ -252,7 +252,7 @@ public class ConversionInstructions {
                 throw new NotImplementedException(this);
         }
         this.rightSideNew = right.toString();
-        result.append(stackHandle.store(leftSide, scope, rightSideNew));
+        result.append(LoadStore.store(leftSide, scope, rightSideNew));
         this.assign = false;
         return result.toString();
     }
@@ -321,7 +321,7 @@ public class ConversionInstructions {
             result.append("return").append("\n");
         } else{
             Element operand = instruction.getOperand();
-            result.append(stackHandle.load(operand, scope));
+            result.append(LoadStore.load(operand, scope));
             ElementType type = instruction.getOperand().getType().getTypeOfElement();
             if (type == ElementType.INT32 || type == ElementType.BOOLEAN){
                 result.append("ireturn").append("\n");
@@ -340,8 +340,8 @@ public class ConversionInstructions {
         Element field = instruction.getSecondOperand();
         Element value = instruction.getThirdOperand();
 
-        result.append(stackHandle.load(classElement, scope));
-        result.append(stackHandle.load(value, scope));
+        result.append(LoadStore.load(classElement, scope));
+        result.append(LoadStore.load(value, scope));
 
         String className = utils.getJasminType(classElement.getType());
         String fieldName = ((Operand) field).getName();
@@ -360,7 +360,7 @@ public class ConversionInstructions {
         ArrayList<Element> parameters = instruction.getListOfOperands();
         Type returnType = instruction.getReturnType();
         for (Element param : parameters){
-            result.append(stackHandle.load(param, scope));
+            result.append(LoadStore.load(param, scope));
         }
         result.append("invokestatic ");
 

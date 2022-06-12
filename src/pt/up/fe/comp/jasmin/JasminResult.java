@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import pt.up.fe.comp.TestUtils;
+import pt.up.fe.comp.jmm.jasmin.JasminUtils;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
 import pt.up.fe.comp.jmm.report.Report;
 import pt.up.fe.comp.jmm.report.ReportsProvider;
