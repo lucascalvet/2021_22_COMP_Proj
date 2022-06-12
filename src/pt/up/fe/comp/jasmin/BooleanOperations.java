@@ -5,6 +5,13 @@ import pt.up.fe.specs.util.exceptions.NotImplementedException;
 
 public class BooleanOperations {
 
+    public static boolean isBooleanOp(OperationType operationType){
+        if(operationType == OperationType.ANDB || operationType == OperationType.LTH || operationType == OperationType.NOTB){
+            return true;
+        }
+        return false;
+    }
+
     public static String operate(OperationType type, String op1, String op2){
         StringBuilder result = new StringBuilder();
         //availar a expressção

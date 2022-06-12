@@ -8,14 +8,12 @@ import pt.up.fe.specs.util.exceptions.NotImplementedException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import static pt.up.fe.comp.jasmin.BooleanOperations.*;
 
 public class ConversionInstructions {
     private final ClassUnit classUnit;
     private final ConversionUtils utils;
     private final FunctionClassMap<Instruction, String> instructionMap;
     private HashMap<String, Descriptor> scope;
-    //private LoadStore stackHandle;
 
     private boolean assign = false;
     private Element leftSideNew;
@@ -180,26 +178,11 @@ public class ConversionInstructions {
                 String rightInstruction = LoadStore.load(rightElement, scope);
                 OperationType operationType = ((BinaryOpInstruction) rightSide).getOperation().getOpType();
 
-                if(operationType == OperationType.ADD || operationType == OperationType.DIV || operationType == OperationType.MUL ||
-                        operationType == OperationType.SUB){
+                if(BinaryOps.isBinaryOp(operationType)){
+                    result.append(BinaryOps.operate(rightElement, leftElement, scope, operationType));
+                } else if(BooleanOperations.isBooleanOp(operationType)){
+                    result.append(BooleanOperations.operate(operationType, leftInstruction, rightInstruction));
 
-                    result.append(LoadStore.load(leftElement, scope));
-                    result.append(LoadStore.load(rightElement, scope));
-                    result.append(BinaryOps.getOperation(operationType));
-                } else if(operationType == OperationType.ANDB || operationType == OperationType.LTH || operationType == OperationType.NOTB){
-                    switch (operationType){
-                        case LTH:
-                            result.append(lthConversion(leftInstruction, rightInstruction));
-                            break;
-                        case ANDB:
-                            result.append(andConversion(leftInstruction, rightInstruction));
-                            break;
-                        case NOTB:
-                            result.append(notConversion(rightInstruction));
-                            break;
-                        default:
-                            throw new NotImplementedException(this);
-                    }
                 }
                 break;
             case CALL:
