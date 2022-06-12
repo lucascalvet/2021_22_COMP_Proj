@@ -1,4 +1,48 @@
 # Compilers Project
+## GROUP 7A
+
+### Two options, **1:**
+| Name | UpNumber | Self Assessment | Contribution |
+| :---: | :---: | :--------------: | :----------: |
+| Ana Matilde Barra | 201904795 | | 25% |
+| Eunice Amorim | 201904920 | | 25% |
+| José Ferreira | 201904515 | | 25% |
+| Lucas Calvet | 201904517 | | 25% |
+
+### or **2:**
+NAME1: Ana Matilde Barra, NR1: 201904795, GRADE1: <0 to 20 value>, CONTRIBUTION1: 25%
+
+NAME2: Eunice Amorim, NR2: 201904920, GRADE2: <0 to 20 value>, CONTRIBUTION2: 25%
+
+NAME3: José Ferreira, NR3: 201904515, GRADE3: <0 to 20 value>, CONTRIBUTION3: 25%
+
+NAME4: Lucas Calvet, NR4: 201904517, GRADE4: <0 to 20 value>, CONTRIBUTION4: 25%
+
+**GLOBAL Grade of the project:** <0 to 20>
+
+
+## SUMMARY:
+(Describe what your tool does and its main features.)
+
+
+## SEMANTIC ANALYSIS:
+(Refer the semantic rules implemented by your tool.)
+
+
+## CODE GENERATION:
+(describe how the code generation of your tool works and identify the possible problems your tool has regarding code generation.)
+
+
+## PROS:
+(Identify the most positive aspects of your tool)
+
+
+## CONS: 
+(Identify the most negative aspects of your tool)
+
+---
+
+## Instructions 
 
 For this project, you need to install [Java](https://jdk.java.net/), [Gradle](https://gradle.org/install/), and [Git](https://git-scm.com/downloads/) (and optionally, a [Git GUI client](https://git-scm.com/downloads/guis), such as TortoiseGit or GitHub Desktop). Please check the [compatibility matrix](https://docs.gradle.org/current/userguide/compatibility.html) for Java and Gradle versions.
 
