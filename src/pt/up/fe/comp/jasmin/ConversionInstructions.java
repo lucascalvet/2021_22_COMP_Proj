@@ -8,12 +8,36 @@ import pt.up.fe.specs.util.exceptions.NotImplementedException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import static pt.up.fe.comp.jasmin.CallInstructions.getCodeNew;
+
 
 public class ConversionInstructions {
     private final ClassUnit classUnit;
+
+    public ConversionUtils getUtils() {
+        return utils;
+    }
+
+    public HashMap<String, Descriptor> getScope() {
+        return scope;
+    }
+
     private final ConversionUtils utils;
     private final FunctionClassMap<Instruction, String> instructionMap;
     private HashMap<String, Descriptor> scope;
+
+    private boolean assign = false;
+
+    public Element getLeftSideNew() {
+        return leftSideNew;
+    }
+
+    public String getRightSideNew() {
+        return rightSideNew;
+    }
+
+    private Element leftSideNew;
+    private String rightSideNew;
 
     public boolean isAssign() {
         return assign;
@@ -22,10 +46,6 @@ public class ConversionInstructions {
     public void setAssign(boolean assign) {
         this.assign = assign;
     }
-
-    private boolean assign = false;
-    private Element leftSideNew;
-    private String rightSideNew;
 
     public ConversionInstructions(ClassUnit classUnit) {
         this.classUnit = classUnit;
@@ -59,94 +79,17 @@ public class ConversionInstructions {
     public String getCode(CallInstruction instruction){
 
         switch(instruction.getInvocationType()){
-            //TODO : ver as outras invocações
             case invokestatic:
-                return getCodeInvokeStatic(instruction);
+                return CallInstructions.getCodeInvokeStatic(instruction, this);
             case invokespecial:
-                return getCodeInvokeSpecial(instruction);
+                return CallInstructions.getCodeInvokeSpecial(instruction, this);
             case invokevirtual:
-                return getCodeInvokeVirtual(instruction);
+                return CallInstructions.getCodeInvokeVirtual(instruction, this);
             case NEW:
                 return getCodeNew(instruction);
             default:
-                return ""; //throw new NotImplementedException(instruction.getInvocationType());
+                return "";
         }
-    }
-
-    private String getCodeNew(CallInstruction instruction) {
-        StringBuilder result = new StringBuilder();
-        org.specs.comp.ollir.Type returnType = instruction.getReturnType();
-
-        if(returnType.getTypeOfElement() == ElementType.OBJECTREF){
-            result.append("new ").append(((ClassType) returnType).getName()).append("\n");
-            result.append("dup\n");
-        } else{
-            //TODO : new array
-            //throw new NotImplementedException(this);
-        }
-        return result.toString();
-    }
-
-    private String getCodeInvokeVirtual(CallInstruction instruction) {
-        StringBuilder result = new StringBuilder();
-        ArrayList<Element> operands = instruction.getListOfOperands();
-        Type returnType = instruction.getReturnType();
-        Element firstArg = instruction.getFirstArg();
-
-        String className = ((ClassType) firstArg.getType()).getName();
-        String methodCall = ((LiteralElement) instruction.getSecondArg()).getLiteral();
-
-        result.append(LoadStore.load(firstArg, scope));
-
-        for(Element operand : operands){
-            result.append(LoadStore.load(operand, scope));
-        }
-
-        result.append("invokevirtual ").append(className).append(".");
-        result.append(methodCall.replace("\"", ""));
-
-        result.append("(");
-
-        for(var operand : operands){
-            result.append(CallInstructions.getArgumentCode(operand, utils));
-        }
-
-        result.append(")");
-
-        result.append(utils.getJasminType(returnType)).append("\n");
-
-        if(!this.assign && returnType.getTypeOfElement() != ElementType.VOID){
-            result.append("pop\n");
-            this.assign = false;
-        }
-
-        return result.toString();
-    }
-
-    private String getCodeInvokeSpecial(CallInstruction instruction) {
-        StringBuilder result = new StringBuilder();
-        ArrayList<Element> parameters = instruction.getListOfOperands();
-        String methodName =  ((LiteralElement) instruction.getSecondArg()).getLiteral().replace("\"", "");
-        Element classElement = instruction.getFirstArg();
-        Type returnType = instruction.getReturnType();
-
-        for (Element param : parameters){
-            result.append(LoadStore.load(param, scope));
-        }
-        result.append("invokespecial ").append(((ClassType) classElement.getType()).getName());
-        result.append(".").append(methodName);
-
-        result.append("(");
-
-        for(var operand : parameters){
-            result.append(CallInstructions.getArgumentCode(operand, utils));
-        }
-
-        result.append(")");
-        result.append(utils.getJasminType(returnType)).append("\n");
-        result.append(LoadStore.store(this.leftSideNew, this.scope, this.rightSideNew));
-
-        return result.toString();
     }
 
     public String getCode(AssignInstruction instruction){
@@ -216,42 +159,6 @@ public class ConversionInstructions {
     public String getCode(PutFieldInstruction instruction){
         return FieldsOperations.getPutFieldCode(instruction, utils, scope);
 
-    }
-
-    private String getCodeInvokeStatic(CallInstruction instruction) {
-        //return CallInstructions.get
-        var result = new StringBuilder();
-
-        ArrayList<Element> parameters = instruction.getListOfOperands();
-        Type returnType = instruction.getReturnType();
-        for (Element param : parameters){
-            result.append(LoadStore.load(param, scope));
-        }
-        result.append("invokestatic ");
-
-        var methodClass = ((Operand) instruction.getFirstArg()).getName();
-        result.append(utils.getFullyQualifiedName(methodClass)).append(".");
-
-        String methodName = ((LiteralElement) instruction.getSecondArg()).getLiteral();
-        result.append(methodName.replace("\"", ""));
-
-        result.append("(");
-
-        for(var operand : parameters){
-            result.append(CallInstructions.getArgumentCode(operand, utils));
-        }
-
-        result.append(")");
-
-        result.append(utils.getJasminType(instruction.getReturnType()));
-        result.append("\n");
-
-        if(!this.assign && returnType.getTypeOfElement() != ElementType.VOID){
-            result.append("pop\n");
-            this.assign = false;
-        }
-
-        return result.toString();
     }
 
 }
