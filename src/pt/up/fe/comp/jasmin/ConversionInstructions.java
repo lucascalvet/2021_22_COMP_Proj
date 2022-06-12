@@ -143,7 +143,7 @@ public class ConversionInstructions {
         result.append("(");
 
         for(var operand : operands){
-            result.append(getArgumentCode(operand));
+            result.append(CallInstructions.getArgumentCode(operand, utils));
         }
 
         result.append(")");
@@ -174,7 +174,7 @@ public class ConversionInstructions {
         result.append("(");
 
         for(var operand : parameters){
-            result.append(getArgumentCode(operand));
+            result.append(CallInstructions.getArgumentCode(operand, utils));
         }
 
         result.append(")");
@@ -355,6 +355,7 @@ public class ConversionInstructions {
     }
 
     private String getCodeInvokeStatic(CallInstruction instruction) {
+        //return CallInstructions.get
         var result = new StringBuilder();
 
         ArrayList<Element> parameters = instruction.getListOfOperands();
@@ -373,7 +374,7 @@ public class ConversionInstructions {
         result.append("(");
 
         for(var operand : parameters){
-            result.append(getArgumentCode(operand));
+            result.append(CallInstructions.getArgumentCode(operand, utils));
         }
 
         result.append(")");
@@ -388,13 +389,5 @@ public class ConversionInstructions {
 
         return result.toString();
     }
-
-    private String getArgumentCode(Element operand) {
-        StringBuilder result = new StringBuilder();
-
-        result.append(utils.getJasminType(operand.getType()));
-        return result.toString();
-    }
-
 
 }
