@@ -77,6 +77,7 @@ public class CallInstructions {
     }
 
     public static String getCodeInvokeVirtual(CallInstruction instruction, ConversionInstructions converter) {
+        //return "aload_1\niload_2 \ninvokevirtual GetterAndSetter.setA(I)I \nistore_3 \n" + "aload_1\ninvokevirtual GetterAndSetter.getA()I\nistore_3\n";
         ConversionUtils utils = converter.getUtils();
         HashMap<String, Descriptor> scope = converter.getScope();
 
@@ -119,6 +120,7 @@ public class CallInstructions {
     }
 
     public static String getCodeNew(CallInstruction instruction, ConversionInstructions converter) {
+        HashMap<String, Descriptor> scope = converter.getScope();
         StringBuilder result = new StringBuilder();
         Type returnType = instruction.getReturnType();
 
@@ -133,6 +135,7 @@ public class CallInstructions {
                 element = instruction.getFirstArg();
             }
             result.append(LoadStore.newArray(element, converter.getScope()));
+            result.append(LoadStore.store(converter.getLeftSideNew(), scope, converter.getRightSideNew()));
             //result.append("newarray int\n");
             //TODO : new array
             //throw new NotImplementedException("Array new");
@@ -140,6 +143,15 @@ public class CallInstructions {
         return result.toString();
     }
 
+    public static String getCodeArrayLength(CallInstruction instruction, ConversionInstructions converter) {
+        StringBuilder result = new StringBuilder();
+        Element arrayLength = instruction.getFirstArg();
+        result.append(LoadStore.load(arrayLength, converter.getScope()));
+        result.append("arraylength\n");
+        result.append(LoadStore.store(converter.getLeftSideNew(), converter.getScope(), converter.getRightSideNew()));
+
+        return result.toString();
+    }
 
     public static String getArgumentCode(Element operand, ConversionUtils utils) {
         StringBuilder result = new StringBuilder();

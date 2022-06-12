@@ -2,8 +2,11 @@ package pt.up.fe.comp.jasmin;
 
 import org.specs.comp.ollir.*;
 import pt.up.fe.specs.util.classmap.FunctionClassMap;
+import pt.up.fe.specs.util.exceptions.NotImplementedException;
+
 import java.util.HashMap;
 
+import static pt.up.fe.comp.jasmin.CallInstructions.getCodeArrayLength;
 import static pt.up.fe.comp.jasmin.CallInstructions.getCodeNew;
 
 
@@ -55,8 +58,10 @@ public class ConversionInstructions {
                 return CallInstructions.getCodeInvokeVirtual(instruction, this);
             case NEW:
                 return getCodeNew(instruction, this);
+            case arraylength:
+                return getCodeArrayLength(instruction, this);
             default:
-                return "";
+                throw new NotImplementedException("Call instruction" + instruction.getInvocationType());
         }
     }
 
