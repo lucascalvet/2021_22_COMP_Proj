@@ -107,10 +107,13 @@ public class CallInstructions {
 
         result.append(utils.getJasminType(returnType)).append("\n");
 
+
         if(!converter.isAssign() && returnType.getTypeOfElement() != ElementType.VOID){
             result.append("pop\n");
             converter.setAssign(false);
         }
+
+        result.append(LoadStore.store(converter.getLeftSideNew(), scope, converter.getRightSideNew()));
 
         return result.toString();
     }
