@@ -36,6 +36,14 @@ public class ConversionInstructions {
         return rightSideNew;
     }
 
+    public void setLeftSideNew(Element leftSideNew) {
+        this.leftSideNew = leftSideNew;
+    }
+
+    public void setRightSideNew(String rightSideNew) {
+        this.rightSideNew = rightSideNew;
+    }
+
     private Element leftSideNew;
     private String rightSideNew;
 
@@ -93,47 +101,7 @@ public class ConversionInstructions {
     }
 
     public String getCode(AssignInstruction instruction){
-        this.assign = true;
-        StringBuilder result = new StringBuilder();
-        Instruction rightSide = instruction.getRhs();
-        Element leftSide = instruction.getDest();
-        this.leftSideNew = instruction.getDest();
-
-        //handling right side
-        StringBuilder right = new StringBuilder();
-        InstructionType type = rightSide.getInstType();
-        switch (type){
-            case NOPER:
-                Element single = ((SingleOpInstruction) rightSide).getSingleOperand();
-                right.append(LoadStore.load(single, scope));
-                result.append(LoadStore.load(single, scope));
-                break;
-            case GETFIELD:
-                Element classElement = ((GetFieldInstruction) rightSide).getFirstOperand();
-                Element field = ((GetFieldInstruction) rightSide).getSecondOperand();
-
-                result.append(FieldsOperations.getGetFieldCode(classElement, field, utils, scope));
-
-                break;
-            case BINARYOPER:
-                Element rightElement = ((BinaryOpInstruction) rightSide).getRightOperand();
-                Element leftElement = ((BinaryOpInstruction) rightSide).getLeftOperand();
-                OperationType operationType = ((BinaryOpInstruction) rightSide).getOperation().getOpType();
-
-                result.append(BinaryOperation.processBinaryOperation(rightElement, leftElement, operationType, scope));
-                break;
-            case CALL:
-                this.rightSideNew = right.toString();
-                result.append(getCode((CallInstruction) rightSide));
-                return result.toString();
-
-            default:
-                throw new NotImplementedException(this);
-        }
-        this.rightSideNew = right.toString();
-        result.append(LoadStore.store(leftSide, scope, rightSideNew));
-        this.assign = false;
-        return result.toString();
+        return AssignOperation.getCode(instruction, this);
     }
 
 
