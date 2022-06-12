@@ -7,9 +7,9 @@ import pt.up.fe.specs.util.exceptions.NotImplementedException;
 
 import java.util.HashMap;
 
-public class BinaryOps {
+public class ArithmeticOps {
 
-    public static boolean isBinaryOp(OperationType operationType){
+    public static boolean isArithmeticOp(OperationType operationType){
         if(operationType == OperationType.ADD || operationType == OperationType.DIV || operationType == OperationType.MUL ||
                 operationType == OperationType.SUB){
             return true;
@@ -22,7 +22,7 @@ public class BinaryOps {
         StringBuilder result = new StringBuilder();
         result.append(LoadStore.load(leftElement, scope));
         result.append(LoadStore.load(rightElement, scope));
-        result.append(BinaryOps.getOperation(operationType));
+        result.append(ArithmeticOps.getOperation(operationType));
         return result.toString();
     }
 

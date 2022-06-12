@@ -1,11 +1,8 @@
 package pt.up.fe.comp.jasmin;
 
 import org.specs.comp.ollir.*;
-import pt.up.fe.specs.util.exceptions.NotImplementedException;
 
 import java.util.HashMap;
-
-import static pt.up.fe.comp.jasmin.BooleanOperations.*;
 
 public class ConditionalOperations {
 

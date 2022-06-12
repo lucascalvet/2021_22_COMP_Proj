@@ -15,6 +15,14 @@ public class ConversionInstructions {
     private final FunctionClassMap<Instruction, String> instructionMap;
     private HashMap<String, Descriptor> scope;
 
+    public boolean isAssign() {
+        return assign;
+    }
+
+    public void setAssign(boolean assign) {
+        this.assign = assign;
+    }
+
     private boolean assign = false;
     private Element leftSideNew;
     private String rightSideNew;
@@ -173,17 +181,9 @@ public class ConversionInstructions {
             case BINARYOPER:
                 Element rightElement = ((BinaryOpInstruction) rightSide).getRightOperand();
                 Element leftElement = ((BinaryOpInstruction) rightSide).getLeftOperand();
-
-                String leftInstruction = LoadStore.load(leftElement, scope);
-                String rightInstruction = LoadStore.load(rightElement, scope);
                 OperationType operationType = ((BinaryOpInstruction) rightSide).getOperation().getOpType();
 
-                if(BinaryOps.isBinaryOp(operationType)){
-                    result.append(BinaryOps.operate(rightElement, leftElement, scope, operationType));
-                } else if(BooleanOperations.isBooleanOp(operationType)){
-                    result.append(BooleanOperations.operate(operationType, leftInstruction, rightInstruction));
-
-                }
+                result.append(BinaryOperation.processBinaryOperation(rightElement, leftElement, operationType, scope));
                 break;
             case CALL:
                 this.rightSideNew = right.toString();
