@@ -1,13 +1,7 @@
-package pt.up.fe.comp.jmm.jasmin;
+package pt.up.fe.comp.jasmin;
 
 import org.specs.comp.ollir.*;
 
-import pt.up.fe.specs.util.SpecsIo;
-import pt.up.fe.specs.util.classmap.FunctionClassMap;
-import pt.up.fe.specs.util.exceptions.NotImplementedException;
-
-import java.awt.*;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;

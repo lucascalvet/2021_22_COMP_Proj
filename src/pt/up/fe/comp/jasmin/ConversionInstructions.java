@@ -1,6 +1,7 @@
-package pt.up.fe.comp.jmm.jasmin;
+package pt.up.fe.comp.jasmin;
 
 import org.specs.comp.ollir.*;
+import org.specs.comp.ollir.Type;
 import pt.up.fe.specs.util.classmap.FunctionClassMap;
 import pt.up.fe.specs.util.exceptions.NotImplementedException;
 
@@ -109,7 +110,7 @@ public class ConversionInstructions {
 
     private String getCodeNew(CallInstruction instruction) {
         StringBuilder result = new StringBuilder();
-        Type returnType = instruction.getReturnType();
+        org.specs.comp.ollir.Type returnType = instruction.getReturnType();
 
         if(returnType.getTypeOfElement() == ElementType.OBJECTREF){
             result.append("new ").append(((ClassType) returnType).getName()).append("\n");
@@ -124,7 +125,7 @@ public class ConversionInstructions {
     private String getCodeInvokeVirtual(CallInstruction instruction) {
         StringBuilder result = new StringBuilder();
         ArrayList<Element> operands = instruction.getListOfOperands();
-        Type returnType = instruction.getReturnType();
+        org.specs.comp.ollir.Type returnType = instruction.getReturnType();
         Element firstArg = instruction.getFirstArg();
 
         String className = ((ClassType) firstArg.getType()).getName();
@@ -162,7 +163,7 @@ public class ConversionInstructions {
         ArrayList<Element> parameters = instruction.getListOfOperands();
         String methodName =  ((LiteralElement) instruction.getSecondArg()).getLiteral().replace("\"", "");
         Element classElement = instruction.getFirstArg();
-        Type returnType = instruction.getReturnType();
+        org.specs.comp.ollir.Type returnType = instruction.getReturnType();
 
         for (Element param : parameters){
             result.append(stackHandle.load(param, scope));

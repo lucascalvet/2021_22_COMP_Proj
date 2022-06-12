@@ -1,7 +1,7 @@
 package pt.up.fe.comp.jmm.ast2jasmin;
 
 import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
-import pt.up.fe.comp.jmm.jasmin.JasminResult;
+import pt.up.fe.comp.jasmin.JasminResult;
 
 /**
  * Special stage for groups that will not be doing OLLIR optimizations (e.g. due to being a grupo of 2 elements). <br>

@@ -1,6 +1,7 @@
-package pt.up.fe.comp.jmm.jasmin;
+package pt.up.fe.comp.jasmin;
 
 import org.specs.comp.ollir.*;
+import org.specs.comp.ollir.Type;
 import pt.up.fe.specs.util.exceptions.NotImplementedException;
 
 import java.util.Collections;

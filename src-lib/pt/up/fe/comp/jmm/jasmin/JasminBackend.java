@@ -1,5 +1,6 @@
 package pt.up.fe.comp.jmm.jasmin;
 
+import pt.up.fe.comp.jasmin.JasminResult;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
 
 /**
