@@ -169,13 +169,7 @@ public class ConversionInstructions {
                 Element classElement = ((GetFieldInstruction) rightSide).getFirstOperand();
                 Element field = ((GetFieldInstruction) rightSide).getSecondOperand();
 
-                String className = utils.getJasminType(classElement.getType());
-                String fieldName = ((Operand) field).getName();
-                String fieldType = utils.getJasminType(field.getType());
-
-                result.append(LoadStore.load(classElement, scope));
-                result.append("getfield ").append(className).append("/");
-                result.append(fieldName).append(" ").append(fieldType).append("\n");
+                result.append(FieldsOperations.getGetFieldCode(classElement, field, utils, scope));
 
                 break;
             case BINARYOPER:
@@ -220,24 +214,8 @@ public class ConversionInstructions {
     }
 
     public String getCode(PutFieldInstruction instruction){
-        StringBuilder result = new StringBuilder();
+        return FieldsOperations.getPutFieldCode(instruction, utils, scope);
 
-        Element classElement = instruction.getFirstOperand();
-        Element field = instruction.getSecondOperand();
-        Element value = instruction.getThirdOperand();
-
-        result.append(LoadStore.load(classElement, scope));
-        result.append(LoadStore.load(value, scope));
-
-        String className = utils.getJasminType(classElement.getType());
-        String fieldName = ((Operand) field).getName();
-        String type = utils.getJasminType(field.getType());
-
-        result.append("putfield ").append(className).append("/").append(fieldName);
-        result.append(" ").append(type).append("\n");
-
-
-        return result.toString();
     }
 
     private String getCodeInvokeStatic(CallInstruction instruction) {

@@ -2,8 +2,6 @@ package pt.up.fe.comp.jasmin;
 
 import org.specs.comp.ollir.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 
 public class CallInstructions {
 
