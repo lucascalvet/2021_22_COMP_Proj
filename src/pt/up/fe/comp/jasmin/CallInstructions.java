@@ -1,7 +1,6 @@
 package pt.up.fe.comp.jasmin;
 
 import org.specs.comp.ollir.*;
-import pt.up.fe.specs.util.exceptions.NotImplementedException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -107,7 +106,6 @@ public class CallInstructions {
 
         if(!converter.isAssign() && returnType.getTypeOfElement() != ElementType.VOID){
             result.append("pop\n");
-
         }
 
         return result.toString();
@@ -128,7 +126,7 @@ public class CallInstructions {
             } else {
                 element = instruction.getFirstArg();
             }
-            result.append(LoadStore.newArray(element, converter.getScope()));
+            result.append(LoadStore.newArray(element, scope));
         }
         return result.toString();
     }

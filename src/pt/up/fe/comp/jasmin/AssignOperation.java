@@ -15,24 +15,20 @@ public class AssignOperation {
         StringBuilder result = new StringBuilder();
         Instruction rightSide = instruction.getRhs();
         Element leftSide = instruction.getDest();
-        converter.setLeftSideNew(instruction.getDest());
 
-        //handling right side
+        StringBuilder right = new StringBuilder();
         InstructionType type = rightSide.getInstType();
         switch (type){
             case NOPER:
-                StringBuilder right = new StringBuilder();
                 Element single = ((SingleOpInstruction) rightSide).getSingleOperand();
                 right.append(LoadStore.load(single, converter.getScope()));
                 result.append(LoadStore.load(single, scope));
-                result.append(LoadStore.store(leftSide, scope, right.toString()));
                 break;
             case GETFIELD:
                 Element classElement = ((GetFieldInstruction) rightSide).getFirstOperand();
                 Element field = ((GetFieldInstruction) rightSide).getSecondOperand();
 
                 result.append(FieldsOperations.getGetFieldCode(classElement, field, utils, scope));
-                result.append(LoadStore.store(leftSide, scope, null));
                 break;
             case BINARYOPER:
                 Element rightElement = ((BinaryOpInstruction) rightSide).getRightOperand();
@@ -40,16 +36,14 @@ public class AssignOperation {
                 OperationType operationType = ((BinaryOpInstruction) rightSide).getOperation().getOpType();
 
                 result.append(BinaryOperation.processBinaryOperation(rightElement, leftElement, operationType, scope));
-                result.append(LoadStore.store(leftSide, scope, null));
                 break;
             case CALL:
                 result.append(converter.getCode((CallInstruction) rightSide));
-                result.append(LoadStore.store(converter.getLeftSideNew(), scope, null));
-                return result.toString();
-
+                break;
             default:
                 throw new NotImplementedException("Problem in assign");
         }
+        result.append(LoadStore.store(leftSide, scope, right.toString()));
         converter.setAssign(false);
         return result.toString();
     }

@@ -89,7 +89,6 @@ public class LoadStore {
         ArrayList<Element> indexOperand = arrayOperand.getIndexOperands();
         Element index = indexOperand.get(0);
         int indexVirtual =  scope.get(((Operand) index).getName()).getVirtualReg();
-        //result.append("batatas\n");
 
         if (indexVirtual > 3 || indexVirtual < 0)
             result.append("iload " + indexVirtual + "\n");
