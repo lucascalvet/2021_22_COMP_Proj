@@ -3,6 +3,7 @@ package pt.up.fe.comp.jasmin;
 import org.specs.comp.ollir.*;
 import pt.up.fe.specs.util.exceptions.NotImplementedException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class LoadStore {
@@ -14,11 +15,18 @@ public class LoadStore {
             result.append("ldc ").append(((LiteralElement)element).getLiteral()).append("\n");
         } else {
             if (type == ElementType.INT32 || type == ElementType.STRING || type == ElementType.BOOLEAN){
-                int register = scope.get(((Operand)element).getName()).getVirtualReg();
-                if (register > 3 || register < 0)
-                    result.append("iload ").append(register).append("\n");
-                else
-                    result.append("iload_").append(register).append("\n");
+                ElementType typeVar = scope.get(((Operand)element).getName()).getVarType().getTypeOfElement();
+                if(typeVar == ElementType.ARRAYREF) {
+                    result.append(loadArray(element, scope));
+                }
+                else{
+
+                    int register = scope.get(((Operand)element).getName()).getVirtualReg();
+                    if (register > 3 || register < 0)
+                        result.append("iload ").append(register).append("\n");
+                    else
+                        result.append("iload_").append(register).append("\n");
+                }
             } else {
                 if(type == ElementType.CLASS || type == ElementType.THIS || type == ElementType.OBJECTREF || type == ElementType.ARRAYREF){
                     int register = scope.get(((Operand)element).getName()).getVirtualReg();
@@ -38,13 +46,19 @@ public class LoadStore {
         ElementType type = element.getType().getTypeOfElement();
 
         if(type == ElementType.INT32 || type == ElementType.STRING || type ==  ElementType.BOOLEAN){
-            String name = ((Operand)element).getName();
-            Descriptor descriptor = scope.get(name);
-            int register = descriptor.getVirtualReg();
-            if (register > 3 || register < 0)
-                result.append("istore ").append(register).append("\n");
-            else
-                result.append("istore_").append(register).append("\n");
+            ElementType typeVar = scope.get(((Operand)element).getName()).getVarType().getTypeOfElement();
+            if(typeVar == ElementType.ARRAYREF) {
+                result.append(storeArray(element, scope, rightSide));
+            }
+            else {
+                String name = ((Operand)element).getName();
+                Descriptor descriptor = scope.get(name);
+                int register = descriptor.getVirtualReg();
+                if (register > 3 || register < 0)
+                    result.append("istore ").append(register).append("\n");
+                else
+                    result.append("istore_").append(register).append("\n");
+            }
         }
         else if (type == ElementType.OBJECTREF || type == ElementType.ARRAYREF || type == ElementType.THIS){
             int register = scope.get(((Operand)element).getName()).getVirtualReg();
@@ -60,6 +74,54 @@ public class LoadStore {
         result.append(LoadStore.load(element, scope));
         result.append("newarray " + "int" + "\n");
         return result.toString();
+    }
+
+    public static String storeArray(Element element, HashMap<String, Descriptor> scope, String rightSide){
+        StringBuilder result = new StringBuilder();
+        int array = scope.get(((Operand)element).getName()).getVirtualReg();
+
+        if (array > 3 || array < 0)
+            result.append("aload " + array + "\n");
+        else result.append("aload_"+ array + "\n");
+
+
+        ArrayOperand arrayOperand = (ArrayOperand) element;
+        ArrayList<Element> indexOperand = arrayOperand.getIndexOperands();
+        Element index = indexOperand.get(0);
+        int indexVirtual =  scope.get(((Operand) index).getName()).getVirtualReg();
+
+        if (indexVirtual > 3 || indexVirtual < 0)
+            result.append("iload " + indexVirtual + "\n");
+        else result.append("iload_"+ indexVirtual + "\n");
+        //result.append(rightSide);
+        result.append("iastore\n");
+        return result.toString();
+    }
+
+    public static String loadArray(Element element, HashMap<String, Descriptor> scope){
+        StringBuilder result = new StringBuilder();
+        int array = scope.get(((Operand)element).getName()).getVirtualReg();
+
+        if (array > 3 || array < 0)
+            result.append("aload " + array + "\n");
+        else result.append("aload_"+ array + "\n");
+
+
+        ArrayOperand arrayOperand = (ArrayOperand) element;
+        ArrayList<Element> indexOperand = arrayOperand.getIndexOperands();
+        Element index = indexOperand.get(0);
+        int indexVirtual =  scope.get(((Operand) index).getName()).getVirtualReg();
+
+
+        if (indexVirtual > 3 || indexVirtual < 0)
+            result.append("iload " + indexVirtual + "\n");
+        else result.append("iload_"+ indexVirtual + "\n");
+        result.append("iaload\n");
+        return result.toString();
+    }
+
+    public boolean isArrayAccess(){
+        return true;
     }
 
 }

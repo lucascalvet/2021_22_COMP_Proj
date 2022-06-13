@@ -11,8 +11,6 @@ import static pt.up.fe.comp.jasmin.CallInstructions.getCodeNew;
 
 
 public class ConversionInstructions {
-    private Element leftSideNew;
-    private String rightSideNew;
     private final ConversionUtils utils;
     private final FunctionClassMap<Instruction, String> instructionMap;
     private HashMap<String, Descriptor> scope;
@@ -98,22 +96,6 @@ public class ConversionInstructions {
 
     public HashMap<String, Descriptor> getScope() {
         return scope;
-    }
-
-    public Element getLeftSideNew() {
-        return leftSideNew;
-    }
-
-    public String getRightSideNew() {
-        return rightSideNew;
-    }
-
-    public void setLeftSideNew(Element leftSideNew) {
-        this.leftSideNew = leftSideNew;
-    }
-
-    public void setRightSideNew(String rightSideNew) {
-        this.rightSideNew = rightSideNew;
     }
 
     public boolean isAssign() {
