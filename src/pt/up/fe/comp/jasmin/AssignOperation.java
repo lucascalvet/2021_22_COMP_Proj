@@ -40,6 +40,13 @@ public class AssignOperation {
             case CALL:
                 result.append(converter.getCode((CallInstruction) rightSide));
                 break;
+            case UNARYOPER:
+                Element e = ((UnaryOpInstruction) rightSide).getOperand();
+                OperationType optype = ((UnaryOpInstruction) rightSide).getOperation().getOpType();
+                String loadoper = LoadStore.load(e, scope);
+                BooleanOperations.operate(optype, null, loadoper);
+                result.append(BooleanOperations.notConversion(loadoper));
+                break;
             default:
                 throw new NotImplementedException("Problem in assign");
         }
