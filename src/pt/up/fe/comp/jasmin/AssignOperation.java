@@ -22,6 +22,9 @@ public class AssignOperation {
         InstructionType type = rightSide.getInstType();
         switch (type){
             case NOPER:
+                //result.append("batatas\n");
+                //return result.toString();
+
                 Element single = ((SingleOpInstruction) rightSide).getSingleOperand();
                 right.append(LoadStore.load(single, converter.getScope()));
                 result.append(LoadStore.load(single, scope));
