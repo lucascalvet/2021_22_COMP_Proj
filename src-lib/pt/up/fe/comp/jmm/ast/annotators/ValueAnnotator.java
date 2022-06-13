@@ -1,19 +1,19 @@
 package pt.up.fe.comp.jmm.ast.annotators;
 
-import pt.up.fe.comp.BaseNode;
 import pt.up.fe.comp.jmm.ast.AstNode;
 import pt.up.fe.comp.jmm.ast.JmmNode;
 import pt.up.fe.comp.jmm.ast.JmmNodeImpl;
-import pt.up.fe.comp.jmm.ast.visitors.AJmmVisitor;
 import pt.up.fe.comp.jmm.ast.visitors.PreorderJmmVisitor;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class ValueAnnotator extends PreorderJmmVisitor<Boolean, Boolean> {
-    Map<String, String> vars;
-    public ValueAnnotator(){
+    private Map<String, String> vars;
+    private final boolean constProp;
+    public ValueAnnotator(boolean constProp){
         this.vars = new HashMap<>();
+        this.constProp = constProp;
         addVisit(AstNode.WHILE, this::visitWhile);
         addVisit(AstNode.BLOCK, this::visitBlock);
         addVisit(AstNode.BODY, this::visitBody);
@@ -24,12 +24,15 @@ public class ValueAnnotator extends PreorderJmmVisitor<Boolean, Boolean> {
     }
 
     private Boolean visitDefault(JmmNode node, Boolean dummy) {
-        if(node.getJmmParent() != null && (node.getJmmParent().equals(AstNode.WHILE.toString()) || (node.getJmmParent().equals(AstNode.BLOCK.toString()) && node.getJmmParent().getJmmParent().equals(AstNode.WHILE.toString())))){
-            return false;
-        }
-        for(var child : node.getChildren()){
-            if(child.getKind().equals(AstNode.ID.toString())){
-                changeId(child);
+        if(this.constProp){
+            if(node.getJmmParent() != null){
+                final var parent = node.getJmmParent();
+                if(parent.getKind().equals(AstNode.WHILE.toString()) || (parent.getKind().equals(AstNode.CONDITION.toString()) || parent.getKind().equals(AstNode.BLOCK.toString())) && parent.getJmmParent().getKind().equals(AstNode.WHILE.toString())){
+                    return false;
+                }
+            }
+            for(var child : node.getChildren()){
+                swapNode(child);
             }
         }
         return true;
@@ -124,6 +127,9 @@ public class ValueAnnotator extends PreorderJmmVisitor<Boolean, Boolean> {
                 }
             }
         }
+        else{
+            visitDefault(node, dummy);
+        }
         return true;
     }
 
@@ -141,10 +147,25 @@ public class ValueAnnotator extends PreorderJmmVisitor<Boolean, Boolean> {
         return visitDefault(node, dummy);
     }
 
-    private Boolean changeId(JmmNode node) {
-        if(!node.getJmmParent().getKind().equals(AstNode.ASSIGN.toString()) || node.getIndexOfSelf() != 0){
-            if(node.getAttributes().contains("name") && vars.containsKey(node.get("name"))){
-                final String value = vars.get(node.get("name"));
+    private Boolean swapNode(JmmNode node) {
+        if(AstNode.getConsts().contains(node.getKind()) || (node.getJmmParent().getKind().equals(AstNode.ASSIGN.toString()) && node.getIndexOfSelf() == 0)){
+            return true;
+        }
+        else{
+            if(node.getJmmParent().getKind().equals(AstNode.ASSIGN.toString())){
+                for(var child : node.getChildren()){
+                    swapNode(child);
+                }
+            }
+
+            String value;
+            if(node.getAttributes().contains("name") && vars.containsKey(node.get("name"))) {
+                value = vars.get(node.get("name"));
+            }
+            else {
+                value = getValue(node);
+            }
+            if(!value.equals("")){
                 if(value.equals("true")){
                     var newNode = new JmmNodeImpl(AstNode.TRUE.toString());
                     for(String at : node.getAttributes()){
@@ -180,6 +201,7 @@ public class ValueAnnotator extends PreorderJmmVisitor<Boolean, Boolean> {
             }
             return true;
         }
+        visitDefault(assign.getJmmChild(1), dummy);
         final String value = getValue(assign.getJmmChild(1));
         if(value.equals("")){
             if(assign.getJmmChild(0).getAttributes().contains("name")){
@@ -196,6 +218,9 @@ public class ValueAnnotator extends PreorderJmmVisitor<Boolean, Boolean> {
     }
 
     private Boolean annotateCondition(JmmNode condition, Boolean dummy){
+        if(!condition.getJmmParent().getKind().equals(AstNode.WHILE.toString())){
+            visitDefault(condition, dummy);
+        }
         final String value = getValue(condition.getJmmChild(0));
         if(value.equals("")){
             return false;

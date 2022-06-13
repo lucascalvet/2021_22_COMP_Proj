@@ -46,12 +46,9 @@ public class ParserTest {
 
     @Test
     public void custom() {
-        noErrors(SpecsIo.getResource("fixtures/public/cpf/4_jasmin/control_flow/SimpleWhileStat.jmm"));
-    }
-
-    @Test
-    public void custom2() {
-        noErrors(SpecsIo.getResource("fixtures/public/cpf/4_jasmin/control_flow/IfWhileNested.jmm"));
+        noErrors(SpecsIo.getResource("fixtures/public/cpf/4_jasmin/calls/ConditionArgsFuncCall.jmm"));
+        //noErrors(SpecsIo.getResource("fixtures/public/cpf/4_jasmin/control_flow/SimpleWhileStat.jmm"));
+        //mustFail(SpecsIo.getResource("fixtures/public/cp2/IntInIfCondition.jmm"));
     }
 
     @Test

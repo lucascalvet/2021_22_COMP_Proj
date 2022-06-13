@@ -10,18 +10,82 @@ import pt.up.fe.comp.jmm.report.Report;
 import pt.up.fe.comp.jmm.report.ReportType;
 import pt.up.fe.comp.jmm.report.Stage;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class DeadCodeRemover extends PreorderJmmVisitor<Boolean, Boolean> {
     private boolean changeless;
+    private Map<String, List<JmmNode>> declaredVars;
 
     public DeadCodeRemover(){
-        addVisit(AstNode.MAIN_BODY, this::removeDeadCode);
-        addVisit(AstNode.BODY, this::removeDeadCode);
-        addVisit(AstNode.BLOCK, this::removeDeadCode);
         this.changeless = true;
+        this.declaredVars = new HashMap();
+        addVisit(AstNode.VAR, this::visitVar);
+        addVisit(AstNode.ASSIGN, this::visitAssign);
+        addVisit(AstNode.ID, this::visitId);
+        addVisit(AstNode.MAIN_BODY, this::visitBody);
+        addVisit(AstNode.BODY, this::visitBody);
+        addVisit(AstNode.BLOCK, this::removeDeadCode);
+    }
+
+    private Boolean clearUnusedVars(){
+        if(this.declaredVars.isEmpty()){
+            return true;
+        }
+        for(String key : this.declaredVars.keySet()){
+            final var nodeList = this.declaredVars.get(key);
+            for(var node : nodeList){
+                if(node.getKind().equals(AstNode.ASSIGN.toString()) && node.getJmmChild(1).getKind().equals(AstNode.ACCESS.toString())){
+                    node.getJmmParent().setChild(node.getJmmChild(1), node.getIndexOfSelf());
+                }
+                else{
+                    node.getJmmParent().removeJmmChild(node);
+                }
+            }
+        }
+        this.declaredVars = new HashMap();
+        return false;
+    }
+
+    private Boolean visitBody(JmmNode node, Boolean dummy){
+        clearUnusedVars();
+        return removeDeadCode(node, dummy);
+    }
+
+    private Boolean visitVar(JmmNode node, Boolean dummy){
+        if(!node.getJmmParent().getKind().equals(AstNode.CLASS_BODY.toString())){
+            final var nodeList = new ArrayList<JmmNode>();
+            nodeList.add(node);
+            this.declaredVars.put(node.getJmmChild(1).get("name"), nodeList);
+            return true;
+        }
+        return false;
+    }
+
+    private Boolean visitAssign(JmmNode node, Boolean dummy){
+        if(node.getJmmChild(0).getAttributes().contains("name")){
+            List<JmmNode> nodeList;
+            if(declaredVars.containsKey(node.getJmmChild(0).get("name"))){
+                nodeList = this.declaredVars.get(node.getJmmChild(0).get("name"));
+            }
+            else{
+                nodeList = new ArrayList<JmmNode>();
+            }
+            nodeList.add(node);
+            this.declaredVars.put(node.getJmmChild(0).get("name"), nodeList);
+            return true;
+        }
+        return false;
+    }
+
+    private Boolean visitId(JmmNode node, Boolean dummy){
+        if(node.getAttributes().contains("name") && this.declaredVars.containsKey(node.get("name"))){
+            if(node.getJmmParent().getKind().equals(AstNode.VAR.toString()) || (node.getJmmParent().getKind().equals(AstNode.ASSIGN.toString()) && node.getIndexOfSelf() == 0)){
+                return false;
+            }
+            this.declaredVars.remove(node.get("name"));
+            return true;
+        }
+        return false;
     }
 
     private Boolean removeDeadCode(JmmNode node, Boolean dummy) {
@@ -83,7 +147,10 @@ public class DeadCodeRemover extends PreorderJmmVisitor<Boolean, Boolean> {
     }
 
     public boolean isAllRemoved(){
-        return this.changeless;
+        if(this.changeless){
+            return clearUnusedVars();
+        }
+        return false;
     }
 
 }

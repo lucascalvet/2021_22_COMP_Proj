@@ -23,7 +23,7 @@ public class JmmAnalyser implements JmmAnalysis {
         boolean allRemoved = false;
         int counter = 1;
         while(!allRemoved){
-            new ValueAnnotator().visit(parserResult.getRootNode());
+            new ValueAnnotator(true).visit(parserResult.getRootNode());
             DeadCodeRemover deadCodeRemover = new DeadCodeRemover();
             deadCodeRemover.visit(parserResult.getRootNode());
             allRemoved = deadCodeRemover.isAllRemoved();
