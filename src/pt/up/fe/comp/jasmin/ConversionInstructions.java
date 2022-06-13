@@ -104,14 +104,10 @@ public class ConversionInstructions {
         return leftSideNew;
     }
 
-    public String getRightSideNew() {
-        return rightSideNew;
-    }
 
     public void setLeftSideNew(Element leftSideNew) {
         this.leftSideNew = leftSideNew;
     }
-
 
     public boolean isAssign() {
         return assign;

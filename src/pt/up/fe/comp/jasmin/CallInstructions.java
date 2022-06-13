@@ -34,7 +34,7 @@ public class CallInstructions {
         result.append(")");
         result.append(utils.getJasminType(returnType)).append("\n");
         if(converter.isAssign()) {
-            result.append(LoadStore.store(converter.getLeftSideNew(), scope, converter.getRightSideNew()));
+            result.append(LoadStore.store(converter.getLeftSideNew(), scope, null));
             converter.setAssign(false);
         }
         return result.toString();
@@ -115,7 +115,7 @@ public class CallInstructions {
 
         }
         if (converter.isAssign()){
-            result.append(LoadStore.store(converter.getLeftSideNew(), scope, converter.getRightSideNew()));
+            result.append(LoadStore.store(converter.getLeftSideNew(), scope, null));
             converter.setAssign(false);
         }
 
@@ -139,12 +139,9 @@ public class CallInstructions {
             }
             result.append(LoadStore.newArray(element, converter.getScope()));
             if (converter.isAssign()){
-                result.append(LoadStore.store(converter.getLeftSideNew(), scope, converter.getRightSideNew()));
+                result.append(LoadStore.store(converter.getLeftSideNew(), scope, null));
                 converter.setAssign(false);
             }
-            //result.append("newarray int\n");
-            //TODO : new array
-            //throw new NotImplementedException("Array new");
         }
         return result.toString();
     }
@@ -155,7 +152,7 @@ public class CallInstructions {
         result.append(LoadStore.load(arrayLength, converter.getScope()));
         result.append("arraylength\n");
         if (converter.isAssign())
-            result.append(LoadStore.store(converter.getLeftSideNew(), converter.getScope(), converter.getRightSideNew()));
+            result.append(LoadStore.store(converter.getLeftSideNew(), converter.getScope(), null));
 
         return result.toString();
     }

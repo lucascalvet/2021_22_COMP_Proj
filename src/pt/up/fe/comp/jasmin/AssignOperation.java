@@ -32,7 +32,7 @@ public class AssignOperation {
                 Element field = ((GetFieldInstruction) rightSide).getSecondOperand();
 
                 result.append(FieldsOperations.getGetFieldCode(classElement, field, utils, scope));
-                result.append(LoadStore.store(leftSide, scope, converter.getRightSideNew()));
+                result.append(LoadStore.store(leftSide, scope, null));
                 break;
             case BINARYOPER:
                 Element rightElement = ((BinaryOpInstruction) rightSide).getRightOperand();
