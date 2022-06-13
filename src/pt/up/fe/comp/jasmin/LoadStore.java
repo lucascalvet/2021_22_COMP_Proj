@@ -20,7 +20,7 @@ public class LoadStore {
                 else
                     result.append("iload_").append(register).append("\n");
             } else {
-                if(type == ElementType.CLASS || type == ElementType.THIS || type == ElementType.OBJECTREF){
+                if(type == ElementType.CLASS || type == ElementType.THIS || type == ElementType.OBJECTREF || type == ElementType.ARRAYREF){
                     int register = scope.get(((Operand)element).getName()).getVirtualReg();
                     if (register > 3 || register < 0)
                         result.append("aload ").append(register).append("\n");
@@ -57,8 +57,7 @@ public class LoadStore {
 
     public static String newArray(Element element, HashMap<String, Descriptor> scope){
         StringBuilder result = new StringBuilder();
-        //result.append(LoadStore.load(element, scope)).append("\n");
-
+        result.append(LoadStore.load(element, scope));
         result.append("newarray " + "int" + "\n");
         return result.toString();
     }
