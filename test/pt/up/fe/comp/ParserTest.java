@@ -46,12 +46,12 @@ public class ParserTest {
 
     @Test
     public void custom() {
-        noErrors(SpecsIo.getResource("fixtures/public/cpf/4_jasmin/control_flow/SimpleIfElseStat.jmm"));
+        noErrors(SpecsIo.getResource("fixtures/public/cpf/4_jasmin/control_flow/SimpleWhileStat.jmm"));
     }
 
     @Test
     public void custom2() {
-        noErrors(SpecsIo.getResource("fixtures/public/cpf/4_jasmin/control_flow/SimpleIfElseNot.jmm"));
+        noErrors(SpecsIo.getResource("fixtures/public/cpf/4_jasmin/control_flow/IfWhileNested.jmm"));
     }
 
     @Test

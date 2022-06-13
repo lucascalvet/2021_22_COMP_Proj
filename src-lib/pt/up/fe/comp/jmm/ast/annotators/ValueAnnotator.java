@@ -3,6 +3,7 @@ package pt.up.fe.comp.jmm.ast.annotators;
 import pt.up.fe.comp.BaseNode;
 import pt.up.fe.comp.jmm.ast.AstNode;
 import pt.up.fe.comp.jmm.ast.JmmNode;
+import pt.up.fe.comp.jmm.ast.JmmNodeImpl;
 import pt.up.fe.comp.jmm.ast.visitors.AJmmVisitor;
 import pt.up.fe.comp.jmm.ast.visitors.PreorderJmmVisitor;
 
@@ -12,13 +13,26 @@ import java.util.Map;
 public class ValueAnnotator extends PreorderJmmVisitor<Boolean, Boolean> {
     Map<String, String> vars;
     public ValueAnnotator(){
-        vars = new HashMap<>();
-        addVisit(AstNode.IF, this::visitBlock);
-        addVisit(AstNode.ELSE, this::visitBlock);
-        addVisit(AstNode.WHILE, this::visitBlock);
+        this.vars = new HashMap<>();
+        addVisit(AstNode.WHILE, this::visitWhile);
         addVisit(AstNode.BLOCK, this::visitBlock);
+        addVisit(AstNode.BODY, this::visitBody);
+        addVisit(AstNode.MAIN_BODY, this::visitBody);
         addVisit(AstNode.ASSIGN, this::annotateAssign);
         addVisit(AstNode.CONDITION, this::annotateCondition);
+        setDefaultVisit(this::visitDefault);
+    }
+
+    private Boolean visitDefault(JmmNode node, Boolean dummy) {
+        if(node.getJmmParent() != null && (node.getJmmParent().equals(AstNode.WHILE.toString()) || (node.getJmmParent().equals(AstNode.BLOCK.toString()) && node.getJmmParent().getJmmParent().equals(AstNode.WHILE.toString())))){
+            return false;
+        }
+        for(var child : node.getChildren()){
+            if(child.getKind().equals(AstNode.ID.toString())){
+                changeId(child);
+            }
+        }
+        return true;
     }
 
     private String getValue(JmmNode node){
@@ -103,9 +117,57 @@ public class ValueAnnotator extends PreorderJmmVisitor<Boolean, Boolean> {
     }
 
     private Boolean visitBlock(JmmNode node, Boolean dummy) {
+        if(node.getJmmParent().getKind().equals(AstNode.WHILE.toString())){
+            for (var child : node.getChildren()) {
+                if(child.getKind().equals(AstNode.ASSIGN.toString())){
+                    annotateAssign(child, true);
+                }
+            }
+        }
+        return true;
+    }
+
+    private Boolean visitWhile(JmmNode node, Boolean dummy) {
         for (var child : node.getChildren()) {
             if(child.getKind().equals(AstNode.ASSIGN.toString())){
                 annotateAssign(child, true);
+            }
+        }
+        return true;
+    }
+
+    private Boolean visitBody(JmmNode node, Boolean dummy) {
+        this.vars = new HashMap<>();
+        return visitDefault(node, dummy);
+    }
+
+    private Boolean changeId(JmmNode node) {
+        if(!node.getJmmParent().getKind().equals(AstNode.ASSIGN.toString()) || node.getIndexOfSelf() != 0){
+            if(node.getAttributes().contains("name") && vars.containsKey(node.get("name"))){
+                final String value = vars.get(node.get("name"));
+                if(value.equals("true")){
+                    var newNode = new JmmNodeImpl(AstNode.TRUE.toString());
+                    for(String at : node.getAttributes()){
+                        newNode.put(at, node.get(at));
+                    }
+                    node.getJmmParent().setChild(newNode, node.getIndexOfSelf());
+                }
+                else if (value.equals("false")){
+                    var newNode = new JmmNodeImpl(AstNode.FALSE.toString());
+                    for(String at : node.getAttributes()){
+                        newNode.put(at, node.get(at));
+                    }
+                    node.getJmmParent().setChild(newNode, node.getIndexOfSelf());
+                }
+                else{
+                    var newNode = new JmmNodeImpl(AstNode.INT.toString());
+                    for(String at : node.getAttributes()){
+                        newNode.put(at, node.get(at));
+                    }
+                    newNode.put("value", value);
+                    node.getJmmParent().setChild(newNode, node.getIndexOfSelf());
+                }
+                return false;
             }
         }
         return true;

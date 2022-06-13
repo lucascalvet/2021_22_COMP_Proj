@@ -19,9 +19,6 @@ public class JmmAnalyser implements JmmAnalysis {
 
     @Override
     public JmmSemanticsResult semanticAnalysis(JmmParserResult parserResult) {
-        JmmSymbolTable symbolTable = new JmmSymbolTable(parserResult.getRootNode());
-        List <Report> reports = symbolTable.getReports();
-        List <SemanticAnalyser> analysers = Arrays.asList(new SingleMainMethodCheck(symbolTable), new FunctionVerifier(parserResult.getRootNode(), symbolTable), new TypeVerifier(parserResult.getRootNode(), symbolTable), new SuperImportCheck(symbolTable), new BlockVerifier(parserResult.getRootNode(), symbolTable));
 
         boolean allRemoved = false;
         int counter = 1;
@@ -34,6 +31,10 @@ public class JmmAnalyser implements JmmAnalysis {
             System.out.println(parserResult.getRootNode().toTree());
             counter += 1;
         }
+
+        JmmSymbolTable symbolTable = new JmmSymbolTable(parserResult.getRootNode());
+        List <Report> reports = symbolTable.getReports();
+        List <SemanticAnalyser> analysers = Arrays.asList(new SingleMainMethodCheck(symbolTable), new FunctionVerifier(parserResult.getRootNode(), symbolTable), new TypeVerifier(parserResult.getRootNode(), symbolTable), new SuperImportCheck(symbolTable), new BlockVerifier(parserResult.getRootNode(), symbolTable));
 
         for(var analyser : analysers){
             System.out.println(analyser.toString());
