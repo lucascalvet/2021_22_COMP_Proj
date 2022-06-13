@@ -36,7 +36,7 @@ public class Launcher {
         Map<String, Integer> flags = new HashMap<>();
         flags.put("-r", -1); //Default value
         String optimize = "false";
-        String debug = "false"; //TODO: Do we do this? - only print extras if debug.equals("true") ?
+        String debug = "false";
 
         if(args.length != 1) {
             for (int i = 1; i < args.length; i++) {

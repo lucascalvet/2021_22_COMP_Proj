@@ -58,7 +58,7 @@ In order to generate code that can be executed, our tool follows the steps expla
   - Translating to Jasmin
   - ...
 
-(Possible problems our compiller may have regarding code generation)
+(Possible problems our compiler may have regarding code generation)
 
 ## Pros:
 [comment]: <> (&#40;Identify the most positive aspects of your tool&#41;)
