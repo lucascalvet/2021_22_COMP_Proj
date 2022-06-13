@@ -1,6 +1,7 @@
-package pt.up.fe.comp.jmm.jasmin;
+package pt.up.fe.comp.jasmin;
 
 import org.specs.comp.ollir.*;
+import org.specs.comp.ollir.Type;
 import pt.up.fe.specs.util.exceptions.NotImplementedException;
 
 import java.util.Collections;
@@ -42,10 +43,14 @@ public class ConversionUtils {
     public String getJasminType(Type type){
 
         if(type instanceof ArrayType){
-            return "[" + getJasminType(((ArrayType) type).getTypeOfElements());
+            StringBuilder result = new StringBuilder();
+
+            result.append("[".repeat(Math.max(0, ((ArrayType) type).getNumDimensions())));
+            result.append(getJasminType(((ArrayType) type).getArrayType()));
+            return result.toString();
         }
         if(type.getTypeOfElement() == ElementType.OBJECTREF){
-            return ((ClassType)type).getName();
+            return "L" + ((ClassType)type).getName() + ";";
         }
         return getJasminType(type.getTypeOfElement());
     }
@@ -74,12 +79,6 @@ public class ConversionUtils {
                 //TODO: check if right
                 jasminType = type.getClass().getName();
                 break;
-            case ARRAYREF:
-                break;
-           /* case OBJECTREF:
-                //TODO: check if right
-                jasminType = ((Type) (type))//type.getClass().getName();
-                break;*/
             default:
                 throw new NotImplementedException(type);
         }

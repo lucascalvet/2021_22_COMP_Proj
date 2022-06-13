@@ -1,0 +1,27 @@
+package pt.up.fe.comp.jasmin;
+
+import org.specs.comp.ollir.Descriptor;
+import org.specs.comp.ollir.Element;
+import org.specs.comp.ollir.OperationType;
+
+
+import java.util.HashMap;
+
+public class BinaryOperation {
+
+    public static String processBinaryOperation(Element rightElement, Element leftElement,
+                                                OperationType operationType, HashMap<String, Descriptor> scope){
+        StringBuilder result = new StringBuilder();
+
+        String leftInstruction = LoadStore.load(leftElement, scope);
+        String rightInstruction = LoadStore.load(rightElement, scope);
+
+        if(ArithmeticOps.isArithmeticOp(operationType)){
+            result.append(ArithmeticOps.operate(rightElement, leftElement, scope, operationType));
+        } else if(BooleanOperations.isBooleanOp(operationType)){
+            result.append(BooleanOperations.operate(operationType, leftInstruction, rightInstruction));
+
+        }
+        return result.toString();
+    }
+}

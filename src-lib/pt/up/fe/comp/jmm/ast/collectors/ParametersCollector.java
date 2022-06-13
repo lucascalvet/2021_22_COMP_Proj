@@ -64,7 +64,7 @@ public class ParametersCollector extends Collector {
                     t = new Type("int", true);
                 }
                 else if (ts.equals("custom")){
-                    t = new Type(child.getChildren().get(0).get("name"), true);
+                    t = new Type(child.getChildren().get(0).get("name"), false);
                 }
                 else{
                     t = new Type(ts, false);

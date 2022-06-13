@@ -1,12 +1,12 @@
-package pt.up.fe.comp.jmm.jasmin;
+package pt.up.fe.comp.jasmin;
 
 import org.specs.comp.ollir.*;
 import pt.up.fe.specs.util.exceptions.NotImplementedException;
 
 import java.util.HashMap;
 
-public class StackHandle {
-    public String load(Element element, HashMap<String, Descriptor> scope){
+public class LoadStore {
+    public static String load(Element element, HashMap<String, Descriptor> scope){
         StringBuilder result = new StringBuilder();
 
         ElementType type = element.getType().getTypeOfElement();
@@ -20,7 +20,7 @@ public class StackHandle {
                 else
                     result.append("iload_").append(register).append("\n");
             } else {
-                if(type == ElementType.CLASS || type == ElementType.THIS || type == ElementType.OBJECTREF){
+                if(type == ElementType.CLASS || type == ElementType.THIS || type == ElementType.OBJECTREF || type == ElementType.ARRAYREF){
                     int register = scope.get(((Operand)element).getName()).getVirtualReg();
                     if (register > 3 || register < 0)
                         result.append("aload ").append(register).append("\n");
@@ -33,7 +33,7 @@ public class StackHandle {
         return result.toString();
     }
 
-    public String store(Element element, HashMap<String, Descriptor> scope, String rightSide){
+    public static String store(Element element, HashMap<String, Descriptor> scope, String rightSide){
         StringBuilder result = new StringBuilder();
         ElementType type = element.getType().getTypeOfElement();
 
@@ -55,24 +55,11 @@ public class StackHandle {
         return result.toString();
     }
 
-    public String getOperation(OperationType operationType) {
+    public static String newArray(Element element, HashMap<String, Descriptor> scope){
         StringBuilder result = new StringBuilder();
-        switch (operationType){
-            case MUL:
-                result.append("imul \n");
-                break;
-            case DIV:
-                result.append("div \n");
-                break;
-            case ADD:
-                result.append("iadd \n");
-                break;
-            case SUB:
-                result.append("isub \n");
-                break;
-            default:
-                throw new NotImplementedException(this);
-        }
-        return  result.toString();
+        result.append(LoadStore.load(element, scope));
+        result.append("newarray " + "int" + "\n");
+        return result.toString();
     }
+
 }

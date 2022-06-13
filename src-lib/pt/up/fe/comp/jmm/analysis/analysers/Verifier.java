@@ -28,18 +28,40 @@ public abstract class Verifier extends PreorderJmmVisitor<Boolean, Boolean> impl
     }
 
     protected boolean isValidExternal(JmmNode access){
-        if(!access.getKind().equals(AstNode.ACCESS.toString())){
+
+        if(!access.getKind().equals(AstNode.ACCESS.toString()) || (!access.getJmmChild(0).getKind().equals(AstNode.THIS.toString()) && !access.getJmmChild(0).getAttributes().contains("name"))){
             return false;
         }
-        if (!access.getJmmChild(0).getAttributes().contains("name")){
-            return false;
+        String accessIdName = symbolTable.getClassName();
+        if(!access.getJmmChild(0).getKind().equals(AstNode.THIS.toString())){
+            accessIdName = access.getJmmChild(0).get("name");
         }
-        String accessIdName = access.getJmmChild(0).get("name");
         String className = accessIdName;
         if(getVar(accessIdName) != null){
             className = getVar(accessIdName).getType().getName();
         }
-        return (symbolTable.getSuper().equals(className) || symbolTable.getImports().contains(className));
+        return ((symbolTable.getClassName().equals(className) && !symbolTable.getSuper().equals("")) || symbolTable.getSuper().equals(className) || symbolTable.getImports().contains(className));
+    }
+
+    protected boolean isField(String name){
+        if(!this.scope.equals("")){
+            for(var local_variable : symbolTable.getLocalVariables(this.scope)){
+                if(local_variable.getName().equals(name)){
+                    return false;
+                }
+            }
+            for(var param : symbolTable.getParameters(this.scope)){
+                if(param.getName().equals(name)){
+                    return false;
+                }
+            }
+        }
+        for(var field : symbolTable.getFields()){
+            if(field.getName().equals(name)){
+                return true;
+            }
+        }
+        return false;
     }
 
     protected Symbol getVar(String name){
@@ -55,7 +77,6 @@ public abstract class Verifier extends PreorderJmmVisitor<Boolean, Boolean> impl
                 }
             }
         }
-
         for(var field : symbolTable.getFields()){
             if(field.getName().equals(name)){
                 return field;
@@ -79,7 +100,8 @@ public abstract class Verifier extends PreorderJmmVisitor<Boolean, Boolean> impl
                     return id_var.getType();
                 }
                 else{
-                    return new Type("this", false);
+                    return new Type(symbolTable.getClassName(), false);
+                    //return new Type("this", false);
                 }
             }
             if(kind.equals(AstNode.TRUE.toString()) || kind.equals(AstNode.FALSE.toString())){
