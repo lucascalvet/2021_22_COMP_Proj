@@ -20,16 +20,19 @@ public class JmmAnalyser implements JmmAnalysis {
     @Override
     public JmmSemanticsResult semanticAnalysis(JmmParserResult parserResult) {
 
-        boolean allRemoved = false;
-        int counter = 1;
-        while(!allRemoved){
-            new ValueAnnotator(true).visit(parserResult.getRootNode());
-            DeadCodeRemover deadCodeRemover = new DeadCodeRemover();
-            deadCodeRemover.visit(parserResult.getRootNode());
-            allRemoved = deadCodeRemover.isAllRemoved();
-            System.out.println("DEADCODE Removal Iteration " + counter);
-            System.out.println(parserResult.getRootNode().toTree());
-            counter += 1;
+        if(parserResult.getConfig().containsKey("optimize") && parserResult.getConfig().get("optimize").equals("true")){
+            System.out.println("DEBUG OPTIMIZED");
+            boolean allRemoved = false;
+            int counter = 1;
+            while(!allRemoved){
+                new ValueAnnotator(true).visit(parserResult.getRootNode());
+                DeadCodeRemover deadCodeRemover = new DeadCodeRemover();
+                deadCodeRemover.visit(parserResult.getRootNode());
+                allRemoved = deadCodeRemover.isAllRemoved();
+                System.out.println("DEADCODE Removal Iteration " + counter);
+                System.out.println(parserResult.getRootNode().toTree());
+                counter += 1;
+            }
         }
 
         JmmSymbolTable symbolTable = new JmmSymbolTable(parserResult.getRootNode());
