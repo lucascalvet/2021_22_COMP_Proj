@@ -15,11 +15,18 @@ public class LoadStore {
             result.append("ldc ").append(((LiteralElement)element).getLiteral()).append("\n");
         } else {
             if (type == ElementType.INT32 || type == ElementType.STRING || type == ElementType.BOOLEAN){
-                int register = scope.get(((Operand)element).getName()).getVirtualReg();
-                if (register > 3 || register < 0)
-                    result.append("iload ").append(register).append("\n");
-                else
-                    result.append("iload_").append(register).append("\n");
+                ElementType typeVar = scope.get(((Operand)element).getName()).getVarType().getTypeOfElement();
+                if(typeVar == ElementType.ARRAYREF) {
+                    result.append(loadArray(element, scope));
+                }
+                else{
+
+                    int register = scope.get(((Operand)element).getName()).getVirtualReg();
+                    if (register > 3 || register < 0)
+                        result.append("iload ").append(register).append("\n");
+                    else
+                        result.append("iload_").append(register).append("\n");
+                }
             } else {
                 if(type == ElementType.CLASS || type == ElementType.THIS || type == ElementType.OBJECTREF || type == ElementType.ARRAYREF){
                     int register = scope.get(((Operand)element).getName()).getVirtualReg();
@@ -91,4 +98,27 @@ public class LoadStore {
         result.append("iastore\n");
         return result.toString();
     }
+
+    public static String loadArray(Element element, HashMap<String, Descriptor> scope){
+        StringBuilder result = new StringBuilder();
+        int array = scope.get(((Operand)element).getName()).getVirtualReg();
+
+        if (array > 3 || array < 0)
+            result.append("aload " + array + "\n");
+        else result.append("aload_"+ array + "\n");
+
+
+        ArrayOperand arrayOperand = (ArrayOperand) element;
+        ArrayList<Element> indexOperand = arrayOperand.getIndexOperands();
+        Element index = indexOperand.get(0);
+        int indexVirtual =  scope.get(((Operand) index).getName()).getVirtualReg();
+
+
+        if (indexVirtual > 3 || indexVirtual < 0)
+            result.append("iload " + indexVirtual + "\n");
+        else result.append("iload_"+ indexVirtual + "\n");
+        result.append("iaload\n");
+        return result.toString();
+    }
+
 }
