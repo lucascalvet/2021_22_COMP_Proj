@@ -112,9 +112,6 @@ public class ConversionInstructions {
         this.leftSideNew = leftSideNew;
     }
 
-    public void setRightSideNew(String rightSideNew) {
-        this.rightSideNew = rightSideNew;
-    }
 
     public boolean isAssign() {
         return assign;

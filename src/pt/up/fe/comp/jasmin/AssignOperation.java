@@ -18,20 +18,21 @@ public class AssignOperation {
         converter.setLeftSideNew(instruction.getDest());
 
         //handling right side
-        StringBuilder right = new StringBuilder();
         InstructionType type = rightSide.getInstType();
         switch (type){
             case NOPER:
+                StringBuilder right = new StringBuilder();
                 Element single = ((SingleOpInstruction) rightSide).getSingleOperand();
                 right.append(LoadStore.load(single, converter.getScope()));
                 result.append(LoadStore.load(single, scope));
+                result.append(LoadStore.store(leftSide, scope, right.toString()));
                 break;
             case GETFIELD:
                 Element classElement = ((GetFieldInstruction) rightSide).getFirstOperand();
                 Element field = ((GetFieldInstruction) rightSide).getSecondOperand();
 
                 result.append(FieldsOperations.getGetFieldCode(classElement, field, utils, scope));
-
+                result.append(LoadStore.store(leftSide, scope, converter.getRightSideNew()));
                 break;
             case BINARYOPER:
                 Element rightElement = ((BinaryOpInstruction) rightSide).getRightOperand();
@@ -39,17 +40,15 @@ public class AssignOperation {
                 OperationType operationType = ((BinaryOpInstruction) rightSide).getOperation().getOpType();
 
                 result.append(BinaryOperation.processBinaryOperation(rightElement, leftElement, operationType, scope));
+                result.append(LoadStore.store(leftSide, scope, null));
                 break;
             case CALL:
-                converter.setRightSideNew(right.toString());
                 result.append(converter.getCode((CallInstruction) rightSide));
                 return result.toString();
 
             default:
                 throw new NotImplementedException("Problem in assign");
         }
-        converter.setRightSideNew(right.toString());
-        result.append(LoadStore.store(leftSide, scope, converter.getRightSideNew()));
         converter.setAssign(false);
         return result.toString();
     }
