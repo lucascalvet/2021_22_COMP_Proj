@@ -13,9 +13,11 @@ public class ValueAnnotator extends PreorderJmmVisitor<Boolean, Boolean> {
     Map<String, String> vars;
     public ValueAnnotator(){
         vars = new HashMap<>();
-        addVisit(AstNode.MAIN_BODY, this::visitBody);
-        addVisit(AstNode.BODY, this::visitBody);
+        addVisit(AstNode.IF, this::visitBlock);
+        addVisit(AstNode.ELSE, this::visitBlock);
+        addVisit(AstNode.WHILE, this::visitBlock);
         addVisit(AstNode.BLOCK, this::visitBlock);
+        addVisit(AstNode.ASSIGN, this::annotateAssign);
         addVisit(AstNode.CONDITION, this::annotateCondition);
     }
 
@@ -100,15 +102,6 @@ public class ValueAnnotator extends PreorderJmmVisitor<Boolean, Boolean> {
         return "";
     }
 
-    private Boolean visitBody(JmmNode node, Boolean dummy) {
-        for (var child : node.getChildren()) {
-            if(child.getKind().equals(AstNode.ASSIGN.toString())){
-                annotateAssign(child, false);
-            }
-        }
-        return true;
-    }
-
     private Boolean visitBlock(JmmNode node, Boolean dummy) {
         for (var child : node.getChildren()) {
             if(child.getKind().equals(AstNode.ASSIGN.toString())){
@@ -118,8 +111,8 @@ public class ValueAnnotator extends PreorderJmmVisitor<Boolean, Boolean> {
         return true;
     }
 
-    private Boolean annotateAssign(JmmNode assign, Boolean erase){
-        if(erase){
+    private Boolean annotateAssign(JmmNode assign, Boolean dummy){
+        if(assign.getJmmParent().getKind().equals(AstNode.BLOCK.toString()) || assign.getJmmParent().getKind().equals(AstNode.IF.toString()) || assign.getJmmParent().getKind().equals(AstNode.ELSE.toString()) || assign.getJmmParent().getKind().equals(AstNode.WHILE.toString())){
             if(assign.getJmmChild(0).getAttributes().contains("name")){
                 vars.remove(assign.getJmmChild(0).get("name"));
             }

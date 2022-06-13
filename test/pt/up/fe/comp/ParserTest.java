@@ -45,6 +45,16 @@ public class ParserTest {
      */
 
     @Test
+    public void custom() {
+        noErrors(SpecsIo.getResource("fixtures/public/cpf/4_jasmin/control_flow/SimpleIfElseStat.jmm"));
+    }
+
+    @Test
+    public void custom2() {
+        noErrors(SpecsIo.getResource("fixtures/public/cpf/4_jasmin/control_flow/SimpleIfElseNot.jmm"));
+    }
+
+    @Test
     public void helloWorld() {
         noErrors(SpecsIo.getResource("fixtures/public/HelloWorld.jmm"));
     }

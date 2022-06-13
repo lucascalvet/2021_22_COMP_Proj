@@ -44,11 +44,17 @@ public class DeadCodeRemover extends PreorderJmmVisitor<Boolean, Boolean> {
                         System.out.println("DEADCODE Removed If on line: " + child.get("line"));
                         int index = child.getIndexOfSelf();
                         final var block = child.getJmmChild(2).getJmmChild(0);
-                        for(var block_child : block.getChildren()){
-                            //block_child.removeParent();
-                            node.add(block_child, index);
-                            index += 1;
+                        if(block.getKind().equals(AstNode.BLOCK.toString())){
+                            for(var block_child : block.getChildren()){
+                                //block_child.removeParent();
+                                node.add(block_child, index);
+                                index += 1;
+                            }
                         }
+                        else{
+                            node.add(block, index);
+                        }
+
                         node.removeJmmChild(child);
                         changeless = false;
                     }
@@ -57,10 +63,15 @@ public class DeadCodeRemover extends PreorderJmmVisitor<Boolean, Boolean> {
                         System.out.println("DEADCODE Removed Else on line: " + child.get("line"));
                         int index = child.getIndexOfSelf();
                         final var block = child.getJmmChild(1);
-                        for(var block_child : block.getChildren()){
-                            //block_child.removeParent();
-                            node.add(block_child, index);
-                            index += 1;
+                        if(block.getKind().equals(AstNode.BLOCK.toString())){
+                            for(var block_child : block.getChildren()){
+                                //block_child.removeParent();
+                                node.add(block_child, index);
+                                index += 1;
+                            }
+                        }
+                        else{
+                            node.add(block, index);
                         }
                         node.removeJmmChild(child);
                         changeless = false;
