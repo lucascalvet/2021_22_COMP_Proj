@@ -1,49 +1,47 @@
 # Compilers Project
-## GROUP 7A
+## GROUP: comp2022-7a
 
-### Two options, **1:**
-| Name | UpNumber | Self Assessment | Contribution |
+| NAME | NR | GRADE | CONTRIBUTION |
 | :---: | :---: | :--------------: | :----------: |
 | Ana Matilde Barra | 201904795 | | 25% |
 | Eunice Amorim | 201904920 | | 25% |
 | José Ferreira | 201904515 | | 25% |
 | Lucas Calvet | 201904517 | | 25% |
 
-### or **2:**
-NAME1: Ana Matilde Barra, NR1: 201904795, GRADE1: <0 to 20 value>, CONTRIBUTION1: 25%
-
-NAME2: Eunice Amorim, NR2: 201904920, GRADE2: <0 to 20 value>, CONTRIBUTION2: 25%
-
-NAME3: José Ferreira, NR3: 201904515, GRADE3: <0 to 20 value>, CONTRIBUTION3: 25%
-
-NAME4: Lucas Calvet, NR4: 201904517, GRADE4: <0 to 20 value>, CONTRIBUTION4: 25%
-
 **GLOBAL Grade of the project:** <0 to 20>
 
 [comment]: <> (IN THE END TO A REVISION OF ALL TEXT AND FACT CHECK ALL OF THIS!)
 
 
-## SUMMARY:
+## Summary:
 [comment]: <> (&#40;Describe what your tool does and its main features.&#41;)
 
 This project consists on a simple compiler for the Java-- (Jmm) Language. <br>
 It parses Jmm files into Java byte code, which is later executed using the Jasmin Library. 
 This tool offers options for code optimization, which can be turned on by using the flags `-r x` and `-o`.
 
-
-
-Main Features:
+**Main Features:**
 
 - Using a Context Free Grammar (defined in [JmmGrammar.jj](/javacc/JmmGrammar.jj)) to identify any Syntatic Errors and build and AST (Abstract Syntax Tree);
 - Building a Symbol Table with the use of all the annotations created in the AST;
 - Using this Symbol Table to build a String representing the initial file to compile contents in Ollir code;
 - Interpreting the Ollir code and translating it to Jasmin Code, which can later be executed.
-- Options selected by input of flags:
-    - **`-d` (Debug)** - ***Parece simples de fazer*** When this option is activated by adding it to the execution command, the outputs will not only be the ones of the compiled file or the errors, but also the additional information of the compiler (AST, Ollir Code, Jasmin Code, etc);
-    - **`-r x` (Register Allocation)** - ***Falta Fazer*** When this option is activated, the compiler will try to minimize the number of registers used, indicating if more are needed; 
-    - **`-o` (Addicional Optimizations)** - ***Vamos Fazer??*** 
+- Available Optimizations:
+  - ...
+    
 
-## SEMANTIC ANALYSIS:
+**Command Line Arguments:**
+
+`.\comp2022-7a.bat <file_path> [-r x] [-o] [-d]`
+
+- Mandatory:
+  - <file_path> - 
+- Optionals (in any order):
+  - **`-r x` (Register Allocation)** - ***Falta Fazer*** When this option is activated, the compiler will try to minimize the number of registers used, indicating if the value given is enough or if more are needed;
+  - **`-o` (Additional Optimizations)** - ***Vamos Fazer??***
+  - **`-d` (Debug)** - ***Parece simples de fazer*** When this option is activated by adding it to the execution command, the outputs will not only be the ones of the compiled file or the errors, but also the additional information of the compiler (AST, Ollir Code, Jasmin Code, etc);
+ 
+## Semantic Analysis:
 [comment]: <> (&#40;Refer the semantic rules implemented by your tool.&#41;)
 
 Our tool implements the following semantic rules:
@@ -51,26 +49,33 @@ Our tool implements the following semantic rules:
 - [x] Rule 1
 - [ ] Rule 2
 
-## CODE GENERATION:
+## Code Generation:
 [comment]: <> (&#40;describe how the code generation of your tool works and identify the possible problems your tool has regarding code generation.&#41;)
 
 In order to generate code that can be executed, our tool follows the steps explained below:
+  - Parsing the input file
   - Translating to Ollir
   - Translating to Jasmin
   - ...
 
 (Possible problems our compiller may have regarding code generation)
 
-## PROS:
+## Pros:
 [comment]: <> (&#40;Identify the most positive aspects of your tool&#41;)
 
 - We have a 'by default' optimization, which involves the use of optimized Jasmin instructions when dealing with the stack. 
 - ...
 
-## CONS:
+## Cons:
 [comment]: <> (&#40;Identify the most negative aspects of your tool&#41;)
 
 - ... 
+
+## Task Distribution: 
+- Ana Matilde Barra - Parser, Jasmin, Report
+- Eunice Amorim - Parser, Jasmin+, 
+- José Ferreira - Parser, Symbol Table, Semantic Analysis
+- Lucas Calvet -  Parser, Symbol Table, Ollir
 
 ---
 
