@@ -397,8 +397,7 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
             varType = new Type(symbolTable.getClassName(), false);
             simpleExpression = "this";
             isThis = true;
-        }
-        else {
+        } else {
             visitAndCreateTemp(accessNode.getJmmChild(0), false, true);
         }
 
@@ -675,25 +674,34 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
 
     private Integer whileVisit(JmmNode whileNode, Integer dummy) {
         String loopLabel = getLabel();
-        String bodyLabel = getLabel();
         String endLoopLabel = getLabel();
 
         code.append(loopLabel)
                 .append(":\n");
 
         // Condition
-        visit(whileNode.getJmmChild(0).getJmmChild(0));
-
-        code.append("if (")
-                .append(simpleExpression)
-                .append(") goto ")
-                .append(bodyLabel)
-                .append(";\n")
-                .append("goto ")
-                .append(endLoopLabel)
-                .append(";\n")
-                .append(bodyLabel)
-                .append(":\n");
+        // Check optimization flag
+        if (true) {
+            visitAndCreateTemp(whileNode.getJmmChild(0).getJmmChild(0));
+            code.append("if (!.bool ")
+                    .append(simpleExpression)
+                    .append(") goto ")
+                    .append(endLoopLabel)
+                    .append(";\n");
+        } else {
+            String bodyLabel = getLabel();
+            visit(whileNode.getJmmChild(0).getJmmChild(0));
+            code.append("if (")
+                    .append(simpleExpression)
+                    .append(") goto ")
+                    .append(bodyLabel)
+                    .append(";\n")
+                    .append("goto ")
+                    .append(endLoopLabel)
+                    .append(";\n")
+                    .append(bodyLabel)
+                    .append(":\n");
+        }
 
         visit(whileNode.getJmmChild(1));
 
