@@ -188,26 +188,28 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
 
     private Integer assignVisit(JmmNode assignNode, Integer dummy) {
 
-        visit(assignNode.getJmmChild(1));
-        String right = simpleExpression;
 
         isAssign = true;
         visit(assignNode.getJmmChild(0));
-        isAssign = false;
-        code.append(simpleExpression);
+        String left = simpleExpression;
+        Type type = varType;
         simpleExpression = "";
-
+        isAssign = false;
         if (wasField) {
             wasField = false;
             return 0;
         }
-        code.append(" :=.")
-                .append(OllirUtils.getOllirType(varType.getName()))
-                .append(" ");
 
-        code.append(right);
+        visit(assignNode.getJmmChild(1));
+        String right = simpleExpression;
+        simpleExpression = "";
 
-        code.append(";\n");
+        code.append(left)
+                .append(" :=.")
+                .append(OllirUtils.getOllirType(type.getName()))
+                .append(" ")
+                .append(right)
+                .append(";\n");
 
 
         return 0;
@@ -391,14 +393,14 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
         }
 
         simpleExpression = "";
+        Type prevVarType = varType;
 
         boolean isThis = false;
         if (accessNode.getJmmChild(0).getKind().equals(AstNode.THIS.toString())) {
             varType = new Type(symbolTable.getClassName(), false);
             simpleExpression = "this";
             isThis = true;
-        }
-        else {
+        } else {
             visitAndCreateTemp(accessNode.getJmmChild(0), false, true);
         }
 
@@ -436,6 +438,8 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
 
         if (varType.getName().equals(symbolTable.getClassName())) {
             varType = symbolTable.getReturnType(chained.getJmmChild(0).get("name"));
+        } else if (accessNode.getJmmParent().getKind().equals(AstNode.ASSIGN.toString())) {
+            varType = prevVarType;
         } else {
             varType = VOID_TYPE;
         }
@@ -675,25 +679,34 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
 
     private Integer whileVisit(JmmNode whileNode, Integer dummy) {
         String loopLabel = getLabel();
-        String bodyLabel = getLabel();
         String endLoopLabel = getLabel();
 
         code.append(loopLabel)
                 .append(":\n");
 
         // Condition
-        visit(whileNode.getJmmChild(0).getJmmChild(0));
-
-        code.append("if (")
-                .append(simpleExpression)
-                .append(") goto ")
-                .append(bodyLabel)
-                .append(";\n")
-                .append("goto ")
-                .append(endLoopLabel)
-                .append(";\n")
-                .append(bodyLabel)
-                .append(":\n");
+        // Check optimization flag
+        if (true) {
+            visitAndCreateTemp(whileNode.getJmmChild(0).getJmmChild(0));
+            code.append("if (!.bool ")
+                    .append(simpleExpression)
+                    .append(") goto ")
+                    .append(endLoopLabel)
+                    .append(";\n");
+        } else {
+            String bodyLabel = getLabel();
+            visit(whileNode.getJmmChild(0).getJmmChild(0));
+            code.append("if (")
+                    .append(simpleExpression)
+                    .append(") goto ")
+                    .append(bodyLabel)
+                    .append(";\n")
+                    .append("goto ")
+                    .append(endLoopLabel)
+                    .append(";\n")
+                    .append(bodyLabel)
+                    .append(":\n");
+        }
 
         visit(whileNode.getJmmChild(1));
 
