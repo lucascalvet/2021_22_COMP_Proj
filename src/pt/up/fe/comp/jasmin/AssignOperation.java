@@ -44,6 +44,7 @@ public class AssignOperation {
                 break;
             case CALL:
                 result.append(converter.getCode((CallInstruction) rightSide));
+                result.append(LoadStore.store(converter.getLeftSideNew(), scope, null));
                 return result.toString();
 
             default:
