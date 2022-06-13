@@ -2,14 +2,15 @@ package pt.up.fe.comp.jasmin;
 
 import org.specs.comp.ollir.*;
 import pt.up.fe.specs.util.classmap.FunctionClassMap;
+import pt.up.fe.specs.util.exceptions.NotImplementedException;
+
 import java.util.HashMap;
 
+import static pt.up.fe.comp.jasmin.CallInstructions.getCodeArrayLength;
 import static pt.up.fe.comp.jasmin.CallInstructions.getCodeNew;
 
 
 public class ConversionInstructions {
-    private Element leftSideNew;
-    private String rightSideNew;
     private final ConversionUtils utils;
     private final FunctionClassMap<Instruction, String> instructionMap;
     private HashMap<String, Descriptor> scope;
@@ -55,8 +56,10 @@ public class ConversionInstructions {
                 return CallInstructions.getCodeInvokeVirtual(instruction, this);
             case NEW:
                 return getCodeNew(instruction, this);
+            case arraylength:
+                return getCodeArrayLength(instruction, this);
             default:
-                return "";
+                throw new NotImplementedException("Call instruction" + instruction.getInvocationType());
         }
     }
 
@@ -93,22 +96,6 @@ public class ConversionInstructions {
 
     public HashMap<String, Descriptor> getScope() {
         return scope;
-    }
-
-    public Element getLeftSideNew() {
-        return leftSideNew;
-    }
-
-    public String getRightSideNew() {
-        return rightSideNew;
-    }
-
-    public void setLeftSideNew(Element leftSideNew) {
-        this.leftSideNew = leftSideNew;
-    }
-
-    public void setRightSideNew(String rightSideNew) {
-        this.rightSideNew = rightSideNew;
     }
 
     public boolean isAssign() {

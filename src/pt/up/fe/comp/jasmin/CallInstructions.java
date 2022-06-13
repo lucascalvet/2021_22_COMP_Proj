@@ -1,7 +1,6 @@
 package pt.up.fe.comp.jasmin;
 
 import org.specs.comp.ollir.*;
-import pt.up.fe.specs.util.exceptions.NotImplementedException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,8 +32,6 @@ public class CallInstructions {
 
         result.append(")");
         result.append(utils.getJasminType(returnType)).append("\n");
-        result.append(LoadStore.store(converter.getLeftSideNew(), scope, converter.getRightSideNew()));
-
         return result.toString();
     }
 
@@ -70,7 +67,6 @@ public class CallInstructions {
 
         if(!converter.isAssign() && returnType.getTypeOfElement() != ElementType.VOID){
             result.append("pop\n");
-            converter.setAssign(false);
         }
 
         return result.toString();
@@ -110,15 +106,13 @@ public class CallInstructions {
 
         if(!converter.isAssign() && returnType.getTypeOfElement() != ElementType.VOID){
             result.append("pop\n");
-            converter.setAssign(false);
         }
-
-        result.append(LoadStore.store(converter.getLeftSideNew(), scope, converter.getRightSideNew()));
 
         return result.toString();
     }
 
     public static String getCodeNew(CallInstruction instruction, ConversionInstructions converter) {
+        HashMap<String, Descriptor> scope = converter.getScope();
         StringBuilder result = new StringBuilder();
         Type returnType = instruction.getReturnType();
 
@@ -132,14 +126,18 @@ public class CallInstructions {
             } else {
                 element = instruction.getFirstArg();
             }
-            result.append(LoadStore.newArray(element, converter.getScope()));
-            //result.append("newarray int\n");
-            //TODO : new array
-            //throw new NotImplementedException("Array new");
+            result.append(LoadStore.newArray(element, scope));
         }
         return result.toString();
     }
 
+    public static String getCodeArrayLength(CallInstruction instruction, ConversionInstructions converter) {
+        StringBuilder result = new StringBuilder();
+        Element arrayLength = instruction.getFirstArg();
+        result.append(LoadStore.load(arrayLength, converter.getScope()));
+        result.append("arraylength\n");
+        return result.toString();
+    }
 
     public static String getArgumentCode(Element operand, ConversionUtils utils) {
         StringBuilder result = new StringBuilder();
