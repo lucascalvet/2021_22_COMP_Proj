@@ -21,7 +21,7 @@ public class AssignOperation {
         switch (type){
             case NOPER:
                 Element single = ((SingleOpInstruction) rightSide).getSingleOperand();
-                right.append(LoadStore.load(single, converter.getScope()));
+                right.append(LoadStore.load(single, scope));
                 result.append(LoadStore.load(single, scope));
                 break;
             case GETFIELD:

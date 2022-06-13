@@ -93,7 +93,7 @@ public class LoadStore {
         if (indexVirtual > 3 || indexVirtual < 0)
             result.append("iload " + indexVirtual + "\n");
         else result.append("iload_"+ indexVirtual + "\n");
-        result.append(rightSide);
+        //result.append(rightSide);
         result.append("iastore\n");
         return result.toString();
     }
@@ -118,6 +118,10 @@ public class LoadStore {
         else result.append("iload_"+ indexVirtual + "\n");
         result.append("iaload\n");
         return result.toString();
+    }
+
+    public boolean isArrayAccess(){
+        return true;
     }
 
 }
