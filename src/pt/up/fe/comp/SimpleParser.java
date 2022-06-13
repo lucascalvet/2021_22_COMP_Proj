@@ -5,6 +5,7 @@ import java.util.Map;
 
 import pt.up.fe.comp.jmm.ast.JmmNode;
 import pt.up.fe.comp.jmm.ast.annotators.LineColAnnotator;
+import pt.up.fe.comp.jmm.ast.annotators.ValueAnnotator;
 import pt.up.fe.comp.jmm.parser.JmmParser;
 import pt.up.fe.comp.jmm.parser.JmmParserResult;
 import pt.up.fe.comp.jmm.report.Report;
