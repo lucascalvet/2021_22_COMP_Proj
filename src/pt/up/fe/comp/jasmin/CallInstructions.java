@@ -33,8 +33,10 @@ public class CallInstructions {
 
         result.append(")");
         result.append(utils.getJasminType(returnType)).append("\n");
-        result.append(LoadStore.store(converter.getLeftSideNew(), scope, converter.getRightSideNew()));
-
+        if(converter.isAssign()) {
+            result.append(LoadStore.store(converter.getLeftSideNew(), scope, converter.getRightSideNew()));
+            converter.setAssign(false);
+        }
         return result.toString();
     }
 
@@ -70,7 +72,6 @@ public class CallInstructions {
 
         if(!converter.isAssign() && returnType.getTypeOfElement() != ElementType.VOID){
             result.append("pop\n");
-            converter.setAssign(false);
         }
 
         return result.toString();
@@ -111,10 +112,12 @@ public class CallInstructions {
 
         if(!converter.isAssign() && returnType.getTypeOfElement() != ElementType.VOID){
             result.append("pop\n");
+
+        }
+        if (converter.isAssign()){
+            result.append(LoadStore.store(converter.getLeftSideNew(), scope, converter.getRightSideNew()));
             converter.setAssign(false);
         }
-
-        result.append(LoadStore.store(converter.getLeftSideNew(), scope, converter.getRightSideNew()));
 
         return result.toString();
     }
@@ -135,7 +138,10 @@ public class CallInstructions {
                 element = instruction.getFirstArg();
             }
             result.append(LoadStore.newArray(element, converter.getScope()));
-            result.append(LoadStore.store(converter.getLeftSideNew(), scope, converter.getRightSideNew()));
+            if (converter.isAssign()){
+                result.append(LoadStore.store(converter.getLeftSideNew(), scope, converter.getRightSideNew()));
+                converter.setAssign(false);
+            }
             //result.append("newarray int\n");
             //TODO : new array
             //throw new NotImplementedException("Array new");
@@ -148,7 +154,8 @@ public class CallInstructions {
         Element arrayLength = instruction.getFirstArg();
         result.append(LoadStore.load(arrayLength, converter.getScope()));
         result.append("arraylength\n");
-        result.append(LoadStore.store(converter.getLeftSideNew(), converter.getScope(), converter.getRightSideNew()));
+        if (converter.isAssign())
+            result.append(LoadStore.store(converter.getLeftSideNew(), converter.getScope(), converter.getRightSideNew()));
 
         return result.toString();
     }
