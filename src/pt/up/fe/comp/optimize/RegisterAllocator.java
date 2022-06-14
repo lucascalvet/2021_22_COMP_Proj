@@ -13,35 +13,13 @@ import java.util.List;
 public class RegisterAllocator {
     OllirResult ollirCode;
     int maxNumReg;
+    boolean debug;
 
-    public RegisterAllocator(OllirResult ollir, int numMaxRegisters) {
+    public RegisterAllocator(OllirResult ollir, int numMaxRegisters, boolean debug) {
         this.ollirCode = ollir;
         this.maxNumReg = numMaxRegisters;
+        this.debug = debug;
     }
-
-//    public int getMinNumReg(){
-//        //TODO: Calculate the minimum number of registers needed -> is this mandatory?
-//        //if maxNumReg < minNumReg -> send message and do optimization with MinNumReg
-//        int minNumReg = 0;
-//
-//        for (Method method: ollirCode.getOllirClass().getMethods()){
-//            //create graph for variables of method
-//            //Compute number of colors needed for graph coloring problem
-//            DataflowAnalyser dataflowAnalyser = new DataflowAnalyser(method);
-//            HashMap<String, List<String>> dataflowAnalysisResult = dataflowAnalyser.getInterferenceResult();
-//
-//            RegistersGraph methodGraph = new RegistersGraph(dataflowAnalysisResult);
-//            GraphColoring graphColored = new GraphColoring(numRegisters, methodGraph);
-//            int colorsNeeded = graphColored.getNumColors();
-//
-//            if (minNumReg < colorsNeeded){
-//                minNumReg = colorsNeeded;
-//            }
-//        }
-//
-//
-//        return minNumReg;
-//    }
 
     public void allocateRegisters(int numRegisters) {
         for (Method method: ollirCode.getOllirClass().getMethods()){
@@ -55,10 +33,13 @@ public class RegisterAllocator {
         DataflowAnalyser dataflowAnalyser = new DataflowAnalyser(method);
         HashMap<String, List<String>> dataflowAnalysisResult = dataflowAnalyser.getInterferenceResult();
 
-        RegistersGraph methodGraph = new RegistersGraph(dataflowAnalysisResult);
+        RegistersGraph methodGraph = new RegistersGraph(method.getMethodName(),dataflowAnalysisResult);
 
         GraphColoring graphColored = new GraphColoring(numRegisters, methodGraph);
-        System.out.println(methodGraph.toString());
+
+        if(this.debug){
+            System.out.println(methodGraph.toString());
+        }
 
         HashMap<String, Descriptor> scope = method.getVarTable();
 

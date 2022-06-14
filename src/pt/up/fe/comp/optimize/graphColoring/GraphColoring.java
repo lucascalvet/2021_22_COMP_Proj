@@ -9,11 +9,13 @@ public class GraphColoring {
     RegistersGraph methodGraph;
     int rValue;
     List<RegisterNode> visited;
+    List<String> messages;
 
     public GraphColoring(int numRegisters, RegistersGraph graph) {
         this.methodGraph = graph;
         this.rValue = numRegisters;
         this.visited = new ArrayList<>();
+        this.messages = new ArrayList<>();
 
         run();
     }
@@ -35,6 +37,10 @@ public class GraphColoring {
                 }
             }
         }
+
+        if(!messages.isEmpty()){
+            System.out.println(messages.get(messages.size()-1));
+        }
     }
 
     private int availableColor(RegisterNode node) {
@@ -49,7 +55,7 @@ public class GraphColoring {
         }
 
         //Check what color available for newNode
-        for(int r = 1; r < rValue; r++){
+        for(int r = 1; r <= rValue; r++){
             if(!colorsInUse.contains(r)){
                 colorToUse = r;
                 break;
@@ -61,8 +67,8 @@ public class GraphColoring {
                 colorToUse = 1;
             } else {
                 colorToUse = (Collections.max(colorsInUse)) + 1;
-                System.out.println("Not enough Registers defined by -r (" + rValue + ")! - using new max (" + colorToUse + ")");
             }
+                messages.add("[" + methodGraph.getMethodName() + "] Not enough registers for allocation (defined by -r " + rValue + ")! - using new max value (" + colorToUse + ")");
 
         }
 

@@ -31,12 +31,18 @@ public class JmmOptimizer implements JmmOptimization {
     @Override
     public OllirResult optimize(OllirResult ollirResult) {
         String numMaxReg = ollirResult.getConfig().get("registerAllocation");
+        String debugOn = ollirResult.getConfig().get("debug");
 
         if (numMaxReg != null) {
             int r_registers = Integer.parseInt(numMaxReg);
+            boolean debug = false;
+
+            if(debugOn != null){
+                debug = debugOn.equals("true");
+            }
 
             if (r_registers != -1) {
-                RegisterAllocator regAlloc = new RegisterAllocator(ollirResult, r_registers);
+                RegisterAllocator regAlloc = new RegisterAllocator(ollirResult, r_registers, debug);
 
                 regAlloc.allocateRegisters(r_registers);
             }

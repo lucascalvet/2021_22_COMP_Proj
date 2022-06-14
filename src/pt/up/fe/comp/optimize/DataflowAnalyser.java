@@ -262,8 +262,8 @@ public class DataflowAnalyser {
         int beginLifeVar2 = lifeVar2.get(0);
         int endLifeVar2 = lifeVar2.get(1);
 
-        return  (beginLifeVar1 <= beginLifeVar2 && beginLifeVar2 <= endLifeVar1) ||
-                (beginLifeVar2 <= beginLifeVar1 && beginLifeVar1 <= endLifeVar2);
+        return  (beginLifeVar1 < beginLifeVar2 && beginLifeVar2 < endLifeVar1) ||
+                (beginLifeVar2 < beginLifeVar1 && beginLifeVar1 < endLifeVar2);
     }
 
     //Deep copy for list

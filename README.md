@@ -53,7 +53,7 @@ Our tool implements the following semantic rules:
 - Types of each operand must be compatible with the respective operation.
 - Array access must be done over an array with an integer index.
 - Arrays can't be used in arithmetic operations.
-- Type of assignee must be compatible with the assigned
+- Type of assignee must be compatible with the assigned.
 - Expressions in conditions must return a boolean.
 - The types of arguments of a function call must be compatible with the types in its method declaration.
 - Declaration of methods from other classes are only possible when said classes are imported.
@@ -84,6 +84,7 @@ In order to generate code that can be executed, our tool follows the steps expla
 - We think that our code could be "cleaner" and more readable.
 - There is a possibility that the size of the stack in *limit stack* of Jasmin is not the minimum in some cases. But, it is reduced as much as possible. 
 - The OLLIR code generator is very dependable on the defined tree structure, meaning that a change to that structure would involve fixing several parts of the generator.
+- The algorithm for Graph Coloring in Register Allocation is greedy, which may lead in some cases to not finding the optimum solution.
 
 ---
 

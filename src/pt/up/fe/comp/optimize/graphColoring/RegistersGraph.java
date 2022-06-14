@@ -5,10 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 
 public class RegistersGraph {
+    String methodName;
     HashMap<String, List<String>> varRelations;
     List<RegisterNode> vars;
 
-    public RegistersGraph(HashMap<String, List<String>> analysisResult) {
+    public RegistersGraph(String methodName, HashMap<String, List<String>> analysisResult) {
+        this.methodName = methodName;
         this.varRelations = analysisResult;
         this.vars = new ArrayList<>();
 
@@ -58,9 +60,13 @@ public class RegistersGraph {
         StringBuilder toPrint = new StringBuilder("varRelation = " + varRelations + "\n vars = \n");
 
         for(RegisterNode var: vars){
-            toPrint.append(var.getVarName()).append(" - color: ").append(var.getRegister()).append("\n");
+            toPrint.append("  ").append(var.getVarName()).append(" - color: ").append(var.getRegister()).append("\n");
         }
 
         return toPrint.toString();
+    }
+
+    public String getMethodName() {
+        return this.methodName;
     }
 }
