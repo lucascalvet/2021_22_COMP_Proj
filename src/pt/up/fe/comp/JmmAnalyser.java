@@ -41,13 +41,16 @@ public class JmmAnalyser implements JmmAnalysis {
         List <SemanticAnalyser> analysers = Arrays.asList(new FunctionVerifier(parserResult.getRootNode(), symbolTable), new TypeVerifier(parserResult.getRootNode(), symbolTable), new SuperImportCheck(symbolTable), new BlockVerifier(parserResult.getRootNode(), symbolTable));
 
         for(var analyser : analysers){
-            System.out.println(analyser.toString());
-            //System.out.println(analyser.getReports());
+            if(parserResult.getConfig().containsKey("debug") && parserResult.getConfig().get("debug").equals("true")) {
+                System.out.println(analyser.toString());
+            }
 
             reports.addAll(analyser.getReports());
         }
 
-        System.out.println(parserResult.getRootNode().toTree());
+        if(parserResult.getConfig().containsKey("debug") && parserResult.getConfig().get("debug").equals("true")) {
+            System.out.println(parserResult.getRootNode().toTree());
+        }
 
         return new JmmSemanticsResult(parserResult, symbolTable, reports);
     }
