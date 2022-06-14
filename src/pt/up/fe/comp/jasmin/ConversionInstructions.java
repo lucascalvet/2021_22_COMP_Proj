@@ -82,7 +82,7 @@ public class ConversionInstructions {
             } else {
                 result.append("areturn").append("\n");
             }
-            counters.decStackSize(1);
+            counters.decStackSize(1, "return");
 
         }
         return result.toString();

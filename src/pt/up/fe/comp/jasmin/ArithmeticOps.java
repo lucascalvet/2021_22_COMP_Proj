@@ -30,19 +30,19 @@ public class ArithmeticOps {
         StringBuilder result = new StringBuilder();
         switch (operationType){
             case MUL:
-                counters.decStackSize(1);
+                counters.decStackSize(1, "imul");
                 result.append("imul \n");
                 break;
             case DIV:
-                counters.decStackSize(1);
+                counters.decStackSize(1, "idiv");
                 result.append("idiv \n");
                 break;
             case ADD:
-                counters.decStackSize(1);
+                counters.decStackSize(1, "iadd");
                 result.append("iadd \n");
                 break;
             case SUB:
-                counters.decStackSize(1);
+                counters.decStackSize(1, "isub");
                 result.append("isub \n");
                 break;
             default:

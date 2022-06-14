@@ -24,7 +24,7 @@ public class FieldsOperations {
         String type = utils.getJasminType(field.getType());
 
         result.append("putfield ").append(className).append("/").append(fieldName);
-        counters.decStackSize(2);
+        counters.decStackSize(2, "putfield");
 
         result.append(" ").append(type).append("\n");
 
@@ -42,7 +42,7 @@ public class FieldsOperations {
 
         result.append(LoadStore.load(classElement, scope, counters));
         result.append("getfield ").append(className).append("/");
-        counters.decStackSize(2);
+        counters.decStackSize(2, "getfield");
 
         result.append(fieldName).append(" ").append(fieldType).append("\n");
 

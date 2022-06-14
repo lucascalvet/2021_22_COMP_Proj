@@ -26,9 +26,10 @@ public class CallInstructions {
         result.append("invokespecial ").append(((ClassType) classElement.getType()).getName());
 
         int parametersSize = parameters.size();
-        counters.decStackSize(parametersSize);
+        counters.decStackSize(parametersSize, "number of parameters" + parametersSize);
+
         if(returnType.getTypeOfElement() != ElementType.VOID){
-            counters.incStackSize(1);
+            counters.incStackSize(1, "not void parameter");
         }
 
         result.append(".").append(methodName);
@@ -58,9 +59,9 @@ public class CallInstructions {
         result.append("invokestatic ");
 
         int parametersSize = parameters.size();
-        counters.decStackSize(parametersSize);
+        counters.decStackSize(parametersSize, "number of parameters"  + parametersSize);
         if(returnType.getTypeOfElement() != ElementType.VOID){
-            counters.incStackSize(1);
+            counters.incStackSize(1, "Not void parameter");
         }
 
         var methodClass = ((Operand) instruction.getFirstArg()).getName();
@@ -82,7 +83,7 @@ public class CallInstructions {
 
         if(!converter.isAssign() && returnType.getTypeOfElement() != ElementType.VOID){
             result.append("pop\n");
-            counters.decStackSize(1);
+            counters.decStackSize(1, "pop");
         }
 
         return result.toString();
@@ -108,9 +109,9 @@ public class CallInstructions {
 
         result.append("invokevirtual ").append(className).append(".");
         int parametersSize = operands.size();
-        counters.decStackSize(parametersSize);
+        counters.decStackSize(parametersSize, "parameter size" + parametersSize);
         if(returnType.getTypeOfElement() != ElementType.VOID){
-            counters.incStackSize(1);
+            counters.incStackSize(1, "Not void parameter");
         }
 
         result.append(methodCall.replace("\"", ""));
@@ -128,7 +129,7 @@ public class CallInstructions {
 
         if(!converter.isAssign() && returnType.getTypeOfElement() != ElementType.VOID){
             result.append("pop\n");
-            counters.decStackSize(1);
+            counters.decStackSize(1, "pop");
         }
 
         return result.toString();
@@ -141,10 +142,10 @@ public class CallInstructions {
 
         if(returnType.getTypeOfElement() == ElementType.OBJECTREF){
             result.append("new ").append(((ClassType) returnType).getName()).append("\n");
-            counters.incStackSize(1);
+            counters.incStackSize(1, "new");
 
             result.append("dup\n");
-            counters.incStackSize(1);
+            counters.incStackSize(1, "dup");
         } else{
             Element element;
             if(instruction.getListOfOperands().size() != 0){
