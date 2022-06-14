@@ -38,6 +38,8 @@ public class BooleanOperations {
         result.append(rightInstruction);
         String label1 = "IFNE"+ (index*2);
         result.append("ifne ").append(label1+"\n");
+        counters.decStackSize(1, "ifne");
+
         result.append(InstructionUtil.iconst(1, counters));
         String label2 = "IFNE_"+(index*2+1);
         result.append("goto ").append(label2+"\n");
@@ -56,10 +58,12 @@ public class BooleanOperations {
         //is left 0?
         result.append(leftInstruction);
         result.append("ifeq ").append(labelFalse).append("\n");
+        counters.decStackSize(1, "ifeq");
 
         //is right 0?
         result.append(rightInstruction);
         result.append("ifeq ").append(labelFalse).append("\n");
+        counters.decStackSize(1, "ifeq");
 
         //if it is true it reached here
         result.append(InstructionUtil.iconst(1, counters));

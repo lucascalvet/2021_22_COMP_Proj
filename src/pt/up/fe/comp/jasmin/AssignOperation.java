@@ -21,8 +21,10 @@ public class AssignOperation {
         switch (type){
             case NOPER:
                 Element single = ((SingleOpInstruction) rightSide).getSingleOperand();
-                right.append(LoadStore.load(single, scope, counters));
-                result.append(LoadStore.load(single, scope, counters));
+                System.out.println("antes do load no noper");
+                String load = LoadStore.load(single, scope, counters);
+                right.append(load);
+                result.append(load);
                 break;
             case GETFIELD:
                 Element classElement = ((GetFieldInstruction) rightSide).getFirstOperand();

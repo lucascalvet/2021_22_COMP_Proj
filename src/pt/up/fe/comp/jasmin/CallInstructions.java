@@ -1,6 +1,7 @@
 package pt.up.fe.comp.jasmin;
 
 import org.specs.comp.ollir.*;
+import pt.up.fe.comp.VOID_;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,6 +15,7 @@ public class CallInstructions {
 
         StringBuilder result = new StringBuilder();
         ArrayList<Element> parameters = instruction.getListOfOperands();
+
         String methodName =  ((LiteralElement) instruction.getSecondArg()).getLiteral().replace("\"", "");
         Element classElement = instruction.getFirstArg();
         Type returnType = instruction.getReturnType();
@@ -22,6 +24,14 @@ public class CallInstructions {
             result.append(LoadStore.load(param, scope, counters));
         }
         result.append("invokespecial ").append(((ClassType) classElement.getType()).getName());
+
+        int parametersSize = parameters.size();
+        counters.decStackSize(parametersSize, "number of parameters" + parametersSize);
+
+        if(returnType.getTypeOfElement() != ElementType.VOID){
+            counters.incStackSize(1, "not void parameter");
+        }
+
         result.append(".").append(methodName);
 
         result.append("(");
@@ -48,6 +58,12 @@ public class CallInstructions {
         }
         result.append("invokestatic ");
 
+        int parametersSize = parameters.size();
+        counters.decStackSize(parametersSize, "number of parameters"  + parametersSize);
+        if(returnType.getTypeOfElement() != ElementType.VOID){
+            counters.incStackSize(1, "Not void parameter");
+        }
+
         var methodClass = ((Operand) instruction.getFirstArg()).getName();
         result.append(utils.getFullyQualifiedName(methodClass)).append(".");
 
@@ -67,6 +83,7 @@ public class CallInstructions {
 
         if(!converter.isAssign() && returnType.getTypeOfElement() != ElementType.VOID){
             result.append("pop\n");
+            counters.decStackSize(1, "pop");
         }
 
         return result.toString();
@@ -91,6 +108,12 @@ public class CallInstructions {
         }
 
         result.append("invokevirtual ").append(className).append(".");
+        int parametersSize = operands.size();
+        counters.decStackSize(parametersSize, "parameter size" + parametersSize);
+        if(returnType.getTypeOfElement() != ElementType.VOID){
+            counters.incStackSize(1, "Not void parameter");
+        }
+
         result.append(methodCall.replace("\"", ""));
 
         result.append("(");
@@ -106,6 +129,7 @@ public class CallInstructions {
 
         if(!converter.isAssign() && returnType.getTypeOfElement() != ElementType.VOID){
             result.append("pop\n");
+            counters.decStackSize(1, "pop");
         }
 
         return result.toString();
@@ -118,7 +142,10 @@ public class CallInstructions {
 
         if(returnType.getTypeOfElement() == ElementType.OBJECTREF){
             result.append("new ").append(((ClassType) returnType).getName()).append("\n");
+            counters.incStackSize(1, "new");
+
             result.append("dup\n");
+            counters.incStackSize(1, "dup");
         } else{
             Element element;
             if(instruction.getListOfOperands().size() != 0){

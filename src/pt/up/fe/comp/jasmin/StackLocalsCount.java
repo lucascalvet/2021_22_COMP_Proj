@@ -22,8 +22,7 @@ public class StackLocalsCount {
     }
 
     public int getStackMaxSize() {
-        return 99;
-        //return stackMaxSize;
+        return stackMaxSize;
     }
 
     public int getLocalsMaxSize(Method method, HashMap<String, Descriptor> scope) {
@@ -42,15 +41,17 @@ public class StackLocalsCount {
         }
     }
 
-    public void incStackSize(int value){
+    public void incStackSize(int value, String instruction){
         this.stackSize += value;
         if(stackSize > stackMaxSize){
             stackMaxSize = stackSize;
         }
+        System.out.println("Stacksize evolution " + this.stackSize + " " + instruction);
     }
 
-    public void decStackSize(int value){
+    public void decStackSize(int value, String instruction){
         this.stackSize -= value;
+        System.out.println("Stacksize evolution " + this.stackSize + " " + instruction);
     }
 
 
