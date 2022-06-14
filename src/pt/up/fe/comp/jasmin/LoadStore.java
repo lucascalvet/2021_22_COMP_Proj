@@ -15,8 +15,7 @@ public class LoadStore {
             result.append("ldc ").append(((LiteralElement)element).getLiteral()).append("\n");
         } else {
             if (type == ElementType.INT32 || type == ElementType.STRING || type == ElementType.BOOLEAN){
-                ElementType typeVar = scope.get(((Operand)element).getName()).getVarType().getTypeOfElement();
-                if(typeVar == ElementType.ARRAYREF) {
+                if(isArrayAccess(element, scope)) {
                     result.append(loadArray(element, scope));
                 }
                 else{
@@ -46,8 +45,7 @@ public class LoadStore {
         ElementType type = element.getType().getTypeOfElement();
 
         if(type == ElementType.INT32 || type == ElementType.STRING || type ==  ElementType.BOOLEAN){
-            ElementType typeVar = scope.get(((Operand)element).getName()).getVarType().getTypeOfElement();
-            if(typeVar == ElementType.ARRAYREF) {
+            if(isArrayAccess(element, scope)) {
                 result.append(storeArray(element, scope, rightSide));
             }
             else {
@@ -93,7 +91,7 @@ public class LoadStore {
         if (indexVirtual > 3 || indexVirtual < 0)
             result.append("iload " + indexVirtual + "\n");
         else result.append("iload_"+ indexVirtual + "\n");
-        //result.append(rightSide);
+        result.append(rightSide);
         result.append("iastore\n");
         return result.toString();
     }
@@ -120,8 +118,18 @@ public class LoadStore {
         return result.toString();
     }
 
-    public boolean isArrayAccess(){
-        return true;
+    public static boolean isArrayAccess(Element element, HashMap<String, Descriptor> scope){
+
+        if(element.isLiteral()){
+        ElementType type = element.getType().getTypeOfElement();
+
+        if(type == ElementType.INT32 || type == ElementType.STRING || type ==  ElementType.BOOLEAN){
+            ElementType typeVar = scope.get(((Operand)element).getName()).getVarType().getTypeOfElement();
+            if(typeVar == ElementType.ARRAYREF) {
+                return true;
+            }
+        }}
+        return false;
     }
 
 }
