@@ -18,10 +18,10 @@ public class ArithmeticOps {
     }
 
     public static String operate(Element rightElement, Element leftElement,
-                                 HashMap<String, Descriptor> scope, OperationType operationType){
+                                 HashMap<String, Descriptor> scope, OperationType operationType, StackLocalsCount counters){
         StringBuilder result = new StringBuilder();
-        result.append(LoadStore.load(leftElement, scope));
-        result.append(LoadStore.load(rightElement, scope));
+        result.append(LoadStore.load(leftElement, scope, counters));
+        result.append(LoadStore.load(rightElement, scope, counters));
         result.append(ArithmeticOps.getOperation(operationType));
         return result.toString();
     }
