@@ -1,0 +1,15 @@
+class PropBools {
+    public boolean foo(boolean factor){
+	  boolean a;
+	  boolean b;
+	  a = true;
+	  a = a && false;
+	  b = a;
+	  a = b && factor;
+	  factor = a && true;
+	  return factor;
+	}
+	public static void main(String[] args) {
+	}
+
+}

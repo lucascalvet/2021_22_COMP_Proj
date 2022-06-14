@@ -70,11 +70,6 @@ public class TypeVerifier extends Verifier{
                         this.addReport(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(assign.get("line")), Integer.valueOf(assign.get("col")), "Assignment types " + t1.toString() + " and " + t2.toString() + " don't match!"));
                         return false;
                     }
-                    /*
-                    else if (t2.getName().equals("") && isValidExternal(assign.getJmmChild(1))){
-                        assign.getJmmChild(1).put("type", t1.toString());
-                    }
-                     */
                 }
             }
         }
@@ -89,11 +84,6 @@ public class TypeVerifier extends Verifier{
                 this.addReport(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(child.get("line")), Integer.valueOf(child.get("col")), "Condition in '" + condition.getJmmParent().getKind() + "' should be a bool, instead it's of the type " + child_type.toString()));
                 return false;
             }
-            /*
-            else if (child_type.getName().equals("") && isValidExternal(child)){
-                child.put("type", "boolean");
-            }
-             */
         }
         return true;
     }

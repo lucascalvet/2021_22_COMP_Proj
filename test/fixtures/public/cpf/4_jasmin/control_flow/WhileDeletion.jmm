@@ -1,0 +1,36 @@
+import excuse;
+
+class WhileDeletion {
+
+    public static void main(String[] args) {
+        boolean i;
+        boolean j;
+        int a;
+        int b;
+        excuse E;
+
+        i = true;
+        j = false;
+
+        a = 5;
+
+        while(false){
+            a = a - 3;
+        }
+
+        while(E.getBool()){
+            excuse.dothething();
+        }
+
+        while(i && a < 4) {
+            excuse.dothescarn();
+        }
+
+        while(true){
+            while(false){
+                b = b + a;
+            }
+            excuse.changeB(b);
+        }
+    }
+}

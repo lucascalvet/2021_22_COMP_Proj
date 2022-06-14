@@ -125,7 +125,6 @@ public class DeadCodeRemover extends PreorderJmmVisitor<Boolean, Boolean> {
                 final var condition = child.getJmmChild(0);
                 if(condition.getAttributes().contains("value") && condition.get("value").equals("false")){
                     //Remove While
-                    System.out.println("DEADCODE Removed While on line: " + child.get("line"));
                     node.removeJmmChild(child);
                     changeless = false;
                 }
@@ -135,7 +134,6 @@ public class DeadCodeRemover extends PreorderJmmVisitor<Boolean, Boolean> {
                 if(condition.getAttributes().contains("value")) {
                     if(condition.get("value").equals("false")) {
                         //Remove If
-                        System.out.println("DEADCODE Removed If on line: " + child.get("line"));
                         int index = child.getIndexOfSelf();
                         final var block = child.getJmmChild(2).getJmmChild(0);
                         if(block.getKind().equals(AstNode.BLOCK.toString())){
@@ -154,7 +152,6 @@ public class DeadCodeRemover extends PreorderJmmVisitor<Boolean, Boolean> {
                     }
                     else if(condition.get("value").equals("true")){
                         //Remove Else
-                        System.out.println("DEADCODE Removed Else on line: " + child.get("line"));
                         int index = child.getIndexOfSelf();
                         final var block = child.getJmmChild(1);
                         if(block.getKind().equals(AstNode.BLOCK.toString())){

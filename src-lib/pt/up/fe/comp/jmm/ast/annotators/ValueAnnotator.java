@@ -76,9 +76,7 @@ public class ValueAnnotator extends PreorderJmmVisitor<Boolean, Boolean> {
             return "";
         }
         final String v2 = getValue(node.getJmmChild(1));
-        if(v2.equals("")){
-            return "";
-        }
+
         if(kind.equals(AstNode.AND.toString())){
             if(v1.equals("true") && v2.equals("true")){
                 return "true";

@@ -21,7 +21,6 @@ public class JmmAnalyser implements JmmAnalysis {
     public JmmSemanticsResult semanticAnalysis(JmmParserResult parserResult) {
 
         if(parserResult.getConfig().containsKey("optimize") && parserResult.getConfig().get("optimize").equals("true")){
-            System.out.println("DEBUG OPTIMIZED");
             boolean allRemoved = false;
             int counter = 1;
             while(!allRemoved){
@@ -29,15 +28,17 @@ public class JmmAnalyser implements JmmAnalysis {
                 DeadCodeRemover deadCodeRemover = new DeadCodeRemover();
                 deadCodeRemover.visit(parserResult.getRootNode());
                 allRemoved = deadCodeRemover.isAllRemoved();
-                System.out.println("DEADCODE Removal Iteration " + counter);
-                System.out.println(parserResult.getRootNode().toTree());
+                if(parserResult.getConfig().containsKey("debug") && parserResult.getConfig().get("debug").equals("true")) {
+                    System.out.println("DEADCODE Removal Iteration " + counter);
+                    System.out.println(parserResult.getRootNode().toTree());
+                }
                 counter += 1;
             }
         }
 
         JmmSymbolTable symbolTable = new JmmSymbolTable(parserResult.getRootNode());
         List <Report> reports = symbolTable.getReports();
-        List <SemanticAnalyser> analysers = Arrays.asList(new SingleMainMethodCheck(symbolTable), new FunctionVerifier(parserResult.getRootNode(), symbolTable), new TypeVerifier(parserResult.getRootNode(), symbolTable), new SuperImportCheck(symbolTable), new BlockVerifier(parserResult.getRootNode(), symbolTable));
+        List <SemanticAnalyser> analysers = Arrays.asList(new FunctionVerifier(parserResult.getRootNode(), symbolTable), new TypeVerifier(parserResult.getRootNode(), symbolTable), new SuperImportCheck(symbolTable), new BlockVerifier(parserResult.getRootNode(), symbolTable));
 
         for(var analyser : analysers){
             System.out.println(analyser.toString());

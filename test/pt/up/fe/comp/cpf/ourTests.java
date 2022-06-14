@@ -1,9 +1,5 @@
 package pt.up.fe.comp.cpf;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,6 +13,8 @@ import pt.up.fe.comp.jmm.ollir.OllirResult;
 import pt.up.fe.specs.util.SpecsIo;
 import pt.up.fe.specs.util.SpecsStrings;
 import pt.up.fe.specs.util.utilities.LineStream;
+
+import static org.junit.Assert.*;
 
 public class ourTests {
 
@@ -49,20 +47,80 @@ public class ourTests {
 
     }
 
+    @Test
+    public void semantic_UndeclaredVar() {
+        var semantics = TestUtils.analyse(SpecsIo.getResource("fixtures/public/cpf/2_semantic_analysis/lookup/UndeclaredVar.jmm"));
+        TestUtils.mustFail(semantics.getReports());
+    }
 
     @Test
     public void deadcode_UnusedImports() {
         Map<String, String> config = new HashMap<>();
         config.put("optimize", "true");
-
-        var semantics = TestUtils.analyse(SpecsIo.getResource("fixtures/public/cpf/2_semantic_analysis/import/UnusedImports.jmm"), config);
-        TestUtils.noErrors(semantics.getReports());
+        var semantics = TestUtils.analyse(SpecsIo.getResource("fixtures/public/cpf/2_semantic_analysis/import/UnusedImports.jmm"));
+        var semanticsOptimized = TestUtils.analyse(SpecsIo.getResource("fixtures/public/cpf/2_semantic_analysis/import/UnusedImports.jmm"), config);
+        TestUtils.noErrors(semanticsOptimized.getReports());
+        assertNotEquals("Expected symbol table to change with -o flag\n", semantics.getSymbolTable(), semanticsOptimized.getSymbolTable());
     }
 
     @Test
-    public void semantic_UndeclaredVar() {
-        var semantics = TestUtils.analyse(SpecsIo.getResource("fixtures/public/cpf/2_semantic_analysis/lookup/UndeclaredVar.jmm"));
-        TestUtils.mustFail(semantics.getReports());
+    public void deadcode_IfDeletion() {
+        Map<String, String> config = new HashMap<>();
+        config.put("optimize", "true");
+        var semantics = TestUtils.analyse(SpecsIo.getResource("fixtures/public/cpf/4_jasmin/control_flow/IfDeletion.jmm"));
+        var semanticsOptimized = TestUtils.analyse(SpecsIo.getResource("fixtures/public/cpf/4_jasmin/control_flow/IfDeletion.jmm"), config);
+        TestUtils.noErrors(semanticsOptimized.getReports());
+        assertNotEquals("Expected symbol table to change with -o flag\n", semantics.getSymbolTable(), semanticsOptimized.getSymbolTable());
+    }
+
+    @Test
+    public void deadcode_WhileDeletion() {
+        Map<String, String> config = new HashMap<>();
+        config.put("optimize", "true");
+        var semantics = TestUtils.analyse(SpecsIo.getResource("fixtures/public/cpf/4_jasmin/control_flow/WhileDeletion.jmm"));
+        var semanticsOptimized = TestUtils.analyse(SpecsIo.getResource("fixtures/public/cpf/4_jasmin/control_flow/WhileDeletion.jmm"), config);
+        TestUtils.noErrors(semanticsOptimized.getReports());
+        assertNotEquals("Expected symbol table to change with -o flag\n", semantics.getSymbolTable(), semanticsOptimized.getSymbolTable());
+    }
+
+    @Test
+    public void deadcode_UnusedVarsDeletion() {
+        Map<String, String> config = new HashMap<>();
+        config.put("optimize", "true");
+        var semantics = TestUtils.analyse(SpecsIo.getResource("fixtures/public/cpf/4_jasmin/control_flow/UnusedVars.jmm"));
+        var semanticsOptimized = TestUtils.analyse(SpecsIo.getResource("fixtures/public/cpf/4_jasmin/control_flow/UnusedVars.jmm"), config);
+        TestUtils.noErrors(semanticsOptimized.getReports());
+        assertNotEquals("Expected symbol table to change with -o flag\n", semantics.getSymbolTable(), semanticsOptimized.getSymbolTable());
+    }
+
+    @Test
+    public void constprop_PropBools() {
+        Map<String, String> config = new HashMap<>();
+        config.put("optimize", "true");
+        var semantics = TestUtils.analyse(SpecsIo.getResource("fixtures/public/cpf/5_optimizations/const_prop/PropBools.jmm"));
+        var semanticsOptimized = TestUtils.analyse(SpecsIo.getResource("fixtures/public/cpf/5_optimizations/const_prop/PropBools.jmm"), config);
+        TestUtils.noErrors(semanticsOptimized.getReports());
+        assertNotEquals("Expected symbol table to change with -o flag\n", semantics.getSymbolTable(), semanticsOptimized.getSymbolTable());
+    }
+
+    @Test
+    public void constprop_PropInts() {
+        Map<String, String> config = new HashMap<>();
+        config.put("optimize", "true");
+        var semantics = TestUtils.analyse(SpecsIo.getResource("fixtures/public/cpf/5_optimizations/const_prop/PropInts.jmm"));
+        var semanticsOptimized = TestUtils.analyse(SpecsIo.getResource("fixtures/public/cpf/5_optimizations/const_prop/PropInts.jmm"), config);
+        TestUtils.noErrors(semanticsOptimized.getReports());
+        assertNotEquals("Expected symbol table to change with -o flag\n", semantics.getSymbolTable(), semanticsOptimized.getSymbolTable());
+    }
+
+    @Test
+    public void constprop_PropMix() {
+        Map<String, String> config = new HashMap<>();
+        config.put("optimize", "true");
+        var semantics = TestUtils.analyse(SpecsIo.getResource("fixtures/public/cpf/5_optimizations/const_prop/PropMix.jmm"));
+        var semanticsOptimized = TestUtils.analyse(SpecsIo.getResource("fixtures/public/cpf/5_optimizations/const_prop/PropMix.jmm"), config);
+        TestUtils.noErrors(semanticsOptimized.getReports());
+        assertNotEquals("Expected symbol table to change with -o flag\n", semantics.getSymbolTable(), semanticsOptimized.getSymbolTable());
     }
 
 }
