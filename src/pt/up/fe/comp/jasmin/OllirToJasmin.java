@@ -104,8 +104,8 @@ public class OllirToJasmin {
         code.append(methodParamTypes).append(")").append(utils.getJasminType(method.getReturnType())).append("\n");
 
         //Corpo do método
-        code.append(".limit stack 99\n");
-        code.append(".limit locals 99\n");
+        code.append(".limit stack ").append(getStackLimit(method)).append("\n");
+        code.append(".limit locals ").append(getLocalsLimit(method)).append("\n");
 
         boolean hasReturn = false;
         index = 0;
@@ -128,6 +128,20 @@ public class OllirToJasmin {
         return result;
     }
 
+    private int getStackLimit(Method method) {
+        return 99;
+    }
 
+    private int getLocalsLimit(Method method) {
+        // Elements in the varTable + this.
+        var varTable = method.getVarTable();
+        int limit = varTable.size();
+
+        if(!method.getMethodName().equals("main")){
+            limit++;
+        }
+
+        return limit;
+    }
 
 }

@@ -96,14 +96,16 @@ public class Launcher {
 
         OllirResult ollirCode = optimizer.toOllir(optimizationResult);
 
+        OllirResult ollirOptimized = optimizer.optimize(ollirCode);
+
         // Check if there are parsing errors
-        TestUtils.noErrors(optimizationResult.getReports());
+        TestUtils.noErrors(optimizationResult.getReports()); //TODO: check if this is to be changed
 
         // Instantiate jasminBackend
         JasminBackendClass jasminBackend = new JasminBackendClass();
 
         // Jasmin Backend stage
-        JasminResult jasminResult = jasminBackend.toJasmin(ollirCode);
+        JasminResult jasminResult = jasminBackend.toJasmin(ollirOptimized);
 
         // Check if there are parsing errors
         TestUtils.noErrors(jasminResult.getReports());
