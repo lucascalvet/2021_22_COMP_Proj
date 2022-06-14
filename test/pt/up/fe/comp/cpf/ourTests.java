@@ -5,6 +5,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Test;
 
@@ -55,5 +57,19 @@ public class ourTests {
 
     }
 
+    @Test
+    public void deadcode_UnusedImports() {
+        Map<String, String> config = new HashMap<>();
+        config.put("optimize", "true");
+
+        var semantics = TestUtils.analyse(SpecsIo.getResource("fixtures/public/cpf/2_semantic_analysis/import/UnusedImports.jmm"), config);
+        TestUtils.noErrors(semantics.getReports());
+    }
+
+    @Test
+    public void semantic_UndeclaredVar() {
+        var semantics = TestUtils.analyse(SpecsIo.getResource("fixtures/public/cpf/2_semantic_analysis/lookup/UndeclaredVar.jmm"));
+        TestUtils.mustFail(semantics.getReports());
+    }
 
 }

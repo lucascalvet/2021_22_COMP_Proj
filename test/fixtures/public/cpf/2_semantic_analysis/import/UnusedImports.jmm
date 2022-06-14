@@ -1,0 +1,23 @@
+import io;
+import D;
+import oi;
+import B;
+import C;
+
+class A {
+    B a;
+
+    public int x(){
+        a = new B();
+        return 2;
+    }
+
+    public static void main(String[] args){
+        C c;
+        int n;
+        c = new C();
+        io.print(c.getN());
+        n = 1 + 2;
+        io.print(n);
+    }
+}

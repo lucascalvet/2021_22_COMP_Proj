@@ -11,14 +11,18 @@ import pt.up.fe.comp.jmm.report.ReportType;
 import pt.up.fe.comp.jmm.report.Stage;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class DeadCodeRemover extends PreorderJmmVisitor<Boolean, Boolean> {
     private boolean changeless;
     private Map<String, List<JmmNode>> declaredVars;
+    private Map<String, JmmNode> imports;
 
     public DeadCodeRemover(){
         this.changeless = true;
         this.declaredVars = new HashMap();
+        this.imports = new HashMap();
+        addVisit(AstNode.IMPORT, this::visitImport);
         addVisit(AstNode.VAR, this::visitVar);
         addVisit(AstNode.ASSIGN, this::visitAssign);
         addVisit(AstNode.ID, this::visitId);
@@ -46,6 +50,28 @@ public class DeadCodeRemover extends PreorderJmmVisitor<Boolean, Boolean> {
         return false;
     }
 
+    private Boolean clearUnusedImports(){
+        if(this.imports.isEmpty()){
+            return true;
+        }
+        for(String key : this.imports.keySet()){
+            final var node = this.imports.get(key);
+            node.getJmmParent().removeJmmChild(node);
+        }
+        this.imports = new HashMap();
+        return false;
+    }
+
+    private Boolean visitImport(JmmNode node, Boolean dummy){
+        var packageNode = node.getJmmChild(0);
+        var importString = packageNode.getChildren().stream()
+                .map(id -> id.get("name"))
+                .collect(Collectors.joining("."));
+
+        this.imports.put(importString, node);
+        return true;
+    }
+
     private Boolean visitBody(JmmNode node, Boolean dummy){
         clearUnusedVars();
         return removeDeadCode(node, dummy);
@@ -62,14 +88,8 @@ public class DeadCodeRemover extends PreorderJmmVisitor<Boolean, Boolean> {
     }
 
     private Boolean visitAssign(JmmNode node, Boolean dummy){
-        if(node.getJmmChild(0).getAttributes().contains("name")){
-            List<JmmNode> nodeList;
-            if(declaredVars.containsKey(node.getJmmChild(0).get("name"))){
-                nodeList = this.declaredVars.get(node.getJmmChild(0).get("name"));
-            }
-            else{
-                nodeList = new ArrayList<JmmNode>();
-            }
+        if(node.getJmmChild(0).getAttributes().contains("name") && declaredVars.containsKey(node.getJmmChild(0).get("name"))){
+            List<JmmNode> nodeList = this.declaredVars.get(node.getJmmChild(0).get("name"));
             nodeList.add(node);
             this.declaredVars.put(node.getJmmChild(0).get("name"), nodeList);
             return true;
@@ -78,12 +98,22 @@ public class DeadCodeRemover extends PreorderJmmVisitor<Boolean, Boolean> {
     }
 
     private Boolean visitId(JmmNode node, Boolean dummy){
-        if(node.getAttributes().contains("name") && this.declaredVars.containsKey(node.get("name"))){
-            if(node.getJmmParent().getKind().equals(AstNode.VAR.toString()) || (node.getJmmParent().getKind().equals(AstNode.ASSIGN.toString()) && node.getIndexOfSelf() == 0)){
-                return false;
+        if(node.getAttributes().contains("name")){
+            final String nodeName = node.get("name");
+            if(this.declaredVars.containsKey(nodeName)){
+                if(node.getJmmParent().getKind().equals(AstNode.VAR.toString()) || (node.getJmmParent().getKind().equals(AstNode.ASSIGN.toString()) && node.getIndexOfSelf() == 0)){
+                    return false;
+                }
+                this.declaredVars.remove(nodeName);
+                return true;
             }
-            this.declaredVars.remove(node.get("name"));
-            return true;
+            if(this.imports.containsKey(nodeName)){
+                if(node.getJmmParent().getKind().equals(AstNode.IMPORT.toString()) || node.getJmmParent().getKind().equals(AstNode.PACKAGE.toString())){
+                    return false;
+                }
+                this.imports.remove(nodeName);
+                return true;
+            }
         }
         return false;
     }
@@ -148,6 +178,7 @@ public class DeadCodeRemover extends PreorderJmmVisitor<Boolean, Boolean> {
 
     public boolean isAllRemoved(){
         if(this.changeless){
+            clearUnusedImports();
             return clearUnusedVars();
         }
         return false;

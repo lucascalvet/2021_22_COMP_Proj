@@ -1,0 +1,18 @@
+import io;
+import op;
+
+class A {
+
+	int a;
+
+    public int m(){
+        int c;
+        a = 10;
+        b = 20;
+        c = 30;
+        io.print(c);
+        io.print(a);
+        io.print(b);
+        return c;
+    }
+}
