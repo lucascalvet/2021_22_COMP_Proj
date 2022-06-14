@@ -24,6 +24,7 @@ public class LoadStore {
 
                     int register = scope.get(((Operand)element).getName()).getVirtualReg();
                     counters.incLocalSize(register);
+                    counters.incStackSize(1);
                     if (register > 3 || register < 0)
                         result.append("iload ").append(register).append("\n");
                     else
@@ -33,6 +34,7 @@ public class LoadStore {
                 if(type == ElementType.CLASS || type == ElementType.THIS || type == ElementType.OBJECTREF || type == ElementType.ARRAYREF){
                     int register = scope.get(((Operand)element).getName()).getVirtualReg();
                     counters.incLocalSize(register);
+                    counters.incStackSize(1);
                     if (register > 3 || register < 0)
                         result.append("aload ").append(register).append("\n");
                     else
@@ -58,6 +60,7 @@ public class LoadStore {
                 Descriptor descriptor = scope.get(name);
                 int register = descriptor.getVirtualReg();
                 counters.incLocalSize(register);
+                counters.decStackSize(1);
                 if (register > 3 || register < 0)
                     result.append("istore ").append(register).append("\n");
                 else
@@ -67,6 +70,7 @@ public class LoadStore {
         else if (type == ElementType.OBJECTREF || type == ElementType.ARRAYREF || type == ElementType.THIS){
             int register = scope.get(((Operand)element).getName()).getVirtualReg();
             counters.incLocalSize(register);
+            counters.decStackSize(1);
             if (register > 3 || register < 0)
                 result.append("astore ").append(register).append("\n");
             else result.append("astore_").append(register).append("\n");
@@ -85,6 +89,7 @@ public class LoadStore {
         StringBuilder result = new StringBuilder();
         int array = scope.get(((Operand)element).getName()).getVirtualReg();
         counters.incLocalSize(array);
+        counters.incStackSize(1);
         if (array > 3 || array < 0)
             result.append("aload " + array + "\n");
         else result.append("aload_"+ array + "\n");
@@ -95,11 +100,13 @@ public class LoadStore {
         Element index = indexOperand.get(0);
         int indexVirtual =  scope.get(((Operand) index).getName()).getVirtualReg();
         counters.incLocalSize(indexVirtual);
+        counters.incStackSize(1);
         if (indexVirtual > 3 || indexVirtual < 0)
             result.append("iload " + indexVirtual + "\n");
         else result.append("iload_"+ indexVirtual + "\n");
         result.append(rightSide);
         result.append("iastore\n");
+        counters.decStackSize(3);
         return result.toString();
     }
 
@@ -107,6 +114,7 @@ public class LoadStore {
         StringBuilder result = new StringBuilder();
         int array = scope.get(((Operand)element).getName()).getVirtualReg();
         counters.incLocalSize(array);
+        counters.incStackSize(1);
         if (array > 3 || array < 0)
             result.append("aload " + array + "\n");
         else result.append("aload_"+ array + "\n");
@@ -117,11 +125,12 @@ public class LoadStore {
         Element index = indexOperand.get(0);
         int indexVirtual =  scope.get(((Operand) index).getName()).getVirtualReg();
         counters.incLocalSize(indexVirtual);
-
+        counters.incStackSize(1);
         if (indexVirtual > 3 || indexVirtual < 0)
             result.append("iload " + indexVirtual + "\n");
         else result.append("iload_"+ indexVirtual + "\n");
         result.append("iaload\n");
+        counters.decStackSize(2);
         return result.toString();
     }
 

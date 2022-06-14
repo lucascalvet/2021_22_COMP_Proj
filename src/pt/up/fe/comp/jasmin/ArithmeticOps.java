@@ -22,23 +22,27 @@ public class ArithmeticOps {
         StringBuilder result = new StringBuilder();
         result.append(LoadStore.load(leftElement, scope, counters));
         result.append(LoadStore.load(rightElement, scope, counters));
-        result.append(ArithmeticOps.getOperation(operationType));
+        result.append(ArithmeticOps.getOperation(operationType, counters));
         return result.toString();
     }
 
-    public static String getOperation(OperationType operationType) {
+    public static String getOperation(OperationType operationType, StackLocalsCount counters) {
         StringBuilder result = new StringBuilder();
         switch (operationType){
             case MUL:
+                counters.decStackSize(1);
                 result.append("imul \n");
                 break;
             case DIV:
+                counters.decStackSize(1);
                 result.append("idiv \n");
                 break;
             case ADD:
+                counters.decStackSize(1);
                 result.append("iadd \n");
                 break;
             case SUB:
+                counters.decStackSize(1);
                 result.append("isub \n");
                 break;
             default:
