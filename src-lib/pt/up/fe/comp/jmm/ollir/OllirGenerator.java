@@ -481,7 +481,7 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
                         .append(simpleExpression)
                         .append("].")
                         .append(OllirUtils.getOllirType(symbol.getType().getName()));
-                varType = symbol.getType();
+                varType = new Type(symbol.getType().getName(), false);
 
                 simpleExpression = terminalCode.toString();
                 return 0;
@@ -502,7 +502,7 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
                         .append(simpleExpression)
                         .append("].")
                         .append(OllirUtils.getCode(symbol.getType()));
-                varType = symbol.getType();
+                varType = new Type(symbol.getType().getName(), false);
 
                 simpleExpression = terminalCode.toString();
                 return 0;
@@ -520,7 +520,7 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
                         .append(simpleExpression)
                         .append("].")
                         .append(OllirUtils.getOllirType(symbol.getType().getName()));
-                varType = symbol.getType();
+                varType = new Type(symbol.getType().getName(), false);
 
                 simpleExpression = terminalCode.toString();
                 return 0;
