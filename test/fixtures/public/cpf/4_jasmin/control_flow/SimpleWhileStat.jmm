@@ -8,7 +8,7 @@ class SimpleWhileStat {
 
 		a = 3;
         i = 0;
-		
+
         while (i < a) {
             ioPlus.printResult(i);
             i = i + 1;

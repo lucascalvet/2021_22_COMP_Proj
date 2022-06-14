@@ -1,6 +1,7 @@
 package pt.up.fe.comp.jasmin;
 
 import org.specs.comp.ollir.*;
+import pt.up.fe.specs.util.exceptions.NotImplementedException;
 
 import java.util.HashMap;
 
@@ -9,11 +10,20 @@ public class ConditionalOperations {
     public static String getCode(CondBranchInstruction instruction, HashMap<String, Descriptor> scope){
         StringBuilder result = new StringBuilder();
         if(instruction.getOperands().size() == 1) {
-            Element op1 = instruction.getOperands().get(0);
-            String op11 = LoadStore.load(op1, scope);
-            result.append(op11);
-            result.append("ifne ");
-            result.append(instruction.getLabel()).append("\n");
+            if(instruction.getCondition().getInstType() == InstructionType.NOPER){
+                Element op1 = instruction.getOperands().get(0);
+                String op11 = LoadStore.load(op1, scope);
+                result.append(op11);
+                result.append("ifne ");
+                result.append(instruction.getLabel()).append("\n");
+            } else {
+                Element op1 = instruction.getOperands().get(0);
+                String op11 = LoadStore.load(op1, scope);
+                result.append(BooleanOperations.notConversion(op11));
+                result.append("ifne ");
+                result.append(instruction.getLabel()).append("\n");
+
+            }
         } else {
 
             Element operand1 = instruction.getOperands().get(0);
