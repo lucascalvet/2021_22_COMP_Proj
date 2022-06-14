@@ -44,8 +44,8 @@ public class AssignOperation {
                 Element e = ((UnaryOpInstruction) rightSide).getOperand();
                 OperationType optype = ((UnaryOpInstruction) rightSide).getOperation().getOpType();
                 String loadoper = LoadStore.load(e, scope, counters);
-                BooleanOperations.operate(optype, null, loadoper);
-                result.append(BooleanOperations.notConversion(loadoper));
+                BooleanOperations.operate(optype, null, loadoper, counters);
+                result.append(BooleanOperations.notConversion(loadoper, counters));
                 break;
             default:
                 throw new NotImplementedException("Problem in assign");

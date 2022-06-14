@@ -12,7 +12,7 @@ public class LoadStore {
 
         ElementType type = element.getType().getTypeOfElement();
         if(element.isLiteral()){
-            result.append(InstructionUtil.iconst(Integer.parseInt(((LiteralElement)element).getLiteral())));
+            result.append(InstructionUtil.iconst(Integer.parseInt(((LiteralElement)element).getLiteral()), counters));
             //result.append("ldc ").append(((LiteralElement)element).getLiteral()).append("\n");
         } else {
             if (type == ElementType.INT32 || type == ElementType.STRING || type == ElementType.BOOLEAN){
