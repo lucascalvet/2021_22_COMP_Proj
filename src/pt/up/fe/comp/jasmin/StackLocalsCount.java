@@ -41,17 +41,15 @@ public class StackLocalsCount {
         }
     }
 
-    public void incStackSize(int value, String instruction){
+    public void incStackSize(int value){
         this.stackSize += value;
         if(stackSize > stackMaxSize){
             stackMaxSize = stackSize;
         }
-        System.out.println("Stacksize evolution " + this.stackSize + " " + instruction);
     }
 
-    public void decStackSize(int value, String instruction){
+    public void decStackSize(int value){
         this.stackSize -= value;
-        System.out.println("Stacksize evolution " + this.stackSize + " " + instruction);
     }
 
 

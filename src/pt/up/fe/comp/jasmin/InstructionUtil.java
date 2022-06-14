@@ -15,7 +15,7 @@ public class InstructionUtil {
         } else {
             result.append("ldc ").append(valueStr).append("\n");
         }
-        counters.incStackSize(1, "iconst");
+        counters.incStackSize(1);
         return result.toString();
     }
 }

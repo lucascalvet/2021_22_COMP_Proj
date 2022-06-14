@@ -1,7 +1,6 @@
 package pt.up.fe.comp.jasmin;
 
 import org.specs.comp.ollir.*;
-import pt.up.fe.comp.VOID_;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,10 +25,10 @@ public class CallInstructions {
         result.append("invokespecial ").append(((ClassType) classElement.getType()).getName());
 
         int parametersSize = parameters.size();
-        counters.decStackSize(parametersSize, "number of parameters" + parametersSize);
+        counters.decStackSize(parametersSize);
 
         if(returnType.getTypeOfElement() != ElementType.VOID){
-            counters.incStackSize(1, "not void parameter");
+            counters.incStackSize(1);
         }
 
         result.append(".").append(methodName);
@@ -59,9 +58,9 @@ public class CallInstructions {
         result.append("invokestatic ");
 
         int parametersSize = parameters.size();
-        counters.decStackSize(parametersSize, "number of parameters"  + parametersSize);
+        counters.decStackSize(parametersSize);
         if(returnType.getTypeOfElement() != ElementType.VOID){
-            counters.incStackSize(1, "Not void parameter");
+            counters.incStackSize(1);
         }
 
         var methodClass = ((Operand) instruction.getFirstArg()).getName();
@@ -83,7 +82,7 @@ public class CallInstructions {
 
         if(!converter.isAssign() && returnType.getTypeOfElement() != ElementType.VOID){
             result.append("pop\n");
-            counters.decStackSize(1, "pop");
+            counters.decStackSize(1);
         }
 
         return result.toString();
@@ -109,9 +108,9 @@ public class CallInstructions {
 
         result.append("invokevirtual ").append(className).append(".");
         int parametersSize = operands.size();
-        counters.decStackSize(parametersSize, "parameter size" + parametersSize);
+        counters.decStackSize(parametersSize);
         if(returnType.getTypeOfElement() != ElementType.VOID){
-            counters.incStackSize(1, "Not void parameter");
+            counters.incStackSize(1);
         }
 
         result.append(methodCall.replace("\"", ""));
@@ -129,7 +128,7 @@ public class CallInstructions {
 
         if(!converter.isAssign() && returnType.getTypeOfElement() != ElementType.VOID){
             result.append("pop\n");
-            counters.decStackSize(1, "pop");
+            counters.decStackSize(1);
         }
 
         return result.toString();
@@ -142,10 +141,10 @@ public class CallInstructions {
 
         if(returnType.getTypeOfElement() == ElementType.OBJECTREF){
             result.append("new ").append(((ClassType) returnType).getName()).append("\n");
-            counters.incStackSize(1, "new");
+            counters.incStackSize(1);
 
             result.append("dup\n");
-            counters.incStackSize(1, "dup");
+            counters.incStackSize(1);
         } else{
             Element element;
             if(instruction.getListOfOperands().size() != 0){
