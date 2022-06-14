@@ -1,5 +1,12 @@
 package pt.up.fe.comp.jasmin;
 
+import org.specs.comp.ollir.Descriptor;
+import org.specs.comp.ollir.Element;
+import org.specs.comp.ollir.Method;
+import org.specs.comp.ollir.Operand;
+
+import java.util.HashMap;
+
 public class StackLocalsCount {
 
     private int stackMaxSize;
@@ -19,9 +26,13 @@ public class StackLocalsCount {
         //return stackMaxSize;
     }
 
-    public int getLocalsMaxSize() {
-        return 98;
-        //return localsMaxSize;
+    public int getLocalsMaxSize(Method method, HashMap<String, Descriptor> scope) {
+        for(Element element : method.getParams()){
+            int local = scope.get(((Operand)element).getName()).getVirtualReg();
+            this.incLocalSize(local);
+        }
+        localsMaxSize++;
+        return localsMaxSize;
     }
 
     public void incLocalSize(int value){

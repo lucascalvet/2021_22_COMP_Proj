@@ -124,7 +124,7 @@ public class OllirToJasmin {
 
         //holding limits
         code.append(".limit stack ").append(counters.getStackMaxSize()).append("\n");
-        code.append(".limit locals ").append(counters.getLocalsMaxSize()).append("\n");
+        code.append(".limit locals ").append(counters.getLocalsMaxSize(method, scope)).append("\n");
 
         code.append(body.toString());
         if(!hasReturn)
