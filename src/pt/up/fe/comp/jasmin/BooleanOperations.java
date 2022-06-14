@@ -38,11 +38,11 @@ public class BooleanOperations {
         result.append(rightInstruction);
         String label1 = "IFNE"+ (index*2);
         result.append("ifne ").append(label1+"\n");
-        result.append("iconst_1\n");
+        result.append(InstructionUtil.iconst(1));
         String label2 = "IFNE_"+(index*2+1);
         result.append("goto ").append(label2+"\n");
         result.append(label1).append(":\n");
-        result.append("iconst_0\n");
+        result.append(InstructionUtil.iconst(0));
         result.append(label2).append(":\n");
         return result.toString();
     }
@@ -62,11 +62,11 @@ public class BooleanOperations {
         result.append("ifeq ").append(labelFalse).append("\n");
 
         //if it is true it reached here
-        result.append("iconst_1").append("\n");
+        result.append(InstructionUtil.iconst(1));
         result.append("goto ").append(labelTrue ).append("\n"); //jump to the end
 
         result.append(labelFalse).append(":\n");
-        result.append("iconst_0").append("\n");
+        result.append(InstructionUtil.iconst(0));
         result.append(labelTrue ).append(":\n");
         return result.toString();
     }
@@ -81,10 +81,10 @@ public class BooleanOperations {
         String label2 = "$IFICMP_"+ (index*2+1);
 
         result.append("if_icmplt ").append(label1).append("\n");
-        result.append("iconst_0").append("\n");
+        result.append(InstructionUtil.iconst(0));
         result.append("goto ").append(label2).append("\n");
         result.append(label1).append(":\n");
-        result.append("iconst_1").append("\n");
+        result.append(InstructionUtil.iconst(1));
         result.append(label2).append(":\n");
         return result.toString();
     }
