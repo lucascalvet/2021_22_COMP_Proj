@@ -45,6 +45,13 @@ public class ParserTest {
      */
 
     @Test
+    public void custom() {
+        noErrors(SpecsIo.getResource("fixtures/public/cpf/2_semantic_analysis/lookup/VarLookup_Field.jmm"));
+        //noErrors(SpecsIo.getResource("fixtures/public/cpf/4_jasmin/control_flow/SimpleWhileStat.jmm"));
+        //mustFail(SpecsIo.getResource("fixtures/public/cp2/IntInIfCondition.jmm"));
+    }
+
+    @Test
     public void helloWorld() {
         noErrors(SpecsIo.getResource("fixtures/public/HelloWorld.jmm"));
     }

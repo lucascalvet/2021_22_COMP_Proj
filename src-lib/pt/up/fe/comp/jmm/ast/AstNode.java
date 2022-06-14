@@ -58,6 +58,7 @@ public enum AstNode {
         this.name = SpecsStrings.toCamelCase(name(), "_", true);
     }
 
+    public static List<String> getConsts(){return Arrays.asList(AstNode.INT.toString(), AstNode.TRUE.toString(), AstNode.FALSE.toString());}
     public static List<String> getBooleanOp(){return Arrays.asList(AstNode.NOT.toString(), AstNode.AND.toString());}
     public static List<String> getAritmeticOp(){return Arrays.asList(AstNode.ADD.toString(), AstNode.SUBTRACT.toString(), AstNode.MULTIPLY.toString(), AstNode.DIVIDE.toString());}
     public static List<String> getTerminalNodes(){return Arrays.asList(AstNode.INT.toString(), AstNode.ID.toString(), AstNode.TRUE.toString() , AstNode.FALSE.toString(), AstNode.THIS.toString());}
