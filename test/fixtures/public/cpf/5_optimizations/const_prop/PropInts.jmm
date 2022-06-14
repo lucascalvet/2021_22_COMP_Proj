@@ -1,0 +1,23 @@
+import io;
+
+class PropInts {
+    public int foo(){
+	  int a;
+	  int b;
+	  int c;
+	  int i;
+	  int res;
+	  a = 10;
+	  i = 0;
+	  while (i < a){
+	    i=i+1;
+	  }
+	  b = 30;
+	  c = 5;
+	  io.print(b / c);
+	  res = 2*a;
+	  return res;
+	}
+	public static void main(String[] args) {
+	}
+}

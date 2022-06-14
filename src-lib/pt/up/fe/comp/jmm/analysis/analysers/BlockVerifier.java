@@ -25,11 +25,6 @@ public class BlockVerifier extends Verifier{
             this.addReport(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(block.get("line")), Integer.valueOf(block.get("col")), "Unnecessary Block"));
             return false;
         }
-        /*
-        if(block.getChildren().size() == 0){
-            block.getJmmParent().removeJmmChild(block);
-        }
-         */
 
         return true;
     }
