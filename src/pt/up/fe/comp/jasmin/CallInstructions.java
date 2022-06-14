@@ -8,7 +8,7 @@ import java.util.HashMap;
 
 public class CallInstructions {
 
-    public static String getCodeInvokeSpecial(CallInstruction instruction, ConversionInstructions converter) {
+    public static String getCodeInvokeSpecial(CallInstruction instruction, ConversionInstructions converter, StackLocalsCount counters) {
         ConversionUtils utils = converter.getUtils();
         HashMap<String, Descriptor> scope = converter.getScope();
 
@@ -19,7 +19,7 @@ public class CallInstructions {
         Type returnType = instruction.getReturnType();
 
         for (Element param : parameters){
-            result.append(LoadStore.load(param, scope));
+            result.append(LoadStore.load(param, scope, counters));
         }
         result.append("invokespecial ").append(((ClassType) classElement.getType()).getName());
         result.append(".").append(methodName);
@@ -35,7 +35,7 @@ public class CallInstructions {
         return result.toString();
     }
 
-    public static String getCodeInvokeStatic(CallInstruction instruction, ConversionInstructions converter) {
+    public static String getCodeInvokeStatic(CallInstruction instruction, ConversionInstructions converter, StackLocalsCount counters) {
 
         ConversionUtils utils = converter.getUtils();
         HashMap<String, Descriptor> scope = converter.getScope();
@@ -44,7 +44,7 @@ public class CallInstructions {
         ArrayList<Element> parameters = instruction.getListOfOperands();
         Type returnType = instruction.getReturnType();
         for (Element param : parameters){
-            result.append(LoadStore.load(param, scope));
+            result.append(LoadStore.load(param, scope, counters));
         }
         result.append("invokestatic ");
 
@@ -72,7 +72,7 @@ public class CallInstructions {
         return result.toString();
     }
 
-    public static String getCodeInvokeVirtual(CallInstruction instruction, ConversionInstructions converter) {
+    public static String getCodeInvokeVirtual(CallInstruction instruction, ConversionInstructions converter, StackLocalsCount counters) {
         ConversionUtils utils = converter.getUtils();
         HashMap<String, Descriptor> scope = converter.getScope();
 
@@ -84,10 +84,10 @@ public class CallInstructions {
         String className = ((ClassType) firstArg.getType()).getName();
         String methodCall = ((LiteralElement) instruction.getSecondArg()).getLiteral();
 
-        result.append(LoadStore.load(firstArg, scope));
+        result.append(LoadStore.load(firstArg, scope, counters));
 
         for(Element operand : operands){
-            result.append(LoadStore.load(operand, scope));
+            result.append(LoadStore.load(operand, scope, counters));
         }
 
         result.append("invokevirtual ").append(className).append(".");
@@ -111,7 +111,7 @@ public class CallInstructions {
         return result.toString();
     }
 
-    public static String getCodeNew(CallInstruction instruction, ConversionInstructions converter) {
+    public static String getCodeNew(CallInstruction instruction, ConversionInstructions converter, StackLocalsCount counters) {
         HashMap<String, Descriptor> scope = converter.getScope();
         StringBuilder result = new StringBuilder();
         Type returnType = instruction.getReturnType();
@@ -126,15 +126,15 @@ public class CallInstructions {
             } else {
                 element = instruction.getFirstArg();
             }
-            result.append(LoadStore.newArray(element, scope));
+            result.append(LoadStore.newArray(element, scope, counters));
         }
         return result.toString();
     }
 
-    public static String getCodeArrayLength(CallInstruction instruction, ConversionInstructions converter) {
+    public static String getCodeArrayLength(CallInstruction instruction, ConversionInstructions converter, StackLocalsCount counters) {
         StringBuilder result = new StringBuilder();
         Element arrayLength = instruction.getFirstArg();
-        result.append(LoadStore.load(arrayLength, converter.getScope()));
+        result.append(LoadStore.load(arrayLength, converter.getScope(), counters));
         result.append("arraylength\n");
         return result.toString();
     }

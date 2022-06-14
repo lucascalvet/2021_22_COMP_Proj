@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class LoadStore {
-    public static String load(Element element, HashMap<String, Descriptor> scope){
+    public static String load(Element element, HashMap<String, Descriptor> scope, StackLocalsCount counters){
         StringBuilder result = new StringBuilder();
 
         ElementType type = element.getType().getTypeOfElement();
@@ -18,7 +18,7 @@ public class LoadStore {
             if (type == ElementType.INT32 || type == ElementType.STRING || type == ElementType.BOOLEAN){
                 ElementType typeVar = scope.get(((Operand)element).getName()).getVarType().getTypeOfElement();
                 if(typeVar == ElementType.ARRAYREF){
-                    result.append(loadArray(element, scope));
+                    result.append(loadArray(element, scope, counters));
                 }
                 else{
 
@@ -42,14 +42,14 @@ public class LoadStore {
         return result.toString();
     }
 
-    public static String store(Element element, HashMap<String, Descriptor> scope, String rightSide){
+    public static String store(Element element, HashMap<String, Descriptor> scope, String rightSide, StackLocalsCount counters){
         StringBuilder result = new StringBuilder();
         ElementType type = element.getType().getTypeOfElement();
 
         if(type == ElementType.INT32 || type == ElementType.STRING || type ==  ElementType.BOOLEAN){
             ElementType typeVar = scope.get(((Operand)element).getName()).getVarType().getTypeOfElement();
             if(typeVar == ElementType.ARRAYREF) {
-                result.append(storeArray(element, scope, rightSide));
+                result.append(storeArray(element, scope, rightSide, counters));
             }
             else {
                 String name = ((Operand)element).getName();
@@ -70,14 +70,14 @@ public class LoadStore {
         return result.toString();
     }
 
-    public static String newArray(Element element, HashMap<String, Descriptor> scope){
+    public static String newArray(Element element, HashMap<String, Descriptor> scope, StackLocalsCount counters){
         StringBuilder result = new StringBuilder();
-        result.append(LoadStore.load(element, scope));
+        result.append(LoadStore.load(element, scope, counters));
         result.append("newarray " + "int" + "\n");
         return result.toString();
     }
 
-    public static String storeArray(Element element, HashMap<String, Descriptor> scope, String rightSide){
+    public static String storeArray(Element element, HashMap<String, Descriptor> scope, String rightSide, StackLocalsCount counters){
         StringBuilder result = new StringBuilder();
         int array = scope.get(((Operand)element).getName()).getVirtualReg();
 
@@ -99,7 +99,7 @@ public class LoadStore {
         return result.toString();
     }
 
-    public static String loadArray(Element element, HashMap<String, Descriptor> scope){
+    public static String loadArray(Element element, HashMap<String, Descriptor> scope, StackLocalsCount counters){
         StringBuilder result = new StringBuilder();
         int array = scope.get(((Operand)element).getName()).getVirtualReg();
 
@@ -119,19 +119,6 @@ public class LoadStore {
         else result.append("iload_"+ indexVirtual + "\n");
         result.append("iaload\n");
         return result.toString();
-    }
-
-    public static boolean isArrayAccess(Element element, HashMap<String, Descriptor> scope){
-        if(element.isLiteral()){
-        ElementType type = element.getType().getTypeOfElement();
-
-        if(type == ElementType.INT32 || type == ElementType.STRING || type ==  ElementType.BOOLEAN){
-            ElementType typeVar = scope.get(((Operand)element).getName()).getVarType().getTypeOfElement();
-            if(typeVar == ElementType.ARRAYREF) {
-                return true;
-            }
-        }}
-        return false;
     }
 
 }

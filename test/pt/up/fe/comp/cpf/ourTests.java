@@ -47,13 +47,5 @@ public class ourTests {
 
     }
 
-    /*checks multiple expressions as indexes to access the elements of an array*/
-    @Test
-    public void section5_Arrays_Load_ComplexArrayAccess() {
-        CpUtils.runJasmin(getJasminResult("arrays/ComplexArrayAccess.jmm"),
-                "Result: 1\nResult: 2\nResult: 3\nResult: 4\nResult: 5");
-
-    }
-
 
 }

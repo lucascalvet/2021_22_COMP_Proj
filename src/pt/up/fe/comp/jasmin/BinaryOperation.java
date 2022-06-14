@@ -10,14 +10,14 @@ import java.util.HashMap;
 public class BinaryOperation {
 
     public static String processBinaryOperation(Element rightElement, Element leftElement,
-                                                OperationType operationType, HashMap<String, Descriptor> scope){
+                                                OperationType operationType, HashMap<String, Descriptor> scope, StackLocalsCount counters){
         StringBuilder result = new StringBuilder();
 
-        String leftInstruction = LoadStore.load(leftElement, scope);
-        String rightInstruction = LoadStore.load(rightElement, scope);
+        String leftInstruction = LoadStore.load(leftElement, scope, counters);
+        String rightInstruction = LoadStore.load(rightElement, scope, counters);
 
         if(ArithmeticOps.isArithmeticOp(operationType)){
-            result.append(ArithmeticOps.operate(rightElement, leftElement, scope, operationType));
+            result.append(ArithmeticOps.operate(rightElement, leftElement, scope, operationType, counters));
         } else if(BooleanOperations.isBooleanOp(operationType)){
             result.append(BooleanOperations.operate(operationType, leftInstruction, rightInstruction));
 
