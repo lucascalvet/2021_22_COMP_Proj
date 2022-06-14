@@ -22,8 +22,7 @@ public class StackLocalsCount {
     }
 
     public int getStackMaxSize() {
-        return 99;
-        //return stackMaxSize;
+        return stackMaxSize;
     }
 
     public int getLocalsMaxSize(Method method, HashMap<String, Descriptor> scope) {
