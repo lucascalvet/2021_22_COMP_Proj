@@ -1,5 +1,6 @@
 package pt.up.fe.comp.jmm.ollir;
 
+import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.SymbolTable;
 import pt.up.fe.comp.jmm.analysis.table.Type;
@@ -9,11 +10,13 @@ import pt.up.fe.comp.jmm.ast.visitors.AJmmVisitor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
     private final StringBuilder code;
     private final SymbolTable symbolTable;
+    private final Map<String, String> config;
     private String methodSignature = null;
     private Type varType;
     private boolean isAssign = false;
@@ -26,9 +29,10 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
     private static final Type BOOL_TYPE = new Type("bool", false);
     private static final Type VOID_TYPE = new Type("void", false);
 
-    public OllirGenerator(SymbolTable symbolTable) {
+    public OllirGenerator(JmmSemanticsResult semanticsResult) {
         this.code = new StringBuilder();
-        this.symbolTable = symbolTable;
+        this.symbolTable = semanticsResult.getSymbolTable();
+        this.config = semanticsResult.getConfig();
 
         addVisit(AstNode.PROGRAM, this::programVisit);
         addVisit(AstNode.CLASS_DECL, this::classDeclVisit);
@@ -687,7 +691,7 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
 
         // Condition
         // Check optimization flag
-        if (true) {
+        if (config.containsKey("optimize") && config.get("optimize").equals("true")) {
             visitAndCreateTemp(whileNode.getJmmChild(0).getJmmChild(0));
             code.append("if (!.bool ")
                     .append(simpleExpression)
