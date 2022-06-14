@@ -80,6 +80,8 @@ public class BooleanOperations {
         String label1 = "$IFICMP_"+ (index*2);
         String label2 = "$IFICMP_"+ (index*2+1);
 
+        //result.append("isub \n");
+        //result.append("iflt ").append(label1).append("\n");
         result.append("if_icmplt ").append(label1).append("\n");
         result.append(InstructionUtil.iconst(0));
         result.append("goto ").append(label2).append("\n");
