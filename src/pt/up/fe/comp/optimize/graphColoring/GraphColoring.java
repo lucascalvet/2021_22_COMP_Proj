@@ -2,6 +2,7 @@ package pt.up.fe.comp.optimize.graphColoring;
 
 import java.sql.Ref;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class GraphColoring {
@@ -24,11 +25,6 @@ public class GraphColoring {
             if(node.getRegister() == -1){
                 //not colored yet
                 int newColor = availableColor(node);
-
-                if(newColor == -1){
-                    System.out.println("Not enough Registers!");
-                    break;
-                }
 
                 node.setRegister(newColor);
 
@@ -53,15 +49,24 @@ public class GraphColoring {
         }
 
         //Check what color available for newNode
-        for(int r = 0; r < rValue; r++){
+        for(int r = 1; r < rValue; r++){
             if(!colorsInUse.contains(r)){
                 colorToUse = r;
                 break;
             }
         }
 
+        if(colorToUse == -1){
+            if(colorsInUse.isEmpty()){
+                colorToUse = 1;
+            } else {
+                colorToUse = (Collections.max(colorsInUse)) + 1;
+                System.out.println("Not enough Registers defined by -r (" + rValue + ")! - using new max (" + colorToUse + ")");
+            }
+
+        }
+
         return colorToUse;
     }
-
 
 }

@@ -78,6 +78,10 @@ public class OllirToJasmin {
     }
 
     public String getCode(Method method){
+        //to count locals and stack size
+        StackLocalsCount counters = new StackLocalsCount();
+        inst.setCounters(counters);
+
         method.buildVarTable();
         HashMap<String, Descriptor> scope = method.getVarTable();
         this.inst.updateScope(scope);
@@ -104,20 +108,25 @@ public class OllirToJasmin {
         code.append(methodParamTypes).append(")").append(utils.getJasminType(method.getReturnType())).append("\n");
 
         //Corpo do método
-        code.append(".limit stack ").append(getStackLimit(method)).append("\n");
-        code.append(".limit locals ").append(getLocalsLimit(method)).append("\n");
+
+        StringBuilder body = new StringBuilder();
 
         boolean hasReturn = false;
         index = 0;
         for(var instruction : method.getInstructions()){
             List<String> labels = method.getLabels(instruction);
             for (String label: labels)
-                code.append(label).append(":\n");
+                body.append(label).append(":\n");
             if(instruction.getInstType()==InstructionType.RETURN) hasReturn = true;
-            code.append(inst.getCode(instruction));
+            body.append(inst.getCode(instruction));
             index++;
         }
 
+        //holding limits
+        code.append(".limit stack ").append(counters.getStackMaxSize()).append("\n");
+        code.append(".limit locals ").append(counters.getLocalsMaxSize(method, scope)).append("\n");
+
+        code.append(body.toString());
         if(!hasReturn)
             code.append("return\n"); //se for return Void
 
@@ -127,21 +136,4 @@ public class OllirToJasmin {
         var result = code.toString();
         return result;
     }
-
-    private int getStackLimit(Method method) {
-        return 99;
-    }
-
-    private int getLocalsLimit(Method method) {
-        // Elements in the varTable + this.
-        var varTable = method.getVarTable();
-        int limit = varTable.size();
-
-        if(!method.getMethodName().equals("main")){
-            limit++;
-        }
-
-        return limit;
-    }
-
 }

@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 public class AssignOperation {
 
-    public static String getCode(AssignInstruction instruction, ConversionInstructions converter){
+    public static String getCode(AssignInstruction instruction, ConversionInstructions converter, StackLocalsCount counters){
         ConversionUtils utils = converter.getUtils();
         HashMap<String, Descriptor> scope = converter.getScope();
 
@@ -15,41 +15,44 @@ public class AssignOperation {
         StringBuilder result = new StringBuilder();
         Instruction rightSide = instruction.getRhs();
         Element leftSide = instruction.getDest();
-        converter.setLeftSideNew(instruction.getDest());
 
-        //handling right side
         StringBuilder right = new StringBuilder();
         InstructionType type = rightSide.getInstType();
         switch (type){
             case NOPER:
                 Element single = ((SingleOpInstruction) rightSide).getSingleOperand();
-                right.append(LoadStore.load(single, converter.getScope()));
-                result.append(LoadStore.load(single, scope));
+                System.out.println("antes do load no noper");
+                String load = LoadStore.load(single, scope, counters);
+                right.append(load);
+                result.append(load);
                 break;
             case GETFIELD:
                 Element classElement = ((GetFieldInstruction) rightSide).getFirstOperand();
                 Element field = ((GetFieldInstruction) rightSide).getSecondOperand();
 
-                result.append(FieldsOperations.getGetFieldCode(classElement, field, utils, scope));
-
+                result.append(FieldsOperations.getGetFieldCode(classElement, field, utils, scope, counters));
                 break;
             case BINARYOPER:
                 Element rightElement = ((BinaryOpInstruction) rightSide).getRightOperand();
                 Element leftElement = ((BinaryOpInstruction) rightSide).getLeftOperand();
                 OperationType operationType = ((BinaryOpInstruction) rightSide).getOperation().getOpType();
 
-                result.append(BinaryOperation.processBinaryOperation(rightElement, leftElement, operationType, scope));
+                result.append(BinaryOperation.processBinaryOperation(rightElement, leftElement, operationType, scope, counters));
                 break;
             case CALL:
-                converter.setRightSideNew(right.toString());
                 result.append(converter.getCode((CallInstruction) rightSide));
-                return result.toString();
-
+                break;
+            case UNARYOPER:
+                Element e = ((UnaryOpInstruction) rightSide).getOperand();
+                OperationType optype = ((UnaryOpInstruction) rightSide).getOperation().getOpType();
+                String loadoper = LoadStore.load(e, scope, counters);
+                BooleanOperations.operate(optype, null, loadoper, counters);
+                result.append(BooleanOperations.notConversion(loadoper, counters));
+                break;
             default:
                 throw new NotImplementedException("Problem in assign");
         }
-        converter.setRightSideNew(right.toString());
-        result.append(LoadStore.store(leftSide, scope, converter.getRightSideNew()));
+        result.append(LoadStore.store(leftSide, scope, right.toString(), counters));
         converter.setAssign(false);
         return result.toString();
     }

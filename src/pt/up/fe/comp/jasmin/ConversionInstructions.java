@@ -11,12 +11,11 @@ import static pt.up.fe.comp.jasmin.CallInstructions.getCodeNew;
 
 
 public class ConversionInstructions {
-    private Element leftSideNew;
-    private String rightSideNew;
     private final ConversionUtils utils;
     private final FunctionClassMap<Instruction, String> instructionMap;
     private HashMap<String, Descriptor> scope;
 
+    private StackLocalsCount counters;
     private boolean assign = false;
 
     public ConversionInstructions(ClassUnit classUnit) {
@@ -44,51 +43,53 @@ public class ConversionInstructions {
     }
 
     public String getCode(CondBranchInstruction instruction){
-        return ConditionalOperations.getCode(instruction, scope);
+        return ConditionalOperations.getCode(instruction, scope, counters);
     }
 
     public String getCode(CallInstruction instruction){
 
         switch(instruction.getInvocationType()){
             case invokestatic:
-                return CallInstructions.getCodeInvokeStatic(instruction, this);
+                return CallInstructions.getCodeInvokeStatic(instruction, this, counters);
             case invokespecial:
-                return CallInstructions.getCodeInvokeSpecial(instruction, this);
+                return CallInstructions.getCodeInvokeSpecial(instruction, this, counters);
             case invokevirtual:
-                return CallInstructions.getCodeInvokeVirtual(instruction, this);
+                return CallInstructions.getCodeInvokeVirtual(instruction, this, counters);
             case NEW:
-                return getCodeNew(instruction, this);
+                return getCodeNew(instruction, this, counters);
             case arraylength:
-                return getCodeArrayLength(instruction, this);
+                return getCodeArrayLength(instruction, this, counters);
             default:
                 throw new NotImplementedException("Call instruction" + instruction.getInvocationType());
         }
     }
 
     public String getCode(AssignInstruction instruction){
-        return AssignOperation.getCode(instruction, this);
+        return AssignOperation.getCode(instruction, this, counters);
     }
 
     public String getCode(ReturnInstruction instruction){
+
         StringBuilder result = new StringBuilder();
         if(!instruction.hasReturnValue()) {
             result.append("return").append("\n");
         } else{
             Element operand = instruction.getOperand();
-            result.append(LoadStore.load(operand, scope));
+            result.append(LoadStore.load(operand, scope, counters));
             ElementType type = instruction.getOperand().getType().getTypeOfElement();
             if (type == ElementType.INT32 || type == ElementType.BOOLEAN){
                 result.append("ireturn").append("\n");
             } else {
                 result.append("areturn").append("\n");
             }
+            counters.decStackSize(1);
 
         }
         return result.toString();
     }
 
     public String getCode(PutFieldInstruction instruction){
-        return FieldsOperations.getPutFieldCode(instruction, utils, scope);
+        return FieldsOperations.getPutFieldCode(instruction, utils, scope, counters);
 
     }
 
@@ -100,22 +101,6 @@ public class ConversionInstructions {
         return scope;
     }
 
-    public Element getLeftSideNew() {
-        return leftSideNew;
-    }
-
-    public String getRightSideNew() {
-        return rightSideNew;
-    }
-
-    public void setLeftSideNew(Element leftSideNew) {
-        this.leftSideNew = leftSideNew;
-    }
-
-    public void setRightSideNew(String rightSideNew) {
-        this.rightSideNew = rightSideNew;
-    }
-
     public boolean isAssign() {
         return assign;
     }
@@ -124,4 +109,7 @@ public class ConversionInstructions {
         this.assign = assign;
     }
 
+    public void setCounters(StackLocalsCount counters) {
+        this.counters = counters;
+    }
 }

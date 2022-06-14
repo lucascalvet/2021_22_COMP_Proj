@@ -122,7 +122,10 @@ public abstract class Verifier extends PreorderJmmVisitor<Boolean, Boolean> impl
         }
         if(kind.equals(AstNode.ARRAY_ACCESS.toString())){
             var arr = expr.getJmmChild(0);
-            var arr_name = arr.get("name");
+            String arr_name = "";
+            if(arr.getAttributes().contains("name")){
+                arr_name = arr.get("name");
+            }
             var index = expr.getJmmChild(1);
             if(!this.getExpressionType(index).equals(new Type("int", false))){
                 this.addReport(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.valueOf(index.get("line")), Integer.valueOf(index.get("col")), "Array index must be an integer"));

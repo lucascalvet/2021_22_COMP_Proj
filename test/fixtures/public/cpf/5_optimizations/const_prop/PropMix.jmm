@@ -1,0 +1,84 @@
+import so;
+import excuse;
+import io;
+import D;
+import oi;
+import B;
+import C;
+import A;
+import Well;
+
+class PropMix {
+
+    public int mix(int arg) {
+        boolean i;
+        boolean j;
+        int a;
+        int b;
+        int c;
+        D d;
+        excuse E;
+        Well after;
+
+        i = true;
+        j = false;
+
+        if(j){
+            a = 10;
+        }
+        else{
+            a = 0;
+        }
+
+        while(false){
+            a = a - 3;
+        }
+
+        if(a < 1){
+            a = a + 5;
+        }
+        else{
+            a = a + 20;
+        }
+
+        if(i && !j && !(a < 5) && a + 10 < 30 && a * 0 < 1){
+            excuse.dosome(a, !i, j, a * a / 8 + 10);
+        }
+        else{
+            excuse.dosome(a + 2);
+        }
+
+        while(arg < 20 && true){
+            excuse.dothething();
+        }
+
+        arg = E.getInt();
+        arg = 2 * a;
+
+        while(i && arg < 4) {
+            excuse.dothescarn();
+        }
+
+        while(true){
+            while(false){
+                b = b + a;
+            }
+
+            if(i){
+                c = so.simple(after.all());
+            }
+            else{
+                if(true){
+                    io.print(a*b*c);
+                }
+                else{
+                    while(true){
+                        io.print(c*b*a);
+                    }
+                }
+            }
+        }
+
+        return c;
+    }
+}

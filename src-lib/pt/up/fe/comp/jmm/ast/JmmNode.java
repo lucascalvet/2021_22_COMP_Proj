@@ -126,7 +126,7 @@ public interface JmmNode {
     /**
      * Replaces a node at the given position. If the given node already has a parent, swaps positions.
      * 
-     * @param child
+     * @param newNode
      * @param index
      */
     default void setChild(JmmNode newNode, int index) {
