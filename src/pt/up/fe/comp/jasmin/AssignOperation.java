@@ -23,9 +23,6 @@ public class AssignOperation {
                 Element single = ((SingleOpInstruction) rightSide).getSingleOperand();
                 right.append(LoadStore.load(single, scope));
                 result.append(LoadStore.load(single, scope));
-               /* if(!LoadStore.isArrayAccess(single, scope)){
-
-                }*/
                 break;
             case GETFIELD:
                 Element classElement = ((GetFieldInstruction) rightSide).getFirstOperand();

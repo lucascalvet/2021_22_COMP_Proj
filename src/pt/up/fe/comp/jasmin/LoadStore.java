@@ -15,7 +15,8 @@ public class LoadStore {
             result.append("ldc ").append(((LiteralElement)element).getLiteral()).append("\n");
         } else {
             if (type == ElementType.INT32 || type == ElementType.STRING || type == ElementType.BOOLEAN){
-                if(isArrayAccess(element, scope)) {
+                ElementType typeVar = scope.get(((Operand)element).getName()).getVarType().getTypeOfElement();
+                if(typeVar == ElementType.ARRAYREF){
                     result.append(loadArray(element, scope));
                 }
                 else{
@@ -45,7 +46,8 @@ public class LoadStore {
         ElementType type = element.getType().getTypeOfElement();
 
         if(type == ElementType.INT32 || type == ElementType.STRING || type ==  ElementType.BOOLEAN){
-            if(isArrayAccess(element, scope)) {
+            ElementType typeVar = scope.get(((Operand)element).getName()).getVarType().getTypeOfElement();
+            if(typeVar == ElementType.ARRAYREF) {
                 result.append(storeArray(element, scope, rightSide));
             }
             else {
@@ -119,7 +121,6 @@ public class LoadStore {
     }
 
     public static boolean isArrayAccess(Element element, HashMap<String, Descriptor> scope){
-
         if(element.isLiteral()){
         ElementType type = element.getType().getTypeOfElement();
 
