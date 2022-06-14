@@ -1,7 +1,7 @@
 package pt.up.fe.comp.jasmin;
 
 public class InstructionUtil {
-    public static String iconst(int value){
+    public static String iconst(int value, StackLocalsCount counters){
         String valueStr = Integer.toString(value);
         StringBuilder result = new StringBuilder();
         if(value == -1){

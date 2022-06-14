@@ -19,7 +19,7 @@ public class BinaryOperation {
         if(ArithmeticOps.isArithmeticOp(operationType)){
             result.append(ArithmeticOps.operate(rightElement, leftElement, scope, operationType, counters));
         } else if(BooleanOperations.isBooleanOp(operationType)){
-            result.append(BooleanOperations.operate(operationType, leftInstruction, rightInstruction));
+            result.append(BooleanOperations.operate(operationType, leftInstruction, rightInstruction, counters));
 
         }
         return result.toString();

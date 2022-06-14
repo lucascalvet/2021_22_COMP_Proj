@@ -19,7 +19,7 @@ public class ConditionalOperations {
             } else {
                 Element op1 = instruction.getOperands().get(0);
                 String op11 = LoadStore.load(op1, scope, counters);
-                result.append(BooleanOperations.notConversion(op11));
+                result.append(BooleanOperations.notConversion(op11, counters));
                 result.append("ifne ");
                 result.append(instruction.getLabel()).append("\n");
 
@@ -36,7 +36,7 @@ public class ConditionalOperations {
             BinaryOpInstruction op = (BinaryOpInstruction) operation;
             OperationType type = op.getOperation().getOpType();
 
-            result.append(BooleanOperations.operate(type, op1, op2));
+            result.append(BooleanOperations.operate(type, op1, op2, counters));
 
             result.append("ifne ");
             result.append(instruction.getLabel()).append("\n");
