@@ -188,17 +188,18 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
 
     private Integer assignVisit(JmmNode assignNode, Integer dummy) {
 
-
         isAssign = true;
         visit(assignNode.getJmmChild(0));
         String left = simpleExpression;
         Type type = varType;
-        simpleExpression = "";
         isAssign = false;
         if (wasField) {
+            code.append(simpleExpression);
+            simpleExpression = "";
             wasField = false;
             return 0;
         }
+        simpleExpression = "";
 
         visit(assignNode.getJmmChild(1));
         String right = simpleExpression;
