@@ -256,6 +256,7 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
                 symbol = field;
                 varType = symbol.getType();
                 if (isAssign) {
+                    isAssign = false;
                     wasField = true;
                     JmmNode valueNode = idNode.getJmmParent().getJmmChild(1);
                     visitAndCreateTemp(valueNode);
@@ -323,22 +324,7 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
     private Integer newVisit(JmmNode newNode, Integer dummy) {
 
         if (newNode.getJmmChild(0).getKind().equals(AstNode.INT_TYPE.toString())) {
-            visit(newNode.getJmmChild(1));
-
-            if (!(newNode.getJmmChild(1).getKind().equals(AstNode.ID.toString()) || newNode.getJmmChild(1).getKind().equals(AstNode.INT.toString()))) {
-                final String temp = getTemp();
-
-                code.append(temp)
-                        .append(".")
-                        .append(OllirUtils.getCode(INT_TYPE))
-                        .append(" :=.")
-                        .append(OllirUtils.getCode(INT_TYPE))
-                        .append(" ")
-                        .append(simpleExpression)
-                        .append(";\n");
-
-                simpleExpression = temp;
-            }
+            visitAndCreateTemp(newNode.getJmmChild(1));
 
             final StringBuilder terminalCode = new StringBuilder();
 
@@ -371,6 +357,7 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
     }
 
     private Integer accessVisit(JmmNode accessNode, Integer dummy) {
+        Type prevVarType = varType;
         JmmNode chained = accessNode.getJmmChild(1);
 
         if (chained.getJmmChild(0).getKind().equals(AstNode.LENGTH.toString())) {
@@ -398,7 +385,6 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
         }
 
         simpleExpression = "";
-        Type prevVarType = varType;
 
         boolean isThis = false;
         if (accessNode.getJmmChild(0).getKind().equals(AstNode.THIS.toString())) {
@@ -427,8 +413,8 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
 
                     terminalCode.append(").");
 
-                    if (isAssign) {
-                        terminalCode.append(varType);
+                    if (accessNode.getJmmParent().getKind().equals(AstNode.ASSIGN.toString())) {
+                        terminalCode.append(OllirUtils.getCode(prevVarType));
                     } else {
                         terminalCode.append("V");
                     }
@@ -441,7 +427,7 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
             }
         }
 
-        if (varType.getName().equals(symbolTable.getClassName())) {
+        if (varType.getName().equals(symbolTable.getClassName()) && symbolTable.getMethods().contains(chained.getJmmChild(0).get("name"))) {
             varType = symbolTable.getReturnType(chained.getJmmChild(0).get("name"));
         } else if (accessNode.getJmmParent().getKind().equals(AstNode.ASSIGN.toString())) {
             varType = prevVarType;
@@ -584,47 +570,12 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
             type = BOOL_TYPE;
         }
 
-        visit(opNode.getJmmChild(0));
+        visitAndCreateTemp(opNode.getJmmChild(0));
         String leftExpr = simpleExpression;
         Type leftType = varType;
-        visit(opNode.getJmmChild(1));
+        visitAndCreateTemp(opNode.getJmmChild(1));
         String rightExpr = simpleExpression;
         Type rightType = varType;
-
-        if (!(opNode.getJmmChild(0).getKind().equals(AstNode.INT.toString())
-                || opNode.getJmmChild(0).getKind().equals(AstNode.TRUE.toString())
-                || opNode.getJmmChild(0).getKind().equals(AstNode.FALSE.toString())
-                || opNode.getJmmChild(0).getKind().equals(AstNode.ID.toString()))) {
-            String temp = getTemp();
-
-            code.append(temp)
-                    .append(".")
-                    .append(OllirUtils.getCode(leftType))
-                    .append(" :=.")
-                    .append(OllirUtils.getCode(leftType))
-                    .append(" ")
-                    .append(leftExpr)
-                    .append(";\n");
-
-            leftExpr = temp + "." + OllirUtils.getCode(leftType);
-        }
-        if (!(opNode.getJmmChild(1).getKind().equals(AstNode.INT.toString())
-                || opNode.getJmmChild(1).getKind().equals(AstNode.TRUE.toString())
-                || opNode.getJmmChild(1).getKind().equals(AstNode.FALSE.toString())
-                || opNode.getJmmChild(1).getKind().equals(AstNode.ID.toString()))) {
-            String temp = getTemp();
-
-            code.append(temp)
-                    .append(".")
-                    .append(OllirUtils.getCode(rightType))
-                    .append(" :=.")
-                    .append(OllirUtils.getCode(rightType))
-                    .append(" ")
-                    .append(rightExpr)
-                    .append(";\n");
-
-            rightExpr = temp + "." + OllirUtils.getCode(rightType);
-        }
 
         terminalCode.append(leftExpr)
                 .append(" ")
@@ -644,7 +595,13 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
         String endLabel = getLabel();
 
         // Condition
-        visit(ifNode.getJmmChild(0).getJmmChild(0));
+        if (ifNode.getJmmChild(0).getJmmChild(0).getKind().equals(AstNode.NOT.toString()) ||
+                ifNode.getJmmChild(0).getJmmChild(0).getKind().equals(AstNode.AND.toString()) ||
+                ifNode.getJmmChild(0).getJmmChild(0).getKind().equals(AstNode.LOWER.toString())) {
+            visit(ifNode.getJmmChild(0).getJmmChild(0));
+        } else {
+            visitAndCreateTemp(ifNode.getJmmChild(0).getJmmChild(0));
+        }
 
         code.append("if (")
                 .append(simpleExpression)
@@ -700,7 +657,13 @@ public class OllirGenerator extends AJmmVisitor<Integer, Integer> {
                     .append(";\n");
         } else {
             String bodyLabel = getLabel();
-            visit(whileNode.getJmmChild(0).getJmmChild(0));
+            if (whileNode.getJmmChild(0).getJmmChild(0).getKind().equals(AstNode.NOT.toString()) ||
+                    whileNode.getJmmChild(0).getJmmChild(0).getKind().equals(AstNode.AND.toString()) ||
+                    whileNode.getJmmChild(0).getJmmChild(0).getKind().equals(AstNode.LOWER.toString())) {
+                visit(whileNode.getJmmChild(0).getJmmChild(0));
+            } else {
+                visit(whileNode.getJmmChild(0).getJmmChild(0));
+            }
             code.append("if (")
                     .append(simpleExpression)
                     .append(") goto ")

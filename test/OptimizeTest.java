@@ -37,6 +37,12 @@ public class OptimizeTest {
     }
 
     @Test
+    public void testPropMix() {
+        var result = TestUtils.optimize(SpecsIo.getResource("fixtures/public/cpf/5_optimizations/const_prop/PropMix.jmm"));
+        TestUtils.noErrors(result.getReports());
+    }
+
+    @Test
     public void testOllirMethodInvocation() {
         var result = TestUtils.optimize(SpecsIo.getResource("fixtures/public/cp2/OllirMethodInvocation.jmm"));
         TestUtils.noErrors(result.getReports());
